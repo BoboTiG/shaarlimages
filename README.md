@@ -43,3 +43,12 @@ Il suffit d'un conteneur avec l'ID `image-container` dans lequel chaque image se
 	</div>
 
 En bas de code, inclure le script `<script src="/assets/js/linear-partition.min.js"></script>`.
+
+Remerciements
+---
+
+Séb pour avoir mis au point [shaarli ;](http://sebsauvage.net/wiki/doku.php?id=php:shaarli)  
+Bronco pour la fonction [feed2array](http://www.warriordudimanche.net/article178/feed2array-obtenir-un-flux-rss-atom-sous-forme-de-tableau) ;  
+Jakob Holmelund pour la [base javascript](https://github.com/jakobholmelund/fitpicsjs) de la partition linéaire ;  
+Chromatic.io pour l'[inspiration](http://www.chromatic.io/FQrLQsb) ;  
+Et tous les contributeurs et testeurs de l'ombre :)
