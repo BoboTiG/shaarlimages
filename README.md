@@ -24,3 +24,22 @@ Pré-requis
 ---
 
 Pour auto-héberger une galerie, en l'état, il vous faudra PHP et la bibliothèque GD.
+
+Détails techniques
+---
+
+Il suffit d'un conteneur avec l'ID `image-container` dans lequel chaque image sera contenue dans une figure :
+
+	<div id="image-container">
+		<figure>
+			<a href="?i=image.jpg"><img src="images/image.jpg"></a>
+			<figcaption>Une légende optionnelle</figcaption>
+		</figure>
+		<!-- Un exemple avec une image cachée (NSFW) -->
+		<figure data="nsfw">
+			<a href="?i=image-trop-sexy.jpg"><img src="images/image-trop-sexy.jpg"></a>
+			<figcaption>Une légende optionnelle</figcaption>
+		</figure>
+	</div>
+
+En bas de code, inclure le script `<script src="/assets/js/linear-partition.min.js"></script>`.
