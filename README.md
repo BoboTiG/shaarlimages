@@ -24,7 +24,7 @@ J'utilise la liste d'export de [shaarli.fr](http://shaarli.fr/opml?mod=opml), do
 Améliorations possibles
 ---
 
-Dans l'immédiat, la couleur de fond pour chaque image est calculée (couleur moyenne dominante) et une image est ajoutée par dessus pour le grain. Bien que ça rende pas trop mal, il faudrait revoir le mécanisme pour se rapprocher un peu plus de [cette galerie]([celle-ci](http://www.chromatic.io/FQrLQsb).  
+Dans l'immédiat, la couleur de fond pour chaque image est calculée (couleur moyenne dominante) et une image est ajoutée par dessus pour le grain. Bien que ça rende pas trop mal, il faudrait revoir le mécanisme pour se rapprocher un peu plus de [cette galerie](http://www.chromatic.io/FQrLQsb).  
 Pour le reste, libre à vous de forker, bidouiller et proposer des patches ;)
 
 Pré-requis
