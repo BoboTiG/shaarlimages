@@ -23,4 +23,4 @@ Pour le reste, libre à vous de forker, bidouiller et proposer des patches ;)
 Pré-requis
 ---
 
-Pour auto-héberger une galerie, en l'état, il vous faudra PHP 5. C'est tout.
+Pour auto-héberger une galerie, en l'état, il vous faudra PHP et la bibliothèque GD.
