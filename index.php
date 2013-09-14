@@ -1,22 +1,23 @@
 <?php
+
 include 'config.php';
 
 // One image to show?
 $image =
     isset($_GET['i'])
-    && file_exists($CONFIG['dir'].$_GET['i'])
-    && in_array(strtolower(pathinfo($CONFIG['dir'].$_GET['i'], 4)), $CONFIG['ext'])
+    && file_exists($GLOBALS['config']['dir'].$_GET['i'])
     ? $_GET['i'] : NULL;
 
 if ( $image !== NULL )
 {
-    $key = hash_hmac_file('adler32', $CONFIG['dir'].$image, 'bdd_key');
-    if ( !empty($CONFIG['bdd'][$key]['bg_color']) ) {
-        $CONFIG['bg_color'] = $CONFIG['bdd'][$key]['bg_color'];
+    $key = hash_hmac_file('adler32', $GLOBALS['config']['dir'].$image, 'bdd_key');
+    if ( !empty($GLOBALS['bdd']['img'][$key]['bg_color']) ) {
+        $GLOBALS['config']['bg_color'] = $GLOBALS['bdd']['img'][$key]['bg_color'];
     } else {
-        $CONFIG['bg_color'] = docolav($filename, $key);
+        $GLOBALS['bg_color'] = docolav($image, $key);
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +39,7 @@ if ( $image !== NULL )
         echo
         '<style>
             body {
-                background: #'.$CONFIG['bg_color'].' url("/assets/css/bg.png") repeat repeat;
+                background: #'.$GLOBALS['config']['bg_color'].' url("/assets/css/bg.png") repeat repeat;
             }
             img {
                 margin: auto; position: absolute;
@@ -61,69 +62,70 @@ if ( $image !== NULL )
 
 <?php
     if ( $image === NULL ) {
-        $images = $CONFIG['bdd'];
+        $images = !empty($GLOBALS['bdd']['img']) ? $GLOBALS['bdd']['img'] : array();
         
-        // Date filter
-        $use_date = false;
-        if ( isset($_GET['d']) ) {
-            $use_date = true;
-            $date = date('U', strtotime($_GET['d']));
-            $tmp = array();
-            foreach ( $images as $img ) {
-                $pubDate = date('U', strtotime(date('Ymd', $img['date'])));
-                if ( $pubDate == $date ) {
-                    $tmp[] = $img;
-                }
-            }
-            $images = $tmp;
-        } else {
-            rsort($images);
-        }
-        
-        // Page filter
-        $nb = 20;
-        $max = round(count($CONFIG['bdd']) / $nb);
-        $page = 1;
-        if ( isset($_GET['p']) ) {
-            $page = min($max, max($page, $_GET['p'] + 0));
-        }
-        $i = ($page - 1) * $nb;
-        $images = array_slice($images, $i, $nb);
-        
-        // Display
         if ( !empty($images) ) {
-            echo '<div id="image-container">';
-            foreach ( $images as $img ) {
-                printf('
-                    <figure%s>
-                        <a href="?i=%s"><img src="%s%s"></a>
-                        <figcaption><a href="%s" title="Permalink">❄</a></figcaption>
-                    </figure>',
-                    ($img['nsfw'] && !$CONFIG['show_nsfw'] ? ' data="nsfw"' : ''),
-                    urlencode($img['link']), $CONFIG['dir'], urlencode($img['link']),
-                    $img['guid']);
+            // Date filter
+            $use_date = false;
+            if ( isset($_GET['d']) ) {
+                $use_date = true;
+                $date = date('U', strtotime($_GET['d']));
+                $tmp = array();
+                foreach ( $images as $img ) {
+                    $pubDate = date('U', strtotime(date('Ymd', $img['date'])));
+                    if ( $pubDate == $date ) {
+                        $tmp[] = $img;
+                    }
+                }
+                $images = $tmp;
             }
-            echo '</div>';
+            rsort($images);
             
-            // Pagination
-            if ( !$use_date ) {
-                echo '<footer>';
-                if ( $page > 0 && $page < $max ) {
-                    printf('<a href="?p=%d">◄ Older</a> &nbsp; ', $page + 1);
-                }
-                printf(' &nbsp; page %d/%d &nbsp; ', $page, $max);
-                if ( $page > 1 ) {
-                    printf(' &nbsp; <a href="?p=%d">Newer ►</a>', $page - 1);
-                }
-                echo '</footer>';
+            // Page filter
+            $nb = 20;
+            $max = ceil(count($GLOBALS['bdd']['img']) / $nb);
+            $page = 1;
+            if ( isset($_GET['p']) ) {
+                $page = min($max, max($page, $_GET['p'] + 0));
             }
-        } else { echo '<p>No image found ☹</p>'; }
+            $i = ($page - 1) * $nb;
+            $images = array_slice($images, $i, $nb);
+            
+            // Display
+            if ( !empty($images) ) {
+                echo '<div id="image-container">';
+                foreach ( $images as $img ) {
+                    printf('
+                        <figure%s>
+                            <a href="?i=%s"><img src="%s%s"></a>
+                            <figcaption><a href="%s" title="Source">❄</a></figcaption>
+                        </figure>',
+                        ($img['nsfw'] && !$GLOBALS['config']['show_nsfw'] ? ' data="nsfw"' : ''),
+                        urlencode($img['link']), $GLOBALS['config']['dir'], urlencode($img['link']),
+                        $img['guid']);
+                }
+                echo '</div>';
+                
+                // Pagination
+                if ( !$use_date ) {
+                    echo '<footer>';
+                    if ( $page > 0 && $page < $max ) {
+                        printf('<a href="?p=%d">◄ Vieilleries</a> &nbsp; ', $page + 1);
+                    }
+                    printf(' &nbsp; page %d/%d &nbsp; ', $page, $max);
+                    if ( $page > 1 ) {
+                        printf(' &nbsp; <a href="?p=%d">Nouveautés ►</a>', $page - 1);
+                    }
+                    echo '</footer>';
+                }
+            } else { echo '<p>Aucune image ☹</p>'; }
+        } else { echo '<p>Aucune image ☹</p>'; }
     }
     else {
-        $return = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $CONFIG['url'];
+        $return = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $GLOBALS['config']['url'];
         echo
         '<figure>
-            <a href="'.$return.'"><img src="'.$CONFIG['dir'].$image.'"></a>
+            <a href="'.$return.'"><img src="'.$GLOBALS['config']['dir'].urlencode($image).'"></a>
         </figure>';
     }
 ?>
