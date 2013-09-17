@@ -23,8 +23,8 @@
 <div id="image-container"></div>
 <noscript>Oups, cette galerie nécessite l'activation de javascript.</noscript>
 
-<script async src="/images.json"></script>
-<script async src="/assets/js/galinear.min.js"></script>
+<script src="/images.json"></script>
+<script src="/assets/js/galinear.min.js"></script>
 
 </body>
 </html>

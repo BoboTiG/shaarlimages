@@ -13,7 +13,7 @@ function unserialise($value) {
     }
     return $ret;
 }
-function bdd_save($which = 'lastup') {
+function bdd_save($which = 'bdd') {
     global $GLOBALS;
     if ( $which == 'lastup' ) {
         file_put_contents($GLOBALS['config']['lastup'], serialise($GLOBALS['updates']));
@@ -102,7 +102,9 @@ function retieve_partial($link) {
 }
 function friendly_url($url) {
     return str_replace(' ', '-', filter_var(
-        htmlentities(urldecode(trim($url)), ENT_QUOTES, 'UTF-8')
+        htmlentities(
+            stripslashes(strtok(urldecode(trim($url)), '?'))
+        , ENT_QUOTES, 'UTF-8')
     , FILTER_SANITIZE_STRING));
 }
 function read_feed($url) {
@@ -140,34 +142,36 @@ function read_feed($url) {
                 if ( $type == 2 || $type == 3 )  // jpeg, png
                 {
                     $key = hash_hmac_file('adler32', '.httmp', 'bdd_key');
-                    $img = pathinfo($item->link, PATHINFO_BASENAME);
-                    if ( !pathinfo($img, 4) ) {
-                        $img .= $GLOBALS['config']['ext'][$type];
-                    }
-                    $filename = $key.'_'.friendly_url($img);
-                    if ( rename('.httmp', $GLOBALS['config']['dir'].$filename) ) {
-                        ++$ret;
-                        $new_keys[] = $key;
-                        $GLOBALS['images'][$key]['date'] = (string)$pubDate;
-                        $GLOBALS['images'][$key]['link'] = $filename;
-                        $GLOBALS['images'][$key]['guid'] = (string)$item->guid;
-                        $GLOBALS['images'][$key]['docolav'] = (string)docolav($filename, $key);
-                        $GLOBALS['images'][$key]['nsfw'] = false;
-                        // NSFW check, for sensible persons ... =]
-                        if ( !empty($item->category) )
-                        {
-                            foreach ( $item->category as $category ) {
-                                if ( strtolower($category) == 'nsfw' ) {
-                                    $GLOBALS['images'][$key]['nsfw'] = true;
-                                    break;
+                    if ( !isset($GLOBALS['images'][$key]) ) {
+                        $img = pathinfo($item->link, PATHINFO_BASENAME);
+                        if ( !pathinfo($img, 4) ) {
+                            $img .= $GLOBALS['config']['ext'][$type];
+                        }
+                        $filename = $key.'_'.friendly_url($img);
+                        if ( rename('.httmp', $GLOBALS['config']['dir'].$filename) ) {
+                            ++$ret;
+                            $new_keys[] = $key;
+                            $GLOBALS['images'][$key]['date'] = (string)$pubDate;
+                            $GLOBALS['images'][$key]['link'] = $filename;
+                            $GLOBALS['images'][$key]['guid'] = (string)$item->guid;
+                            $GLOBALS['images'][$key]['docolav'] = (string)docolav($filename, $key);
+                            $GLOBALS['images'][$key]['nsfw'] = false;
+                            // NSFW check, for sensible persons ... =]
+                            if ( !empty($item->category) )
+                            {
+                                foreach ( $item->category as $category ) {
+                                    if ( strtolower($category) == 'nsfw' ) {
+                                        $GLOBALS['images'][$key]['nsfw'] = true;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if ( !$GLOBALS['images'][$key]['nsfw'] ) {
-                            $sensible = preg_match('/nsfw/', strtolower((string)$item->title.(string)$item->description));
-                            $GLOBALS['images'][$key]['nsfw'] = $sensible;
-                        }
-                    } else { unlink('.httmp'); }
+                            if ( !$GLOBALS['images'][$key]['nsfw'] ) {
+                                $sensible = preg_match('/nsfw/', strtolower((string)$item->title.(string)$item->description));
+                                $GLOBALS['images'][$key]['nsfw'] = $sensible;
+                            }
+                        } else { unlink('.httmp'); }
+                    }
                 }
             }
         }

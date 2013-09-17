@@ -2,6 +2,19 @@
 
 include 'config.php';
 
+$keys = array();
+$tmp = array();
+rsort($GLOBALS['images']);
+__(count($GLOBALS['images']));
+foreach ( $GLOBALS['images'] as $image ) {
+    if ( !isset($keys[$image]['key']) ) {
+        $keys[] = $image['key'];
+        unset($image);
+    }
+}
+__(count($GLOBALS['images']));
+exit;
+
 if ( is_file($GLOBALS['config']['lastup']) ) {
     $GLOBALS['updates'] = unserialise(file_get_contents($GLOBALS['config']['lastup']));
 }
@@ -14,7 +27,7 @@ if ( in_array($selected, $feeds) ) {
     if ( $ret > 0 ) {
         bdd_save();
         generate_json($new_keys);
-    } elseif ( $ret == 0 ) {
+    } elseif ( $ret < 1 ) {
         bdd_save('lastup');
     }
     echo $ret;
@@ -58,6 +71,10 @@ if ( in_array($selected, $feeds) ) {
             width: 40px;
             height: 40px;
             background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAABEVBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABoX7lMAAAAWnRSTlPpfD7+oizYU5gh4ze9EkhlcSbtjtktcs73MpFE+MZdDO7RnHdmtpQuIoRAEBf8eiqV4Yg7YvIGJKDWW/2XJUOD+3kp4PEKzRqGa/Ntfwgc6OwxD4reAQJcVQB3OGyDAAABL0lEQVR42s3Ud0vEQBAFcBV7PXtvZz0Ve8eC5YpXvJpcbr7/B/FNNmB2N4MLgvj+Gt7+CAnMpqvjmL+BbVdIbVcI6QYhf4TXPaUmWdKCe7fEUVKGY70Uy6cIF9/jLhCfOKJArhwoJ8GhkO28YlROgP4mu49wZifCS3b3aoYToV+Dm446OBEuwy1kHbZnCbDbZc3uAE9cICGefdpC3TAhJjdYS4Bn6CsmJN+GXOvvOI+mbrk62n4d8rIWLPiMdleHF4QcGm6dyycdem/o0gY8RVf14xAJ1PLEM8HVmrWPo1yXv7/ce+Fi1bPgUZGQmfHo5CBHSDGfcBX6VogzNXi8XXqoUpjZxMu13yI9w5PCda0UNNfMyj+AfGYjUlfn8r1WuRlIbc0Fjx0z/+zX/Dv4Bb5NHUFsNNkmAAAAAElFTkSuQmCC) no-repeat center center;
+            opacity: .5;
+        }
+        a:hover {
+            opacity: 1.0;
         }
         .tous {
             background-color: #999;

@@ -48,6 +48,7 @@ if ( !is_dir($GLOBALS['config']['pagecache']) ) {
     mkdir($GLOBALS['config']['pagecache']);
 }
 if ( is_file($GLOBALS['config']['bdd']) ) {
+    __('ok');
     $GLOBALS['images'] = unserialise(file_get_contents($GLOBALS['config']['bdd']));
 }
 
