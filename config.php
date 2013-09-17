@@ -1,8 +1,8 @@
 <?php
 
 ini_set('memory_limit', '64M');
-ini_set('display_errors', '1');
-error_reporting(-1);
+ini_set('display_errors', '0');
+error_reporting(0);
 
 date_default_timezone_set('UTC');
 $GLOBALS = array();
@@ -48,7 +48,6 @@ if ( !is_dir($GLOBALS['config']['pagecache']) ) {
     mkdir($GLOBALS['config']['pagecache']);
 }
 if ( is_file($GLOBALS['config']['bdd']) ) {
-    __('ok');
     $GLOBALS['images'] = unserialise(file_get_contents($GLOBALS['config']['bdd']));
 }
 

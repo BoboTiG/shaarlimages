@@ -2,19 +2,6 @@
 
 include 'config.php';
 
-$keys = array();
-$tmp = array();
-rsort($GLOBALS['images']);
-__(count($GLOBALS['images']));
-foreach ( $GLOBALS['images'] as $image ) {
-    if ( !isset($keys[$image]['key']) ) {
-        $keys[] = $image['key'];
-        unset($image);
-    }
-}
-__(count($GLOBALS['images']));
-exit;
-
 if ( is_file($GLOBALS['config']['lastup']) ) {
     $GLOBALS['updates'] = unserialise(file_get_contents($GLOBALS['config']['lastup']));
 }
