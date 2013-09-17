@@ -14,11 +14,11 @@ $GLOBALS = array();
 $GLOBALS['config']['url'] = '/';
 $GLOBALS['config']['pagecache'] = 'pagecache';
 $GLOBALS['config']['dir'] = 'images/';
-$GLOBALS['config']['bdd_file'] = $GLOBALS['config']['dir'].'images.db';
-$GLOBALS['config']['bdd'] = array();
-$GLOBALS['config']['show_nsfw'] = false;
+$GLOBALS['config']['json'] = 'images.json';
 $GLOBALS['config']['shaarlis'] = 'http://shaarli.fr/opml?mod=opml';
 $GLOBALS['config']['shaarlis_opml'] = '.shaarli.opml';
+$GLOBALS['config']['bdd'] = $GLOBALS['config']['dir'].'.images.db';
+$GLOBALS['config']['lastup'] = $GLOBALS['config']['shaarlis_opml'].'.db';
 $GLOBALS['config']['ext'] = array(2 => '.jpg', 3 => '.png');
 $GLOBALS['config']['ext_ok'] = array('', 'jpg', 'png');
 $GLOBALS['config']['not_domain'] = array(
@@ -32,10 +32,12 @@ $GLOBALS['config']['not_domain'] = array(
 $GLOBALS['config']['domain_to_ckeck'] = array(
     'cheezburger.com' => "!<img class='event-item-lol-image' src='(.+)'!",
 );
+$GLOBALS['config']['ua'] = 'Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8';
+$GLOBALS['images'] = array();
+$GLOBALS['updates'] = array();
 //
 // Not there ;)
 //
-
 
 
 include 'functions.php';
@@ -45,8 +47,8 @@ if ( !is_dir($GLOBALS['config']['dir']) ) {
 if ( !is_dir($GLOBALS['config']['pagecache']) ) {
     mkdir($GLOBALS['config']['pagecache']);
 }
-elseif ( is_file($GLOBALS['config']['bdd_file']) ) {
-    $GLOBALS['bdd'] = unserialise(file_get_contents($GLOBALS['config']['bdd_file']));
+if ( is_file($GLOBALS['config']['bdd']) ) {
+    $GLOBALS['images'] = unserialise(file_get_contents($GLOBALS['config']['bdd']));
 }
 
 
