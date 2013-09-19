@@ -1,3 +1,5 @@
+SetEnv PHP_VER 5_4
+
 # Compression de certains types de fichiers
 AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript
 

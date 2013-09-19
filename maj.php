@@ -1,24 +1,21 @@
 <?php
 
 include 'config.php';
+include 'inc/Update.php';
 
-if ( is_file($GLOBALS['config']['lastup']) ) {
-    $GLOBALS['updates'] = unserialise(file_get_contents($GLOBALS['config']['lastup']));
+$up = new Update();
+
+$selected = !empty($_GET['u']) ? $_GET['u'] : NULL;
+if ( $selected !== NULL ) {
+    $ret = $up->read_feed($selected);
+    if ( $ret !== false ) {
+        echo $ret;
+        exit;
+    }
 }
 
-$feeds = get_feeds();
-$selected = !empty($_GET['u']) ? $_GET['u'] : NULL;
-
-if ( in_array($selected, $feeds) ) {
-    list($ret, $new_keys) = read_feed($selected);
-    if ( $ret > 0 ) {
-        bdd_save();
-        generate_json($new_keys);
-    } elseif ( $ret < 1 ) {
-        bdd_save('lastup');
-    }
-    echo $ret;
-    exit;
+if ( isset($_GET['terminate']) ) {
+    $up->generate_json();
 }
 
 ?>
@@ -52,16 +49,23 @@ if ( in_array($selected, $feeds) ) {
             padding: 5px;
             border-bottom: 1px solid gray;
         }
-        a {
+        p a {
+            outline: 0;
+            opacity: .5;
+            transition: 1s;
+        }
+        td a {
             outline: 0;
             display: inline-block;
             width: 40px;
             height: 40px;
             background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAABEVBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABoX7lMAAAAWnRSTlPpfD7+oizYU5gh4ze9EkhlcSbtjtktcs73MpFE+MZdDO7RnHdmtpQuIoRAEBf8eiqV4Yg7YvIGJKDWW/2XJUOD+3kp4PEKzRqGa/Ntfwgc6OwxD4reAQJcVQB3OGyDAAABL0lEQVR42s3Ud0vEQBAFcBV7PXtvZz0Ve8eC5YpXvJpcbr7/B/FNNmB2N4MLgvj+Gt7+CAnMpqvjmL+BbVdIbVcI6QYhf4TXPaUmWdKCe7fEUVKGY70Uy6cIF9/jLhCfOKJArhwoJ8GhkO28YlROgP4mu49wZifCS3b3aoYToV+Dm446OBEuwy1kHbZnCbDbZc3uAE9cICGefdpC3TAhJjdYS4Bn6CsmJN+GXOvvOI+mbrk62n4d8rIWLPiMdleHF4QcGm6dyycdem/o0gY8RVf14xAJ1PLEM8HVmrWPo1yXv7/ce+Fi1bPgUZGQmfHo5CBHSDGfcBX6VogzNXi8XXqoUpjZxMu13yI9w5PCda0UNNfMyj+AfGYjUlfn8r1WuRlIbc0Fjx0z/+zX/Dv4Bb5NHUFsNNkmAAAAAElFTkSuQmCC) no-repeat center center;
             opacity: .5;
+            transition: 1s;
         }
         a:hover {
             opacity: 1.0;
+            transition: 1s;
         }
         .tous {
             background-color: #999;
@@ -86,6 +90,10 @@ if ( in_array($selected, $feeds) ) {
 <!-- Pré-chargement -->
 <img src="/assets/css/loading.gif" style="display: none;">
 
+<p class="center">
+    Une fois toutes les mises à jour effectuées, <a href="?terminate">générer le JSON</a>.
+</p>
+
 <table>
     <tr>
         <th>N°</th>
@@ -96,25 +104,26 @@ if ( in_array($selected, $feeds) ) {
     <tr class="tous">
         <td colspan="2" class="center">Tous les shaarlis</td>
         <td class="maj"><a href="" onClick="makeAllRequests(); return false;" title="Mettre à jour tous les shaarlis."></a></td>
-        <td class="nouveautes" id="sum"></td>
+        <td class="nouveautes" id="sum">0</td>
     </tr>
     <?php
         $i = 0;
-        foreach ( $feeds as $feed ) {
+        foreach ( $up->get_feeds() as $domain => $feed ) {
             printf(
-                '<tr>
+                '<tr class="%s">
                     <td class="num">%d</td>
                     <td>%s</td>
                     <td class="maj"><a href="" onClick=\'makeRequest("%s", %d); return false;\' title="Mettre à jour ce shaarli."></a></td>
                     <td class="nouveautes" id="%d"></td>
                 </tr>',
+                $domain,
                 ++$i,
-                $feed,
-                $feed, $i,
+                $feed['url'],
+                $domain, $i,
                 $i
             );
         }
-        
+
     ?>
 </table>
 
@@ -124,19 +133,18 @@ var sum = document.getElementById('sum');
 
 function makeAllRequests() {
     var i, current, id = document.getElementsByTagName('tr'), len = id.length;
-    sum.innerHTML = '0';
     for (i = 2; i < len; i += 1) {
-        current = id[i].getElementsByTagName('td')[1].innerHTML;
-        makeRequest(current, i - 1, true);
+        current = id[i].className;
+        makeRequest(current, i - 1);
     }
 }
 
-function makeRequest(url, id, all = false) {
+function makeRequest(url, id) {
     var httpRequest = false, items = document.getElementById(id);
     items.innerHTML  = '<img src="/assets/css/loading.gif" alt="En cours..." title="En cours...">';
     if (window.XMLHttpRequest) {  // Mozilla, Safari, ...
         httpRequest = new XMLHttpRequest();
-    }  else if (window.ActiveXObject) {  // IE
+    } else if (window.ActiveXObject) {  // IE
         try {
             httpRequest = new ActiveXObject('Msxml2.XMLHTTP');
         }
@@ -148,30 +156,25 @@ function makeRequest(url, id, all = false) {
         }
     }
     if (!httpRequest) { return false; }
-    httpRequest.onreadystatechange = function() {
-        alertContents(httpRequest, id, all);
-    };
-    httpRequest.open('GET', '?u=' + url, true);
+    httpRequest.onreadystatechange = function() { alertContents(httpRequest, id); };
+    httpRequest.open('GET', '?u=' + url);
     httpRequest.send(null);
 }
 
-function alertContents(httpRequest, id, all = false) {
+function alertContents(httpRequest, id) {
     if (httpRequest.readyState == 4) {
         if (httpRequest.status == 200) {
             var ret = parseInt(httpRequest.responseText, 10),
                 items = document.getElementById(id);
             items.style.color = 'gray';
             if (ret > 0) {
-                if (all) {
-                    sum.innerHTML = parseInt(sum.innerHTML, 10) + ret;
-                }
+                sum.innerHTML = parseInt(sum.innerHTML, 10) + ret;
                 items.style.color = 'green';
                 ret = '+ ' + ret;
             } else if (ret < 0 || isNaN(ret)) {
-                console.log(ret);
                 items.style.color = 'red';
+                console.log('ret', ret, 'raw', httpRequest.responseText);
                 ret = 'Erreur';
-                console.log(httpRequest.responseText);
             }
             items.innerHTML = ret;
         }
