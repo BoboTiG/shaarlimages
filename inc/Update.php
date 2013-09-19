@@ -256,12 +256,16 @@ class Update
         Fct::secure_save($this->json_file, $lines);
     }
     
+    /**
+     * Callback for uasort().
+     * If will do a rsort() with a multi-dimensional array.
+     */
     private static function compare_date($a, $b)
     {
         if ( $a['date'] == $b['date'] ) {
             return 0;
         }
-        return ( $a['date'] < $b['date'] ) ? 1 : -1;  // invert '1 : -1' for ASC
+        return ( $a['date'] < $b['date'] ) ? 1 : -1;  // invert '1 : -1' for sort()
     }
 
     /**
