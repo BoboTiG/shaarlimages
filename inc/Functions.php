@@ -33,7 +33,7 @@ class Fct
         if ( self::$debug ) {
             echo '<pre>'."\n";
             var_dump($value);
-            echo '</pre>';
+            echo '</pre>'."\n\n";
         }
     }
 
@@ -41,14 +41,17 @@ class Fct
      * Retrieve one resource entierely or partially.
      * http://stackoverflow.com/questions/2032924/how-to-partially-download-a-remote-file-with-curl
      */
-    public static function load_url($url, $partial = false)
+    public static function load_url($url, $partial = false, $headers = array())
     {
-        $parts = explode('/', $url);
-        $referer = $parts[0].'//'.$parts[2];
+        $parts = parse_url($url);
+        $referer = $parts['scheme'].'//'.$parts['host'];
         $ch = curl_init();
         if ( $partial ) {
             curl_setopt($ch, CURLOPT_RANGE, '0-'.self::$bytes);
             curl_setopt($ch, CURLOPT_BUFFERSIZE, self::$bytes);
+        }
+        if ( !empty($headers) ) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERAGENT, self::$ua);

@@ -114,9 +114,17 @@ class Rss
         $xml->startElement('rss');
         $xml->writeAttribute('version', '2.0');
         $xml->writeAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
+        $xml->writeAttribute('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
 
         //channel
         $xml->startElement('channel');
+        
+        //rss
+        $xml->startElement('atom:link');
+        $xml->writeAttribute('href', $this->link.'/?do=rss');
+        $xml->writeAttribute('rel', 'self');
+        $xml->writeAttribute('type', 'application/rss+xml');
+        $xml->endElement();
 
         // title, desc, link, date
         $xml->writeElement('title', $this->title);

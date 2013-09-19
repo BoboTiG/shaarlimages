@@ -22,11 +22,11 @@ if ( $do !== NULL ) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="canonical" href="http://shaarlimages.net">
     <link rel="stylesheet" href="/assets/css/main.min.css">
-    <link type="application/rss+xml" rel="alternate" title="RSS - Shharlimages" href="/?do=rss" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" type="image/png" href="/assets/icon/icon-iphone.png" />
-    <link rel="apple-touch-icon" sizes="72x72" type="image/png" href="/assets/icon/icon-ipad.png" />
-    <link rel="apple-touch-icon" sizes="114x114" type="image/png" href="/assets/icon/icon-iphone4.png" />
+    <link type="application/rss+xml" rel="alternate" title="RSS - Shharlimages" href="/?do=rss">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" type="image/png" href="/assets/icon/icon-iphone.png">
+    <link rel="apple-touch-icon" sizes="72x72" type="image/png" href="/assets/icon/icon-ipad.png">
+    <link rel="apple-touch-icon" sizes="114x114" type="image/png" href="/assets/icon/icon-iphone4.png">
     <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <![endif]-->

@@ -1,6 +1,7 @@
 <?php
 
 include 'inc/Functions.php';
+include 'inc/Solver.php';
 
 class Update
 {
@@ -29,7 +30,7 @@ class Update
      * Images database.
      */
     private $img_file = 'data/images.php';
-    
+
     /**
      * Image database file.
      */
@@ -157,17 +158,35 @@ class Update
             // http://stackoverflow.com/questions/1251582/beautiful-way-to-remove-get-variables-with-php/1251650#1251650
             $link = strtok((string)$item->link, '?');
 
-            if ( $this->link_seems_ok($domain, $link) && $this->test_link($link) ) {
-                $data = Fct::load_url($link);
+            if ( $this->link_seems_ok($domain, $link) ) {
+                $data = false;
+                $req = array();
+                $host = parse_url($link, 1);
+                if ( array_key_exists($host, Solver::$domains) ) {
+                    $func = Solver::$domains[$host];
+                    $req = Solver::$func($link);
+                    $data = Fct::load_url($req['link']);
+                }
+                elseif ( $this->test_link($link) ) {
+                    $data = Fct::load_url($link);
+                }
                 if ( $data !== false )
                 {
-                    list($width, $height, $type) = getimagesizefromstring($data);
+                    list($width, $height, $type, $nsfw) = array(0, 0, 0, false);
+                    if ( count($req) > 1 ) {
+                        $width = $req['width'];
+                        $height = $req['height'];
+                        $type = $req['type'];
+                        $nsfw = $req['nsfw'];
+                    } else {
+                        list($width, $height, $type) = getimagesizefromstring($data);
+                    }
                     if ( $type == 2 || $type == 3 )  // jpeg, png
                     {
                         $key = Fct::small_hash($data);
                         if ( empty($images[$key]) )
                         {
-                            $img = pathinfo($item->link, PATHINFO_BASENAME);
+                            $img = pathinfo($link, PATHINFO_BASENAME);
                             if ( !pathinfo($img, 4) ) {
                                 $img .= $this->ext[$type];
                             }
@@ -179,9 +198,9 @@ class Update
                                 $images[$key]['link'] = $filename;
                                 $images[$key]['guid'] = (string)$item->guid;
                                 $images[$key]['docolav'] = $this->docolav($filename, $width, $height, $type);
-                                $images[$key]['nsfw'] = false;
+                                $images[$key]['nsfw'] = $nsfw;
                                 // NSFW check, for sensible persons ... =]
-                                if ( !empty($item->category) )
+                                if ( !$nsfw && !empty($item->category) )
                                 {
                                     foreach ( $item->category as $category ) {
                                         if ( strtolower($category) == 'nsfw' )
@@ -255,7 +274,7 @@ class Update
         $lines .= "];\n";
         Fct::secure_save($this->json_file, $lines);
     }
-    
+
     /**
      * Callback for uasort().
      * If will do a rsort() with a multi-dimensional array.
