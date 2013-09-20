@@ -12,7 +12,7 @@ class Fct
     /**
      * Show debug informations.
      */
-    public static $debug = false;
+    public static $debug = true;
 
     /**
      * Bytes to download when using partial resource retrieval.
@@ -60,9 +60,12 @@ class Fct
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $data = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ( $code == 0 || $code >= 400 ) {
+            $data = false;
+        }
         if ( $data === false ) {
-            self::__(curl_error($ch));
-            self::__(curl_errno($ch));
+            self::__($url.' -- '.curl_error($ch).curl_errno($ch).' -- status code: '.$code);
         }
         curl_close($ch);
         return $data;

@@ -91,7 +91,7 @@ if ( isset($_GET['terminate']) ) {
 <img src="/assets/css/loading.gif" style="display: none;">
 
 <p class="center">
-    Une fois toutes les mises à jour effectuées, <a href="?terminate">générer le JSON</a>.
+    Une fois toutes les mises à jour effectuées, <a href="?terminate">générer le fichier JSON</a>.
 </p>
 
 <table>

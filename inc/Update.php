@@ -54,7 +54,7 @@ class Update
     /**
      * Time to live for each shaarli.
      */
-    private $ttl_shaarli = 21600;  // 60 * 60 * 6
+    private $ttl_shaarli = 3600;  // 60 * 60
 
     /**
      * Authorized extensions to download.
@@ -144,6 +144,8 @@ class Update
         try {
             $test = new SimpleXMLElement($feed);
         } catch (Exception $e) {
+            Fct::$debug = true;
+            Fct::__($this->get_url($domain).' ERROR: '.$e->getMessage());
             return $ret - 2;
         }
 

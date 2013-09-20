@@ -43,7 +43,7 @@ class Rss
     /**
      * Time to live for each shaarli. From inc/Update.php.
      */
-    private $ttl_shaarli = 21600;  // 60 * 60 * 6
+    private $ttl_shaarli = 3600;  // 60 * 60
 
     /**
      * RSS cached page file name.
@@ -118,7 +118,7 @@ class Rss
 
         //channel
         $xml->startElement('channel');
-        
+
         //rss
         $xml->startElement('atom:link');
         $xml->writeAttribute('href', $this->link.'/?do=rss');
