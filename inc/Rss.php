@@ -150,6 +150,7 @@ class Rss
             $xml->startElement('description');
             $xml->writeCData(
                 '<img src="'.$this->link.'/images/'.$entry['link'].'" width="'.$width.'" height="'.$height.'" />'
+                .'<br />'
                 .'<a href="'.$entry['guid'].'">Permalink</a>'
             );
             $xml->endElement();

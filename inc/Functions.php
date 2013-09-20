@@ -43,8 +43,8 @@ class Fct
      */
     public static function load_url($url, $partial = false, $headers = array())
     {
-        $parts = parse_url($url);
-        $referer = $parts['scheme'].'//'.$parts['host'];
+        //$parts = parse_url($url);
+        //$referer = $parts['scheme'].'//'.$parts['host'];
         $ch = curl_init();
         if ( $partial ) {
             curl_setopt($ch, CURLOPT_RANGE, '0-'.self::$bytes);
@@ -55,13 +55,13 @@ class Fct
         }
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERAGENT, self::$ua);
-        curl_setopt($ch, CURLOPT_REFERER, $referer);
+        //curl_setopt($ch, CURLOPT_REFERER, $referer);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $data = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if ( $code == 0 || $code >= 400 ) {
+        if ( in_array($code, array(0, 401, 403)) ) {
             $data = false;
         }
         if ( $data === false ) {

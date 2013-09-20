@@ -144,7 +144,6 @@ class Update
         try {
             $test = new SimpleXMLElement($feed);
         } catch (Exception $e) {
-            Fct::$debug = true;
             Fct::__($this->get_url($domain).' ERROR: '.$e->getMessage());
             return $ret - 2;
         }
@@ -229,67 +228,6 @@ class Update
     }
 
     /**
-     * Generate the JSON file.
-     */
-    public function generate_json() {
-        if ( is_file($this->json_file) ) {
-            $diff = date('U') - filemtime($this->json_file);
-            if ( $diff < $this->ttl_shaarli ) {
-                return;
-            }
-        }
-
-        $images = array();
-        $tmp = array();
-        foreach ( glob($this->cache_dir.'*.php') as $db )
-        {
-            $tmp = Fct::unserialise($db);
-            $tmp = array_splice($tmp, 1);  // Remove the 'date' key
-            foreach ( array_keys($tmp) as $key )
-            {
-                if ( empty($images[$key]) ) {
-                    $images[$key] = $tmp[$key];
-                }
-                elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
-                    // Older is better (could be the first to share)
-                    $images[$key] = $tmp[$key];
-                }
-            }
-        }
-        uasort($images, 'self::compare_date');
-        Fct::secure_save($this->database, Fct::serialise($images));
-
-        $lines = "var gallery = [\n";
-        $line = "{'key':'%s','src':'%s','w':%d,'h':%d,docolav:'%s','guid':'%s','date':%s,'nsfw':%d},\n";
-        foreach ( $images as $key => $data )
-        {
-            list($width, $height, $type) = getimagesize($this->img_dir.$data['link']);
-            $lines .= sprintf($line,
-                $key, $data['link'],
-                $width, $height,
-                $data['docolav'],
-                $data['guid'],
-                $data['date'],
-                $data['nsfw']
-            );
-        }
-        $lines .= "];\n";
-        Fct::secure_save($this->json_file, $lines);
-    }
-
-    /**
-     * Callback for uasort().
-     * If will do a rsort() with a multi-dimensional array.
-     */
-    private static function compare_date($a, $b)
-    {
-        if ( $a['date'] == $b['date'] ) {
-            return 0;
-        }
-        return ( $a['date'] < $b['date'] ) ? 1 : -1;  // invert '1 : -1' for sort()
-    }
-
-    /**
      * Check a link syntax.
      * If it seems to be an image or does not finish by a slash, then it
      * seems okay.
@@ -351,6 +289,71 @@ class Update
         imagedestroy($tmp_img);
         imagedestroy($img);
         return sprintf('%02X%02X%02X', $r, $g, $b);
+    }
+
+    /**
+     * Callback for uasort().
+     * If will do a rsort() with a multi-dimensional array.
+     */
+    private static function compare_date($a, $b)
+    {
+        if ( $a['date'] == $b['date'] ) {
+            return 0;
+        }
+        return ( $a['date'] < $b['date'] ) ? 1 : -1;  // invert '1 : -1' for sort()
+    }
+
+    /**
+     * Generate the JSON file.
+     */
+    public function generate_json($force = true) {
+        if ( !$force ) {
+            if ( is_file($this->json_file) ) {
+                $diff = date('U') - filemtime($this->json_file);
+                if ( $diff < $this->ttl_shaarli ) {
+                    return;
+                }
+            }
+        } else {
+            usleep(1000000);  // 1 sec
+        }
+
+        $images = array();
+        $tmp = array();
+        foreach ( glob($this->cache_dir.'*.php') as $db )
+        {
+            $tmp = Fct::unserialise($db);
+            $tmp = array_splice($tmp, 1);  // Remove the 'date' key
+            foreach ( array_keys($tmp) as $key )
+            {
+                if ( empty($images[$key]) ) {
+                    $images[$key] = $tmp[$key];
+                }
+                elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
+                    // Older is better (could be the first to share)
+                    $images[$key] = $tmp[$key];
+                }
+            }
+        }
+        uasort($images, 'self::compare_date');
+        Fct::secure_save($this->database, Fct::serialise($images));
+
+        $lines = "var gallery = [\n";
+        $line = "{'key':'%s','src':'%s','w':%d,'h':%d,docolav:'%s','guid':'%s','date':%s,'nsfw':%d},\n";
+        foreach ( $images as $key => $data )
+        {
+            list($width, $height, $type) = getimagesize($this->img_dir.$data['link']);
+            $lines .= sprintf($line,
+                $key, $data['link'],
+                $width, $height,
+                $data['docolav'],
+                $data['guid'],
+                $data['date'],
+                $data['nsfw']
+            );
+        }
+        $lines .= "];\n";
+        Fct::secure_save($this->json_file, $lines);
     }
 
     /**
