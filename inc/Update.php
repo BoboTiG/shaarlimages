@@ -7,6 +7,11 @@ class Update
 {
 
     /**
+     * Host name running the galery -- to prevent re-downloading our images.
+     */
+    private $current_host = 'shaarlimages.net';
+
+    /**
      * Folder containing images.
      */
     private $img_dir = 'images/';
@@ -234,11 +239,14 @@ class Update
      */
     private function link_seems_ok($domain, $link)
     {
-        if ( substr($link, -1) == '/' ) {
+        if ( $domain == $this->current_host ) {
+            Fct::__($this->current_host);
             return false;
         }
-
-        if ( !in_array(strtolower(pathinfo($link, 4)), $this->ext_ok) ) {
+        elseif ( substr($link, -1) == '/' ) {
+            return false;
+        }
+        elseif ( !in_array(strtolower(pathinfo($link, 4)), $this->ext_ok) ) {
             return false;
         }
 
