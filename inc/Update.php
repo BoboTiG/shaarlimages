@@ -49,7 +49,7 @@ class Update
     /**
      * URL to the up to date shaarlis feed's.
      */
-    private $ompl_url = 'http://shaarli.fr/opml?mod=opml';
+    private $ompl_url = 'https://nexen.mkdir.fr/shaarli-api/feeds?pretty=1';
 
     /**
      * Time to live for the OPML file.
@@ -102,20 +102,17 @@ class Update
         }
         if ( $need_update )
         {
-            $xml = Fct::load_url($this->ompl_url);
-            if ( $xml !== false )
+            $data = json_decode(Fct::load_url($this->ompl_url), true);
+            if ( !empty($data) )
             {
-                $data = new SimpleXMLElement($xml, LIBXML_NOCDATA);
-                $now = date('U');
-                foreach ( $data->body->outline as $shaarli )
+                foreach ( $data as $shaarli )
                 {
-                    $url = (string)$shaarli->attributes()->xmlUrl;
-                    $parts = explode('/', $url);
-                    $this->feeds['domains'][$parts[2]] = array(
-                        'url' => $url
+                    $host = parse_url($shaarli['link'], 1);
+                    $this->feeds['domains'][$host] = array(
+                        'url' => stripslashes($shaarli['url'])
                     );
                 }
-                $this->feeds['update'] = $now;
+                $this->feeds['update'] = date('U');
                 Fct::secure_save($this->ompl_file, Fct::serialise($this->feeds));
             }
         }
@@ -180,11 +177,13 @@ class Update
                 {
                     list($width, $height, $type, $nsfw) = array(0, 0, 0, false);
                     if ( count($req) > 1 ) {
+                        $link = $req['link'];
                         $width = $req['width'];
                         $height = $req['height'];
                         $type = $req['type'];
                         $nsfw = $req['nsfw'];
-                    } else {
+                    }
+                    if ( $width == 0 || $height == 0 || $type == 0 ) {
                         list($width, $height, $type) = getimagesizefromstring($data);
                     }
                     if ( $type == 2 || $type == 3 )  // jpeg, png
@@ -192,11 +191,14 @@ class Update
                         $key = Fct::small_hash($data);
                         if ( empty($images[$key]) )
                         {
-                            $img = pathinfo($link, PATHINFO_BASENAME);
+                            $img = basename($link);
                             if ( !pathinfo($img, 4) ) {
                                 $img .= $this->ext[$type];
                             }
                             $filename = Fct::friendly_url($img);
+                            if ( is_file($this->img_dir.$filename) ) {
+                                $filename = $key.'_'.$filename;
+                            }
                             if ( Fct::secure_save($this->img_dir.$filename, $data) !== false ) {
                                 ++$ret;
                                 $images[$key] = array();
@@ -241,9 +243,6 @@ class Update
     {
         if ( $domain == $this->current_host ) {
             Fct::__($this->current_host);
-            return false;
-        }
-        elseif ( substr($link, -1) == '/' ) {
             return false;
         }
         elseif ( !in_array(strtolower(pathinfo($link, 4)), $this->ext_ok) ) {
