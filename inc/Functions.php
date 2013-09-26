@@ -63,7 +63,7 @@ class Fct
         }
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERAGENT, self::$ua);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -75,8 +75,10 @@ class Fct
             $data = curl_exec($ch);
         }
         if ( $data === false ) {
-            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            self::__($url.' -- '.curl_error($ch).' -- '.curl_errno($ch).' -- status code: '.$code);
+            if ( curl_errno($ch) != 28 ) {  // timeout
+                $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                self::__($url.' -- '.curl_error($ch).' -- '.curl_errno($ch).' -- status code: '.$code);
+            }
         }
         curl_close($ch);
         return $data;
