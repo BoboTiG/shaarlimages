@@ -17,19 +17,14 @@ class Solver
      * domain => function name
      */
     public static $domains = array(
-        //~ 'cheezburger.com' => 'cheezburger',
-        'flickr.com' => 'flickr',
+        'i.chzbgr.com'      => 'cheezburger',
+        'flickr.com'        => 'flickr',
         'secure.flickr.com' => 'flickr',
-        'www.flickr.com' => 'flickr',
-        'imgur.com' => 'imgur',
-        'twitter.com' => 'twitter',
-        'xkcd.com' => 'xkcd',
+        'www.flickr.com'    => 'flickr',
+        'imgur.com'         => 'imgur',
+        'twitter.com'       => 'twitter',
+        'xkcd.com'          => 'xkcd',
     );
-
-    /**
-     * Authorization token to use Cheezburger API (Client ID)
-     */
-    //~ public static $cheezburger_auth = 'c3b2b49be03aa3f22129579985c902c9';
 
     /**
      * Authorization token to use flickr API (api_key)
@@ -52,44 +47,12 @@ class Solver
 
     /**
      * cheezburger.com - https://developer.cheezburger.com/
+     * Returns the link, as it is already an image, but URL ends with '/'.
      */
-    //~ public static function cheezburger($link)
-    //~ {
-        //~ $token = self::_cheezburger_request_token();
-        //~ if ( $token !== false ) {
-            //~ $parts = explode('/', trim($link, '/'));
-            //~ $url = 'https://api.cheezburger.com/v1/assets/%d?access_token=%s';
-            //~ $url = sprintf($url, end($parts), $token);
-            //~ $req = json_decode(Fct::load_url($url), true);
-            //~ //Fct::__($req);
-            //~ if ( !empty($req['items']) && $req['items'][0]['asset_type_id'] == 0 ) {
-                //~ $max = $req['items'][0]['media'][0];
-                //~ if ( $max['is_animated'] == 0 ) {
-                    //~ $sensible = preg_match('/nsfw/', strtolower($req['items'][0]['title']));
-                    //~ // Type is not defined, set it to 0, it will be guessed later in Update::read_feed()
-                    //~ return array(
-                        //~ 'type' => 0,
-                        //~ 'width' => (int)$max['width'],
-                        //~ 'height' => (int)$max['height'],
-                        //~ 'nsfw' => (bool)$sensible,
-                        //~ 'link' => (string)$max['url']
-                    //~ );
-                //~ }
-            //~ }
-        //~ }
-        //~ return array('link' => null);
-    //~ }
-    //~ 
-    //~ private static function _cheezburger_request_token()
-    //~ {
-        //~ $url =
-            //~ 'https://api.cheezburger.com/oauth/authorize?client_id='.self::$cheezburger_auth.
-            //~ '&response_type=token&redirect_uri=https://api.cheezburger.com/oauth/login_success';
-        //~ list($data, $location) = Fct::load_url($url, Fct::LOCATION);
-        //~ Fct::__($data);
-        //~ Fct::__($location);
-        //~ return false;
-    //~ }
+    public static function cheezburger($link)
+    {
+        return array('link' => $link);
+    }
 
 
     /**
@@ -131,8 +94,8 @@ class Solver
             $headers = array('Authorization: Client-ID '.self::$imgur_auth);
             $url = 'https://api.imgur.com/3/image/'.end($parts);
             $req = json_decode(Fct::load_url($url, false, $headers), true);
-            //Fct::__($req);
-            if ( $req['success'] && array_key_exists($req['data']['type'], self::$ext) ) {
+            //~ Fct::__($req);
+            if ( $req['success'] && $req['data']['section'] != 'pics' && array_key_exists($req['data']['type'], self::$ext) ) {
                 return array(
                     'type' => self::$ext[$req['data']['type']],
                     'width' => (int)$req['data']['width'],
