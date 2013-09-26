@@ -17,6 +17,11 @@ class Update
     private $img_dir = 'images/';
 
     /**
+     * Folder containing thumbnails.
+     */
+    private $thumb_dir = 'images/thumbs/';
+
+    /**
      * Folder containing data.
      */
     private $data_dir = 'data/';
@@ -81,6 +86,7 @@ class Update
     public function __construct()
     {
         Fct::create_dir($this->img_dir, 0755);
+        Fct::create_dir($this->thumb_dir, 0755);
         Fct::create_dir($this->data_dir);
         Fct::create_dir($this->cache_dir);
         self::get_opml(is_file($this->ompl_file));
@@ -121,7 +127,8 @@ class Update
     /**
      * Retrieve images from one feed.
      */
-    public function read_feed($domain) {
+    public function read_feed($domain)
+    {
         if ( !isset($this->feeds['domains'][$domain]) ) {
             return false;
         }
@@ -204,6 +211,9 @@ class Update
                             }
                             if ( Fct::secure_save($this->img_dir.$filename, $data) !== false ) {
                                 ++$ret;
+                                if ( !is_file($this->thumb_dir.$filename) ) {
+                                    $this->create_thumb($filename, $width, $height, $type);
+                                }
                                 $images[$key] = array();
                                 $images[$key]['date'] = $pubDate;
                                 $images[$key]['link'] = $filename;
@@ -352,7 +362,7 @@ class Update
         $line = "{'key':'%s','src':'%s','w':%d,'h':%d,docolav:'%s','guid':'%s','date':%s,'nsfw':%d},\n";
         foreach ( $images as $key => $data )
         {
-            list($width, $height, $type) = getimagesize($this->img_dir.$data['link']);
+            list($width, $height, $type) = getimagesize($this->thumb_dir.$data['link']);
             $lines .= sprintf($line,
                 $key, $data['link'],
                 $width, $height,
@@ -364,6 +374,46 @@ class Update
         }
         $lines .= "];\n";
         Fct::secure_save($this->json_file, $lines);
+    }
+
+    /**
+     * Create an optimized and progressive JPEG small-szized file
+     * from original (big) image.
+     */
+    public function create_thumb($file, $width, $height, $type)
+    {
+        $quality = 95;
+        $progressive = true;
+        
+        // We want image 800x600 pixels max
+        $coef = $width / $height;
+        if ( $width >= $height ) {
+            $new_width = ($width > 800) ? 800 : $width;
+            $new_height = ceil($new_width / $coef);
+        } else {
+            $new_height = ($height > 600) ? 600 : $height;
+            $new_width = ceil($new_height * $coef);
+        }
+        
+        if ( $type == 2 ) {  // jpeg
+            $source = imagecreatefromjpeg($this->img_dir.$file);
+        } else {  // png
+            $source = imagecreatefrompng($this->img_dir.$file);
+        }
+        
+        $thumb = imagecreatetruecolor($new_width, $new_height);
+        imageinterlace($thumb, $progressive);
+        imagecopyresized($thumb, $source, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+        imagejpeg($thumb, $this->thumb_dir.$file, $quality);
+        
+        imagedestroy($source);
+        imagedestroy($thumb);
+        
+        //~ Fct::__(
+            //~ $width.'x'.$height.' = '.filesize($this->img_dir.$file).' | '.
+            //~ $new_width.'x'.$new_height.' = '.filesize($this->thumb_dir.$file)
+        //~ );
+        return array($new_width, $new_height);
     }
 
     /**
