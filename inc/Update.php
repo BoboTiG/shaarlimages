@@ -54,7 +54,7 @@ class Update
     /**
      * Time to live for the OPML file.
      */
-    private $ttl_opml = 86400;  // 60 * 60 * 24
+    private $ttl_opml = 21600;  // 60 * 60 * 6
 
     /**
      * Time to live for each shaarli.
@@ -64,7 +64,7 @@ class Update
     /**
      * Authorized extensions to download.
      */
-    private $ext_ok = array('', 'jpg', 'png');
+    private $ext_ok = array('jpg', 'jpeg', 'png');
 
     /**
      * Extension to append if not present.
@@ -161,10 +161,10 @@ class Update
             // http://stackoverflow.com/questions/1251582/beautiful-way-to-remove-get-variables-with-php/1251650#1251650
             $link = strtok((string)$item->link, '?');
 
-            if ( $this->link_seems_ok($domain, $link) ) {
+            $host = parse_url($link, 1);
+            if ( $this->link_seems_ok($host, $link) ) {
                 $data = false;
                 $req = array();
-                $host = parse_url($link, 1);
                 if ( array_key_exists($host, Solver::$domains) ) {
                     $func = Solver::$domains[$host];
                     $req = Solver::$func($link);
@@ -192,6 +192,9 @@ class Update
                         if ( empty($images[$key]) )
                         {
                             $img = basename($link);
+                            if ( $host == 'twitter.com' ) {
+                                $img = substr($img, 0, -6);  // delete ':large'
+                            }
                             if ( !pathinfo($img, 4) ) {
                                 $img .= $this->ext[$type];
                             }
@@ -239,17 +242,17 @@ class Update
      * If it seems to be an image or does not finish by a slash, then it
      * seems okay.
      */
-    private function link_seems_ok($domain, $link)
+    private function link_seems_ok($host, $link)
     {
-        if ( $domain == $this->current_host ) {
-            Fct::__($this->current_host);
-            return false;
-        }
-        elseif ( !in_array(strtolower(pathinfo($link, 4)), $this->ext_ok) ) {
-            return false;
+        if ( $host == $this->current_host ) { return false; }
+        if (
+            in_array(strtolower(pathinfo($link, 4)), $this->ext_ok) ||
+            array_key_exists($host, Solver::$domains)
+        ) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -258,7 +261,7 @@ class Update
     private function test_link($link)
     {
         $ret = false;
-        $bytes = Fct::load_url($link, true);
+        $bytes = Fct::load_url($link, Fct::PARTIAL);
         if ( $bytes !== false )
         {
             $sig = substr(bin2hex($bytes), 0, 4);

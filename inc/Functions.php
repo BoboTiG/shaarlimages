@@ -4,6 +4,13 @@ class Fct
 {
 
     /**
+     * load_url() flags.
+     */
+    const NONE     = 0;  // Nothing special
+    const PARTIAL  = 1;  // Retrieve only the firsts $bytes bytes
+    
+    
+    /**
      * Prefix and suffix for data storage.
      */
     private static $prefix = '<?php /* ';
@@ -41,12 +48,13 @@ class Fct
      * Retrieve one resource entierely or partially.
      * http://stackoverflow.com/questions/2032924/how-to-partially-download-a-remote-file-with-curl
      */
-    public static function load_url($url, $partial = false, $headers = array())
+    public static function load_url($url = null, $flag = self::NONE, $headers = array())
     {
-        //$parts = parse_url($url);
-        //$referer = $parts['scheme'].'//'.$parts['host'];
+        if ( $url === null ) {
+            return false;
+        }
         $ch = curl_init();
-        if ( $partial ) {
+        if ( $flag == self::PARTIAL ) {
             curl_setopt($ch, CURLOPT_RANGE, '0-'.self::$bytes);
             curl_setopt($ch, CURLOPT_BUFFERSIZE, self::$bytes);
         }
@@ -55,17 +63,20 @@ class Fct
         }
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERAGENT, self::$ua);
-        //curl_setopt($ch, CURLOPT_REFERER, $referer);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
         $data = curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if ( in_array($code, array(0, 401, 403)) ) {
-            $data = false;
+        if ( curl_errno($ch) == 35 ) {
+            curl_setopt($ch, CURLOPT_SSLVERSION, 2);
+            $data = curl_exec($ch);
         }
         if ( $data === false ) {
-            self::__($url.' -- '.curl_error($ch).curl_errno($ch).' -- status code: '.$code);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            self::__($url.' -- '.curl_error($ch).' -- '.curl_errno($ch).' -- status code: '.$code);
         }
         curl_close($ch);
         return $data;
