@@ -58,7 +58,11 @@ class Rss
 
     public function __construct($nb = 50) {
         $this->images = Fct::unserialise($this->database);
-        $this->number = max(1, min(count($this->images), $nb));
+        if ( $nb == 'all' ) {
+            $this->number = count($this->images);
+        } else {
+            $this->number = max(1, min(count($this->images), $nb + 0));
+        }
         $this->filename = $this->rss_dir.Fct::small_hash($this->number);
         Fct::create_dir($this->rss_dir);
     }
