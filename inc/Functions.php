@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Useful functions (GD, sort, serailize, ...)
+ * Useful functions (GD, sort, serialize, ...)
  */
 class Fct
 {
