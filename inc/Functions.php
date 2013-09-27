@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Useful function (GD, sort, serailize, ...)
+ * Useful functions (GD, sort, serailize, ...)
  */
 class Fct
 {
 
     /**
-     * :load_url() flags.
+     * load_url() flags.
      */
     const NONE     = 0;  // Nothing special
     const PARTIAL  = 1;  // Retrieve only the firsts $bytes bytes
