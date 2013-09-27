@@ -10,7 +10,6 @@
  * If the Api does not handle one of these, set it to NULL.
  *
  * Idée : http://www.commitstrip.com/fr/2013/09/24/yen-a-pour-2-minutes/
- * Idée : http://www.luc-damas.fr/humeurs/table-a-skis/
  */
 class Solver
 {
@@ -25,6 +24,7 @@ class Solver
         'secure.flickr.com' => 'flickr',
         'www.flickr.com'    => 'flickr',
         'imgur.com'         => 'imgur',
+        'www.luc-damas.fr'  => 'luc',
         'twitter.com'       => 'twitter',
         'xkcd.com'          => 'xkcd',
     );
@@ -108,6 +108,28 @@ class Solver
                 );
             }
         }
+        return array('link' => null);
+    }
+
+
+    /**
+     * www.luc-damas.fr - "Ça, c'est du prof !"
+     */
+    public static function luc($link)
+    {
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $doc->loadHTML(Fct::load_url($link));
+        $image = $doc->getElementById('content')->getElementsByTagName('img')->item(0);
+        $src = $image->getAttribute('src');
+        $ext = strtolower(pathinfo($src, 4));
+        return array(
+            'type' => self::$ext[$ext],
+            'width' => (int)$image->getAttribute('width'),
+            'height' => (int)$image->getAttribute('height'),
+            'nsfw' => false,
+            'link' => $src
+        );
         return array('link' => null);
     }
 
