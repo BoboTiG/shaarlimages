@@ -1,49 +1,7 @@
 <?php
 
-include 'inc/Functions.php';
-
 class Rss
 {
-
-    /**
-     * RSS title.
-     */
-    private $title = 'Shaarlimages';
-
-    /**
-     * RSS description.
-     */
-    private $description = 'Shaarlimages, la galerie des shaarlis !';
-
-    /**
-     * RSS link.
-     */
-    private $link = 'http://shaarlimages.net';
-
-    /**
-     * Folder containing images.
-     */
-    private $img_dir = 'images/';
-
-    /**
-     * Image database file.
-     */
-    private $database = 'data/images.php';
-
-    /**
-     * Folder containing pages cache.
-     */
-    private $rss_dir = 'data/rss/';
-
-    /**
-     * Images database.
-     */
-    private $number = 50;
-
-    /**
-     * Time to live for each shaarli. From inc/Update.php.
-     */
-    private $ttl_shaarli = 3600;  // 60 * 60
 
     /**
      * RSS cached page file name.
@@ -57,14 +15,14 @@ class Rss
 
 
     public function __construct($nb = 50) {
-        $this->images = Fct::unserialise($this->database);
+        $this->images = Fct::unserialise(Config::$database);
         if ( $nb == 'all' ) {
-            $this->number = count($this->images);
+            Config::$number = count($this->images);
         } else {
-            $this->number = max(1, min(count($this->images), $nb + 0));
+            Config::$number = max(1, min(count($this->images), $nb + 0));
         }
-        $this->filename = $this->rss_dir.Fct::small_hash($this->number);
-        Fct::create_dir($this->rss_dir);
+        $this->filename = Config::$rss_dir.Fct::small_hash(Config::$number).'.xml';
+        Fct::create_dir(Config::$rss_dir);
     }
 
     /**
@@ -75,7 +33,7 @@ class Rss
     public function get_data()
     {
         if ( !$this->is_cached() ) {
-            $images = array_slice($this->images, 0, $this->number);
+            $images = array_slice($this->images, 0, Config::$number);
             $this->create_rss($images);
         }
         return $this->get_cached();
@@ -85,13 +43,7 @@ class Rss
     * Check if a RSS cached page exists.
     */
     private function is_cached() {
-        if ( is_file($this->filename) ) {
-            $diff = date('U') - filemtime($this->filename);
-            if ( $diff < $this->ttl_shaarli ) {
-                return true;
-            }
-        }
-        return false;
+        return is_file($this->filename);
     }
 
     /**
@@ -125,20 +77,20 @@ class Rss
 
         //rss
         $xml->startElement('atom:link');
-        $xml->writeAttribute('href', $this->link.'/?do=rss');
+        $xml->writeAttribute('href', Config::$link.'/?do=rss');
         $xml->writeAttribute('rel', 'self');
         $xml->writeAttribute('type', 'application/rss+xml');
         $xml->endElement();
 
         // title, desc, link, date
-        $xml->writeElement('title', $this->title);
-        $xml->writeElement('description', $this->description);
-        $xml->writeElement('link', $this->link);
+        $xml->writeElement('title', Config::$title);
+        $xml->writeElement('description', Config::$description);
+        $xml->writeElement('link', Config::$link);
         $xml->writeElement('pubDate', date('r'));
 
         foreach ( $entries as $key => $entry )
         {
-            list($width, $height, $type) = getimagesize($this->img_dir.$entry['link']);
+            list($width, $height, $type) = getimagesize(Config::$img_dir.$entry['link']);
 
             // item
             $xml->startElement('item');
@@ -149,11 +101,11 @@ class Rss
             }
 
             //$xml->writeElement('guid', $entry['guid']);
-            $xml->writeElement('guid', $this->link.'/?i='.$key);
+            $xml->writeElement('guid', Config::$link.'/?i='.$key);
 
             $xml->startElement('description');
             $xml->writeCData(
-                '<img src="'.$this->link.'/images/'.$entry['link'].'" width="'.$width.'" height="'.$height.'" />'
+                '<img src="'.Config::$link.'/images/'.$entry['link'].'" width="'.$width.'" height="'.$height.'" />'
                 .'<br />'
                 .'<a href="'.$entry['guid'].'">Permalink</a>'
             );

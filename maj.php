@@ -1,6 +1,7 @@
 <?php
 
-include 'config.php';
+include 'inc/Config.php';
+include 'inc/Functions.php';
 include 'inc/Update.php';
 
 $up = new Update();
@@ -15,7 +16,7 @@ if ( $selected !== NULL ) {
 }
 
 if ( isset($_GET['terminate']) ) {
-    $up->generate_json();
+    Fct::generate_json();
 }
 
 ?>
@@ -129,7 +130,8 @@ if ( isset($_GET['terminate']) ) {
 
 <script>
 
-var sum = document.getElementById('sum');
+var sum = document.getElementById('sum'),
+    title = document.title;
 
 function makeAllRequests() {
     var i, current, id = document.getElementsByTagName('tr'), len = id.length;
@@ -169,6 +171,7 @@ function alertContents(httpRequest, id) {
             items.style.color = 'gray';
             if (ret > 0) {
                 sum.innerHTML = parseInt(sum.innerHTML, 10) + ret;
+                document.title = '(' + sum.innerHTML + ') ' + title;
                 items.style.color = 'green';
                 ret = '+ ' + ret;
             } else if (ret < 0 || isNaN(ret)) {

@@ -8,6 +8,9 @@
  * Each function have to return array('link' => null) on error.
  * Or an array with at least : type, width, height, nsfw, link
  * If the Api does not handle one of these, set it to NULL.
+ *
+ * Idée : http://www.commitstrip.com/fr/2013/09/24/yen-a-pour-2-minutes/
+ * Idée : http://www.luc-damas.fr/humeurs/table-a-skis/
  */
 class Solver
 {
