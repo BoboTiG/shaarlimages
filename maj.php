@@ -8,7 +8,7 @@ $up = new Update();
 
 $selected = !empty($_GET['u']) ? $_GET['u'] : NULL;
 if ( $selected !== NULL ) {
-    $ret = $up->read_feed($selected);
+    $ret = $up->read_feed($selected, isset($_GET['force']));
     if ( $ret !== false ) {
         echo $ret;
         exit;
@@ -16,7 +16,7 @@ if ( $selected !== NULL ) {
 }
 
 if ( isset($_GET['terminate']) ) {
-    Fct::generate_json();
+    Fct::generate_json(isset($_GET['force']));
 }
 
 ?>
@@ -89,7 +89,7 @@ if ( isset($_GET['terminate']) ) {
 <body>
 
 <!-- Pré-chargement -->
-<img src="/assets/css/loading.gif" style="display: none;">
+<img src="assets/img/loading.gif" style="display: none;">
 
 <p class="center">
     Une fois toutes les mises à jour effectuées, <a href="?terminate">générer le fichier JSON</a>.
@@ -143,7 +143,7 @@ function makeAllRequests() {
 
 function makeRequest(url, id) {
     var httpRequest = false, items = document.getElementById(id);
-    items.innerHTML  = '<img src="/assets/css/loading.gif" alt="En cours..." title="En cours...">';
+    items.innerHTML  = '<img src="assets/img/loading.gif" alt="En cours..." title="En cours...">';
     if (window.XMLHttpRequest) {  // Mozilla, Safari, ...
         httpRequest = new XMLHttpRequest();
     } else if (window.ActiveXObject) {  // IE

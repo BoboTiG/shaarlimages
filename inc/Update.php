@@ -8,9 +8,9 @@ class Update
     /**
      * link_seems_ok() flags.
      */
-    const BAD          = 0x00;  // Host is the same as the current one or a simple URL
-    const GOOD_EXT     = 0x01;  // URL ends with an image extension
-    const GOOD_SOLVER  = 0x02;  // Host is in the Solvers
+    const BAD          = 0;  // Host is the same as the current one or a simple URL
+    const GOOD_EXT     = 1;  // URL ends with an image extension
+    const GOOD_SOLVER  = 2;  // Host is in the Solvers
 
     /**
      * Shaarlis feed's URL.
@@ -62,7 +62,7 @@ class Update
     /**
      * Retrieve images from one feed.
      */
-    public function read_feed($domain)
+    public function read_feed($domain, $force = false)
     {
         if ( !isset($this->feeds['domains'][$domain]) ) {
             return false;
@@ -76,7 +76,7 @@ class Update
         if ( is_file($output) ){
             $images = Fct::unserialise($output);
         }
-        if ( $now - $images['date'] < Config::$ttl_shaarli ) {
+        if ( !$force && ($now - $images['date'] < Config::$ttl_shaarli) ) {
             return $ret;
         }
 
@@ -95,7 +95,7 @@ class Update
         foreach ( $test->channel->item as $item )
         {
             $pubDate = date('U', strtotime($item->pubDate));
-            if ( $pubDate < $images['date'] ){
+            if ( !$force && $pubDate < $images['date'] ){
                 break;
             }
 
@@ -105,10 +105,10 @@ class Update
 
             $host = parse_url($link, 1);
             $ret = $this->link_seems_ok($host, $link);
-            if ( $ret !== self::BAD ) {
+            if ( $ret > self::BAD ) {
                 $data = false;
                 $req = array();
-                if ( $ret === self::GOOD_SOLVER ) {
+                if ( $ret == self::GOOD_SOLVER ) {
                     if ( substr($host, -14) == 'deviantart.com') {
                         $host = 'deviantart.com';
                     }

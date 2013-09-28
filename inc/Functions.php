@@ -121,11 +121,11 @@ class Fct
      */
     public static function friendly_url($url)
     {
-        return str_replace(' ', '-', filter_var(
-            htmlentities(
-                stripslashes(strtok(urldecode(strtolower(trim($url))), '?'))
-            , ENT_QUOTES, 'UTF-8')
-        , FILTER_SANITIZE_STRING));
+        $url = preg_replace('#\&([A-za-z])(?:acute|cedil|circ|grave|ring|tilde|uml)\;#', '\1', $url);
+        $url = preg_replace('#\&([A-za-z]{2})(?:lig)\;#', '\1', $url);
+        $url = stripslashes(strtok(urldecode(strtolower(trim($url))), '?'));
+        filter_var(htmlentities($url, ENT_QUOTES, 'UTF-8'), FILTER_SANITIZE_STRING);
+        return str_replace(' ', '-', $url);
     }
 
     /**
@@ -165,7 +165,7 @@ class Fct
     /**
      * Generate the JSON file.
      */
-    public static function generate_json($force = true) {
+    public static function generate_json($force = false) {
         if ( !$force ) {
             if ( is_file(Config::$json_file) ) {
                 $diff = date('U') - filemtime(Config::$json_file);

@@ -5,26 +5,27 @@ AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javasc
 
 # Mise en cache
 <IfModule mod_expires.c>
-	ExpiresActive On
-	ExpiresByType text/css "access plus 10 years"
-	ExpiresByType text/js "access plus 10 years"
-	ExpiresByType text/javascript "access plus 10 years"
-	ExpiresByType application/x-javascript "access plus 10 years"
-	ExpiresByType image/png "access plus 10 years"
-	ExpiresByType image/jpg "access plus 10 years"
-	#ExpiresDefault "access plus 10 years"
+        ExpiresActive On
+        ExpiresByType text/css "access plus 10 years"
+        ExpiresByType text/js "access plus 10 years"
+        ExpiresByType text/javascript "access plus 10 years"
+        ExpiresByType application/x-javascript "access plus 10 years"
+        ExpiresByType image/png "access plus 10 years"
+        ExpiresByType image/jpg "access plus 10 years"
+        ExpiresByType image/jpeg "access plus 10 years"
+        #ExpiresDefault "access plus 10 years"
 </IfModule>
 
 <Files ~ "^\.ht">
-	Order allow,deny
-	Deny from all
-	Satisfy all
+        Order allow,deny
+        Deny from all
+        Satisfy all
 </Files>
 
 <Files ~ "^~.*">
-	Order allow,deny
-	Deny from all
-	Satisfy all
+        Order allow,deny
+        Deny from all
+        Satisfy all
 </Files>
 
 FileETag Size

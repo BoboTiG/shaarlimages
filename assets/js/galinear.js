@@ -1,13 +1,14 @@
 /*
  *
  * Galinear (gallery using linear partition algorithm).
- * Version 0.2.
+ * Version 0.3.
  *
  * Tiger-222  https://github.com/BoboTiG/galinear
  *
  *
  * Changelog:
  *
+ *  0.3 - add ambilight effect (URL parameter 'al')
  *  0.2 - touch events ready!
  *      - filter by date is functional (URL parameter 'd': ?d=yyyymmdd)
  *      - use of thumbnails to speed up page load
@@ -212,41 +213,106 @@ var linearPartitionFitPics = function (images, options) {
 };
 
 
-/*function makeLight(target, maskImage) {
+// Ambilight effect
+function makeLight() {
     // http://ketluts.net/zepixDemo/scripts/ambilight-image.js
+    // http://chikuyonok.ru/2010/03/ambilight-video/
     'use strict';
-    var targetCanvas, img = new Image(),
-        paletWidth = 10, paletHeight = 8, abmiWidth = target.width + 4000,
-        targetParent = document.getElementByTagName('body'),
-        abmiHeight = target.height,
-        field = document.createElement('canvas');
+    var left, right, all,
+        img = document.getElementsByTagName('img')[0],
+        grain = document.createElement('canvas'),
+        grain_ctx = grain.getContext('2d'),
+        mask = 'assets/img/mask.png',
+        image = new Image(),
+        block_width = 100,
+        calcMidColor = function (data, from, to) {
+            var i,
+                result = [0, 0, 0],
+                total_pixels = (to - from) / 4;
 
-    field.setAttribute('width', paletWidth);
-    field.setAttribute('height', paletHeight);
-    field.setAttribute('id', 'ambilight-field');
-    field.style.position = 'absolute';
-    field.style.left = '-10000px';
-    field.style.top = '-10000px';
-    document.body.appendChild(field);
+            for (i = from; i <= to; i += 4) {
+                result[0] += data[i];
+                result[1] += data[i + 1];
+                result[2] += data[i + 2];
+            }
+            result[0] = Math.round(result[0] / total_pixels);
+            result[1] = Math.round(result[1] / total_pixels);
+            result[2] = Math.round(result[2] / total_pixels);
+            return result;
+        },
+        getMidColors = function (canvas, ctx, block_width) {
+            var i, from,
+                width = canvas.width,
+                height = canvas.height,
+                lamps = 5,
+                block_height = Math.ceil(height / lamps),
+                pxl = block_width * block_height * 4,
+                result = [],
+                img_data = ctx.getImageData(0, 0, block_width, height),
+                total = img_data.data.length;
 
-    targetParent.innerHTML = '<canvas width="' + abmiWidth + '" height="'+ abmiHeight
-        + '" style="position: absolute; z-index: -1; margin-left: -2000px;"></canvas>' +
-    targetParent.innerHTML;
-    targetCanvas = targetParent.firstChild;
+            for (i = 0; i < lamps; i += 1) {
+                from = i * width * block_width;
+                result.push(calcMidColor(img_data.data, i * pxl, Math.min((i + 1) * pxl, total - 1)));
+            }
+            return result;
+        },
+        create_canvas = function (block_width, right)
+        {
+            var i, il, midcolors, grd,
+                offsetx = block_width,
+                canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d');
 
-    addEvent(img, 'load', function () {
-        'use strict';
-        var ctx = field.getContext('2d');
-        var ctx2 = targetCanvas.getContext('2d');
-        var width = target.width / 10;
-        ctx.drawImage(target, 0, 0, width, target.height, 0, 0, paletWidth, paletHeight);
-        ctx2.drawImage(field, 0, 0, paletWidth, paletHeight, 0, 0, 2000, abmiHeight);
-        ctx.drawImage(target, target.width - width, 0, width, target.height, 0, 0, paletWidth, paletHeight);
-        ctx2.drawImage(field, 0, 0, paletWidth, paletHeight, abmiWidth/2, 0, 2000, abmiHeight);
-        ctx2.drawImage(this, 0, 0, 500, 500, 0, 0, 4000, abmiHeight);
-    });
-    img.src = maskImage;
-}*/
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.zIndex = '-2';
+            canvas.style.width = '100%';  // Change to 50% for left/right
+            canvas.style.height = '100%';
+            canvas.width = block_width;
+            canvas.height = img.height;
+            if (right) {
+                offsetx = img.width - block_width;
+            }
+            ctx.drawImage(img, offsetx, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+            midcolors = getMidColors(canvas, ctx, block_width),
+            grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            for (i = 0, il = midcolors.length; i < il; i += 1) {
+                grd.addColorStop(i / il, 'rgb(' + midcolors[i] + ')');
+            }
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            return canvas;
+        };
+
+    // Left part
+    //~ left = create_canvas(block_width, false);
+    //~ left.style.left = '0';
+    //~ document.body.appendChild(left);
+
+    // Right part
+    //~ right = create_canvas(block_width, true);
+    //~ right.style.left = '50%';
+    //~ document.body.appendChild(right);
+
+    // Left & right parts at the same time, take block_width from left side
+    all = create_canvas(block_width, false);
+    all.style.left = '0';
+    document.body.appendChild(all);
+
+    // Grain
+    grain.style.position = 'absolute';
+    grain.style.top = '0';
+    grain.style.left = '0';
+    grain.style.zIndex = '-1';
+    grain.style.width = '100%';
+    grain.style.height = '100%';
+    image.src = mask;
+    grain.width = image.width;
+    grain.height = image.height;
+    grain_ctx.drawImage(image, 0, 0, grain.width, grain.height);
+    document.body.appendChild(grain);
+}
 
 // Retrieve an array of URL parameters
 var parse_query_string = function () {
@@ -312,7 +378,7 @@ if (!galinear_opt) {
         'lines': 3,
         'show_nsfw': 0,
         'toolbar': 1,
-        //'use_ambilight': 1,
+        'use_ambilight': 1,
 
         // Translations
         'txt_no_img': 'Aucune image ☹',
@@ -345,6 +411,10 @@ if (params.toolbar) {
     galinear_opt.toolbar = parseInt(params.toolbar, 10);
     if (galinear_opt.toolbar !== 1) { galinear_opt.toolbar = 0; }
 }
+if (params.al) {
+    galinear_opt.use_ambilight = parseInt(params.al, 10);
+    if (galinear_opt.use_ambilight !== 1) { galinear_opt.use_ambilight = 0; }
+}
 
 // Cookies parameters bypass (> URL > defaults options)
 if (navigator.cookieEnabled && document.cookie.length > 0) {
@@ -366,6 +436,9 @@ if (params.i && gallery.length > 0) {
             img.style.borderTop = '1px solid #111';
             img.style.borderBottom = '1px solid #111';
         }
+        if (galinear_opt.use_ambilight) {
+            makeLight();
+        }
     };
 
     var figure, img, title, toolbar, home,
@@ -381,9 +454,14 @@ if (params.i && gallery.length > 0) {
         if (image.nsfw) { title += ' [ ☂ NSFW ]'; }
         title += ' - ' + document.title;
         document.title = title;
-        if (!image.docolav) { image.docolav = '222'; }
-        document.body.style.background = '#' + image.docolav + ' url(data:image/png;base64,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)';
-        document.body.style.transition = '1s';
+
+        if (!galinear_opt.use_ambilight) {
+            if (!image.docolav) {
+                image.docolav = '222';
+            }
+            document.body.style.background = '#' + image.docolav + ' url(assets/img/bg.png)';
+            document.body.style.transition = '1s';
+        }
 
         img = document.createElement('img');
         img.src = galinear_opt.img_folder + image.src;
@@ -617,3 +695,4 @@ if (params.i && gallery.length > 0) {
     window.onload = linear_me;
     window.onresize = linear_me;
 }
+
