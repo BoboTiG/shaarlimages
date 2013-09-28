@@ -19,14 +19,16 @@ class Solver
      * domain => function name
      */
     public static $domains = array(
-        'i.chzbgr.com'      => 'cheezburger',
-        'flickr.com'        => 'flickr',
-        'secure.flickr.com' => 'flickr',
-        'www.flickr.com'    => 'flickr',
-        'imgur.com'         => 'imgur',
-        'www.luc-damas.fr'  => 'luc',
-        'twitter.com'       => 'twitter',
-        'xkcd.com'          => 'xkcd',
+        'www.bonjourmadame.fr' => 'bonjourmadame',
+        'i.chzbgr.com'         => 'cheezburger',
+        'deviantart.com'       => 'deviantart',
+        'flickr.com'           => 'flickr',
+        'secure.flickr.com'    => 'flickr',
+        'www.flickr.com'       => 'flickr',
+        'imgur.com'            => 'imgur',
+        'www.luc-damas.fr'     => 'luc',
+        'twitter.com'          => 'twitter',
+        'xkcd.com'             => 'xkcd',
     );
 
     /**
@@ -49,12 +51,78 @@ class Solver
 
 
     /**
+     * www.bonjourmadame.fr
+     */
+    public static function bonjourmadame($link)
+    {
+        $parts = explode('/', $link);
+        if ( count($parts) < 4 ) {
+            return array('link' => null);
+        }
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $doc->loadHTML(Fct::load_url($link));
+        if ( $parts[3] == 'post' ) {
+            foreach ( $doc->getElementsByTagName('meta') as $meta ) {
+                if ( $meta->getAttribute('property') == 'og:image' ) {
+                    return array(
+                        'type' => 0,
+                        'width' => 0,
+                        'height' => 0,
+                        'nsfw' => true,
+                        'link' => $meta->getAttribute('content')
+                    );
+                }
+            }
+        } elseif ( $parts[3] == 'image' ) {
+            $image = $doc->getElementById('content')->getElementsByTagName('img')->item(0);
+            return array(
+                'type' => 0,
+                'width' => 0,
+                'height' => 0,
+                'nsfw' => true,
+                'link' => $image->getAttribute('data-src')
+            );
+        }
+        return array('link' => null);
+    }
+
+
+    /**
      * cheezburger.com - https://developer.cheezburger.com/
      * Returns the link, as it is already an image, but URL ends with '/'.
      */
     public static function cheezburger($link)
     {
         return array('link' => $link);
+    }
+
+
+    /**
+     * deviantart.com - http://www.deviantart.com/developers/oembed
+     */
+    public static function deviantart($link)
+    {
+        if ( isset(self::$ext[pathinfo($link, 4)]) ) {
+            return array('link' => $link);
+        }
+        $url = 'https://backend.deviantart.com/oembed?url='.$link;
+        $req = json_decode(Fct::load_url($url), true);
+        //Fct::__($req);
+        if ( $req['type'] == 'photo' ) {
+            $ext = pathinfo($req['url'], 4);
+            if ( array_key_exists($ext, self::$ext) ) {
+                $nsfw = isset($req['rating']) ? $req['rating'] == 'adult' : 0;
+                return array(
+                    'type' => self::$ext[$ext],
+                    'width' => (int)$req['width'],
+                    'height' => (int)$req['height'],
+                    'nsfw' => (bool)$nsfw,
+                    'link' => $req['url']
+                );
+            }
+        }
+        return array('link' => null);
     }
 
 

@@ -6,6 +6,13 @@ class Update
 {
 
     /**
+     * link_seems_ok() flags.
+     */
+    const BAD          = 0x00;  // Host is the same as the current one or a simple URL
+    const GOOD_EXT     = 0x01;  // URL ends with an image extension
+    const GOOD_SOLVER  = 0x02;  // Host is in the Solvers
+
+    /**
      * Shaarlis feed's URL.
      */
     public $feeds = array();
@@ -97,15 +104,19 @@ class Update
             $link = strtok((string)$item->link, '?');
 
             $host = parse_url($link, 1);
-            if ( $this->link_seems_ok($host, $link) ) {
+            $ret = $this->link_seems_ok($host, $link);
+            if ( $ret !== self::BAD ) {
                 $data = false;
                 $req = array();
-                if ( array_key_exists($host, Solver::$domains) ) {
+                if ( $ret === self::GOOD_SOLVER ) {
+                    if ( substr($host, -14) == 'deviantart.com') {
+                        $host = 'deviantart.com';
+                    }
                     $func = Solver::$domains[$host];
                     $req = Solver::$func($link);
                     $data = Fct::load_url($req['link']);
                 }
-                elseif ( $this->test_link($link) ) {
+                else/*if ( $this->test_link($link) )*/ {
                     $data = Fct::load_url($link);
                 }
                 if ( $data !== false )
@@ -179,18 +190,20 @@ class Update
      * Check a link syntax.
      * If it seems to be an image or does not finish by a slash, then it
      * seems okay.
+     *
+     * Returns: check flags at the top of this file.
      */
     private function link_seems_ok($host, $link)
     {
-        if ( $host == Config::$current_host ) { return false; }
-        if (
-            in_array(strtolower(pathinfo($link, 4)), Config::$ext_ok) ||
-            array_key_exists($host, Solver::$domains)
-        ) {
-            return true;
-        }
-
-        return false;
+        if ( $host == Config::$current_host )
+            return self::BAD;
+        if ( in_array(strtolower(pathinfo($link, 4)), Config::$ext_ok) )
+            return self::GOOD_EXT;
+        if ( array_key_exists($host, Solver::$domains) )
+            return self::GOOD_SOLVER;
+        if ( substr($host, -14) == 'deviantart.com' )
+            return self::GOOD_SOLVER;
+        return self::BAD;
     }
 
     /**
