@@ -62,7 +62,7 @@ class Update
     /**
      * Retrieve images from one feed.
      */
-    public function read_feed($domain, $force = false)
+    public function read_feed($domain, $force = true)
     {
         if ( !isset($this->feeds['domains'][$domain]) ) {
             return false;
@@ -76,27 +76,27 @@ class Update
         if ( is_file($output) ){
             $images = Fct::unserialise($output);
         }
-        if ( !$force && ($now - $images['date'] < Config::$ttl_shaarli) ) {
-            return $ret;
+        if ( $now - $images['date'] < Config::$ttl_shaarli ) {
+            if ( !$force ) { return 0; }
         }
 
         $feed = utf8_encode(Fct::load_url($this->get_url($domain)));
         if ( empty($feed) ) {
-            return $ret - 1;
+            return -1;
         }
 
         try {
             $test = new SimpleXMLElement($feed);
         } catch (Exception $e) {
             Fct::__($this->get_url($domain).' ERROR: '.$e->getMessage());
-            return $ret - 2;
+            return -2;
         }
 
         foreach ( $test->channel->item as $item )
         {
             $pubDate = date('U', strtotime($item->pubDate));
-            if ( !$force && $pubDate < $images['date'] ){
-                break;
+            if ( $pubDate < $images['date'] ){
+                if ( !$force ) { break; }
             }
 
             // Strip URL parameters
@@ -105,7 +105,7 @@ class Update
 
             $host = parse_url($link, 1);
             $ret = $this->link_seems_ok($host, $link);
-            if ( $ret > self::BAD ) {
+            if ( $ret <> self::BAD ) {
                 $data = false;
                 $req = array();
                 if ( $ret == self::GOOD_SOLVER ) {
@@ -209,7 +209,7 @@ class Update
     /**
      * Retrieve the firsts bytes of a resource to check if it is an image.
      */
-    private function test_link($link)
+    /*private function test_link($link)
     {
         $ret = false;
         $bytes = Fct::load_url($link, Fct::PARTIAL);
@@ -224,7 +224,7 @@ class Update
             }
         }
         return $ret;
-    }
+    }*/
 
     /**
      * Getters.

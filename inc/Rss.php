@@ -101,13 +101,11 @@ class Rss
             }
 
             //$xml->writeElement('guid', $entry['guid']);
-            $xml->writeElement('guid', Config::$link.'/?i='.$key);
+            $xml->writeElement('guid', $entry['guid']);
 
             $xml->startElement('description');
             $xml->writeCData(
-                '<img src="'.Config::$link.'/images/'.$entry['link'].'" width="'.$width.'" height="'.$height.'" />'
-                .'<br />'
-                .'<a href="'.$entry['guid'].'">Permalink</a>'
+                '<a href="'.Config::$link.'/?i='.$key.'"><img src="'.Config::$link.'/'.Config::$thumb_dir.$entry['link'].'"/></a>'
             );
             $xml->endElement();
             $xml->writeElement('pubDate', date('r', $entry['date']));
