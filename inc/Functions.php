@@ -9,8 +9,9 @@ class Fct
     /**
      * load_url() flags.
      */
-    const NONE     = 0;  // Nothing special
-    const PARTIAL  = 1;  // Retrieve only the firsts $bytes bytes
+    const NONE    = 0;  // Nothing special
+    const PARTIAL = 1;  // Retrieve only the firsts $bytes bytes
+    const IMAGE   = 2;  // We are retrieving an image
 
     /**
      * Prefix and suffix for data storage.
@@ -46,16 +47,24 @@ class Fct
             return false;
         }
         $ch = curl_init();
-        if ( $flag == self::PARTIAL ) {
-            curl_setopt($ch, CURLOPT_RANGE, '0-'.self::$bytes);
-            curl_setopt($ch, CURLOPT_BUFFERSIZE, self::$bytes);
+        switch ( $flag )
+        {
+            case self::PARTIAL:
+                curl_setopt($ch, CURLOPT_RANGE, '0-'.self::$bytes);
+                curl_setopt($ch, CURLOPT_BUFFERSIZE, self::$bytes);
+                break;
+            case self::IMAGE:
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+                break;
+            default:
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+                break;
         }
         if ( !empty($headers) ) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERAGENT, Config::$ua);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -67,10 +76,8 @@ class Fct
             $data = curl_exec($ch);
         }
         if ( $data === false ) {
-            if ( curl_errno($ch) != 28 ) {  // timeout
-                $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                self::__($url.' -- '.curl_error($ch).' -- '.curl_errno($ch).' -- status code: '.$code);
-            }
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            self::__($url.' -- '.curl_error($ch).' -- '.curl_errno($ch).' -- status code: '.$code);
         }
         curl_close($ch);
         return $data;
@@ -165,18 +172,8 @@ class Fct
     /**
      * Generate the JSON file.
      */
-    public static function generate_json($force = false) {
-        if ( !$force ) {
-            if ( is_file(Config::$json_file) ) {
-                $diff = date('U') - filemtime(Config::$json_file);
-                if ( $diff < Config::$ttl_shaarli ) {
-                    return;
-                }
-            }
-        } else {
-            usleep(1000000);  // 1 sec
-        }
-
+    public static function generate_json() {
+        usleep(1000000);  // 1 sec
         $images = array();
         $tmp = array();
         foreach ( glob(Config::$cache_dir.'*.php') as $db )

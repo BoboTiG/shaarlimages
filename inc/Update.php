@@ -62,7 +62,7 @@ class Update
     /**
      * Retrieve images from one feed.
      */
-    public function read_feed($domain, $force = true)
+    public function read_feed($domain)
     {
         if ( !isset($this->feeds['domains'][$domain]) ) {
             return false;
@@ -75,9 +75,9 @@ class Update
 
         if ( is_file($output) ){
             $images = Fct::unserialise($output);
-        }
-        if ( $now - $images['date'] < Config::$ttl_shaarli ) {
-            if ( !$force ) { return 0; }
+            if ( $now - $images['date'] < Config::$ttl_shaarli ) {
+                return 0;
+            }
         }
 
         $feed = utf8_encode(Fct::load_url($this->get_url($domain)));
@@ -88,7 +88,7 @@ class Update
         try {
             $test = new SimpleXMLElement($feed);
         } catch (Exception $e) {
-            Fct::__($this->get_url($domain).' ERROR: '.$e->getMessage());
+            //~ Fct::__($this->get_url($domain).' ERROR: '.$e->getMessage());
             return -2;
         }
 
@@ -96,7 +96,7 @@ class Update
         {
             $pubDate = date('U', strtotime($item->pubDate));
             if ( $pubDate < $images['date'] ){
-                if ( !$force ) { break; }
+                break;
             }
 
             // Strip URL parameters
@@ -104,20 +104,20 @@ class Update
             $link = strtok((string)$item->link, '?');
 
             $host = parse_url($link, 1);
-            $ret = $this->link_seems_ok($host, $link);
-            if ( $ret <> self::BAD ) {
+            $lflag = $this->link_seems_ok($host, $link);
+            if ( $lflag > self::BAD ) {
                 $data = false;
                 $req = array();
-                if ( $ret == self::GOOD_SOLVER ) {
+                if ( $lflag == self::GOOD_SOLVER ) {
                     if ( substr($host, -14) == 'deviantart.com') {
                         $host = 'deviantart.com';
                     }
                     $func = Solver::$domains[$host];
                     $req = Solver::$func($link);
-                    $data = Fct::load_url($req['link']);
+                    $data = Fct::load_url($req['link'], Fct::IMAGE);
                 }
                 else/*if ( $this->test_link($link) )*/ {
-                    $data = Fct::load_url($link);
+                    $data = Fct::load_url($link, Fct::IMAGE);
                 }
                 if ( $data !== false )
                 {

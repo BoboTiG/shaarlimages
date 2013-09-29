@@ -4,3 +4,5 @@ geany_run_script.sh
 .shaarli.opml
 images.json
 data/
+sync.sh
+test.php

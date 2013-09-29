@@ -8,7 +8,7 @@ $up = new Update();
 
 $selected = !empty($_GET['u']) ? $_GET['u'] : NULL;
 if ( $selected !== NULL ) {
-    $ret = $up->read_feed($selected, isset($_GET['force']));
+    $ret = $up->read_feed($selected);
     if ( $ret !== false ) {
         echo $ret;
         exit;
@@ -16,7 +16,7 @@ if ( $selected !== NULL ) {
 }
 
 if ( isset($_GET['terminate']) ) {
-    Fct::generate_json(isset($_GET['force']));
+    Fct::generate_json();
 }
 
 ?>
