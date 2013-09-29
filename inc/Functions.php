@@ -72,12 +72,8 @@ class Fct
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
         $data = curl_exec($ch);
         if ( curl_errno($ch) == 35 ) {
-            curl_setopt($ch, CURLOPT_SSLVERSION, 2);
+            curl_setopt($ch, CURLOPT_SSLVERSION, 1);
             $data = curl_exec($ch);
-        }
-        if ( $data === false ) {
-            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            self::__($url.' -- '.curl_error($ch).' -- '.curl_errno($ch).' -- status code: '.$code);
         }
         curl_close($ch);
         return $data;

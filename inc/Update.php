@@ -75,9 +75,6 @@ class Update
 
         if ( is_file($output) ){
             $images = Fct::unserialise($output);
-            if ( $now - $images['date'] < Config::$ttl_shaarli ) {
-                return 0;
-            }
         }
 
         $feed = utf8_encode(Fct::load_url($this->get_url($domain)));
@@ -88,7 +85,6 @@ class Update
         try {
             $test = new SimpleXMLElement($feed);
         } catch (Exception $e) {
-            //~ Fct::__($this->get_url($domain).' ERROR: '.$e->getMessage());
             return -2;
         }
 
@@ -114,12 +110,9 @@ class Update
                     }
                     $func = Solver::$domains[$host];
                     $req = Solver::$func($link);
-                    $data = Fct::load_url($req['link'], Fct::IMAGE);
+                    $link = $req['link'];
                 }
-                else/*if ( $this->test_link($link) )*/ {
-                    $data = Fct::load_url($link, Fct::IMAGE);
-                }
-                if ( $data !== false )
+                if ( ($data = Fct::load_url($link, Fct::IMAGE)) !== false )
                 {
                     list($width, $height, $type, $nsfw) = array(0, 0, 0, false);
                     if ( count($req) > 1 ) {
@@ -205,26 +198,6 @@ class Update
             return self::GOOD_SOLVER;
         return self::BAD;
     }
-
-    /**
-     * Retrieve the firsts bytes of a resource to check if it is an image.
-     */
-    /*private function test_link($link)
-    {
-        $ret = false;
-        $bytes = Fct::load_url($link, Fct::PARTIAL);
-        if ( $bytes !== false )
-        {
-            $sig = substr(bin2hex($bytes), 0, 4);
-            if ( $sig == 'ffd8' ) {  // jpeg
-                $ret = true;
-            }
-            elseif ( $sig == '8950' ) {  // png
-                $ret = true;
-            }
-        }
-        return $ret;
-    }*/
 
     /**
      * Getters.

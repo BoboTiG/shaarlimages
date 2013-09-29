@@ -1,6 +1,7 @@
 <?php
 
 ini_set('memory_limit', '512M');
+ini_set('time_limit', 0);
 ini_set('display_errors', 0);
 error_reporting(0);
 date_default_timezone_set('UTC');
@@ -46,11 +47,6 @@ class Config
      * Time to live for the OPML file.
      */
     public static $ttl_opml = 21600;  // 60 * 60 * 6
-
-    /**
-     * Time to live for each shaarli.
-     */
-    public static $ttl_shaarli = 3600;  // 60 * 60
 
     /**
      * Folder containing images.
