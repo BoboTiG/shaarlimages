@@ -150,7 +150,6 @@ class Update
                                 $images[$key]['date'] = $pubDate;
                                 $images[$key]['link'] = $filename;
                                 $images[$key]['guid'] = (string)$item->guid;
-                                $images[$key]['docolav'] = Fct::docolav($filename, $width, $height, $type);
                                 $images[$key]['nsfw'] = $nsfw;
                                 // NSFW check, for sensible persons ... =]
                                 if ( !$nsfw && !empty($item->category) )

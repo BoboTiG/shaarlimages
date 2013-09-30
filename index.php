@@ -1,5 +1,9 @@
 <?php
 
+if ( isset($_GET['error']) ) {
+    header('Location: /index.php');
+}
+
 $do = !empty($_GET['do']) ? $_GET['do'] : NULL;
 if ( $do !== NULL ) {
     if ( $do == 'rss' ) {
@@ -40,6 +44,7 @@ if ( $do !== NULL ) {
         https://github.com/BoboTiG/shaarlimages
 -->
 
+<noscript>Oups ! JavaScript doit être activé pour voir la galerie ☹</noscript>
 <div id="image-container"></div>
 
 <script src="images.json"></script>

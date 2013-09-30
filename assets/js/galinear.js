@@ -8,7 +8,10 @@
  *
  * Changelog:
  *
- *  0.3 - add ambilight effect (URL parameter 'al')
+ *  0.3 - add ambilight effect
+ *      - remove color average effect
+ *      - add preferences by cookie (toolbar, show_nsfw and al)
+ *      - code refactor
  *  0.2 - touch events ready!
  *      - filter by date is functional (URL parameter 'd': ?d=yyyymmdd)
  *      - use of thumbnails to speed up page load
@@ -24,131 +27,8 @@
  *  0.0 - first release
  */
 
-var linearPartitionTable = function (seq, k) {
-    'use strict';
-
-    var i, j, x, len,
-        n = seq.length,
-        row = [],
-        table = [],
-        solution = [],
-        listToMin = [],
-        result = {};
-
-    // Create the table
-    for (i = 0; i < n; i += 1) {
-        row = [];
-        for (j = 0; j < k; j += 1) {
-            row.push(0);
-        }
-        table.push(row);
-    }
-
-    // Create solution
-    for (i = 0; i < n - 1; i += 1) {
-        row = [];
-        for (j = 0; j < k - 1; j += 1) {
-            row.push(0);
-        }
-        solution.push(row);
-    }
-
-    for (i = 0; i < n; i += 1) {
-        table[i][0] = seq[i] + (i ? table[i - 1][0] : 0);
-    }
-
-    for (i = 0; i < k; i += 1) {
-        table[0][i] = seq[0];
-    }
-
-    for (i = 1; i < n; i += 1) {
-        for (j = 1; j < k; j += 1) {
-            listToMin = [];
-            for (x = 0; x < i; x += 1) {
-                listToMin.push([Math.max(table[x][j - 1], table[i][0] - table[x][0]), x]);
-            }
-            result = {
-                computed: Infinity,
-                value: Infinity
-            };
-            for (x = 0, len = listToMin.length; x < len; x += 1) {
-                if (listToMin[x][0] < result.computed) {
-                    result = {
-                        value: listToMin[x],
-                        computed: listToMin[x][0]
-                    };
-                }
-            }
-            table[i][j] = result.value[0];
-            solution[i - 1][j - 1] = result.value[1];
-        }
-    }
-    return [table, solution];
-};
-
-
-var linearPartition = function (seq, k) {
-    'use strict';
-
-    var i, solution, partitionTable,
-        n = seq.length - 1,
-        ans = [],
-        finalResult = [],
-        partialAns = [];
-
-    if (k < 1) {
-        return finalResult;
-    }
-    if (k > n) {
-        for (i = 0; i <= n; i += 1) {
-            finalResult.push([seq[i]]);
-        }
-        return finalResult;
-    }
-
-    partitionTable = linearPartitionTable(seq, k);
-    solution = partitionTable[1];
-
-    k -= 2;
-    while (k >= 0) {
-        partialAns = [];
-        for (i = solution[n - 1][k] + 1; i <= n; i += 1) {
-            partialAns.push(seq[i]);
-        }
-
-        partialAns = [partialAns];
-        ans = partialAns.concat(ans);
-        n = solution[n - 1][k];
-        k -= 1;
-    }
-
-    for (i = 0; i <= n; i += 1) {
-        finalResult.push(seq[i]);
-    }
-    finalResult = [finalResult];
-
-    return finalResult.concat(ans);
-};
-
-// options
-
-/**
-
-images = [{
-    width:
-    height:
-    ... Custom info
-}]
-
-options = {
-    containerWidth: int,
-    preferedImageHeight: int,
-    border: int,
-    spacing: int
-}
-
-**/
-var linearPartitionFitPics = function (images, options) {
+// Sytem of the gallery
+function linearPartitionFitPics(images, options) {
     'use strict';
 
     options.border = options.border || 0;
@@ -159,7 +39,95 @@ var linearPartitionFitPics = function (images, options) {
         summedWidth = 0,
         summedRatios = 0,
         weights = [],
-        rowBuffer = [];
+        rowBuffer = [],
+        linearPartitionTable = function (seq, k) {
+            var i, j, x, len,
+                n = seq.length,
+                row = [],
+                table = [],
+                solution = [],
+                listToMin = [],
+                result = {};
+            // Create the table
+            for (i = 0; i < n; i += 1) {
+                row = [];
+                for (j = 0; j < k; j += 1) {
+                    row.push(0);
+                }
+                table.push(row);
+            }
+            // Create solution
+            for (i = 0; i < n - 1; i += 1) {
+                row = [];
+                for (j = 0; j < k - 1; j += 1) {
+                    row.push(0);
+                }
+                solution.push(row);
+            }
+            for (i = 0; i < n; i += 1) {
+                table[i][0] = seq[i] + (i ? table[i - 1][0] : 0);
+            }
+            for (i = 0; i < k; i += 1) {
+                table[0][i] = seq[0];
+            }
+            for (i = 1; i < n; i += 1) {
+                for (j = 1; j < k; j += 1) {
+                    listToMin = [];
+                    for (x = 0; x < i; x += 1) {
+                        listToMin.push([Math.max(table[x][j - 1], table[i][0] - table[x][0]), x]);
+                    }
+                    result = {
+                        computed: Infinity,
+                        value: Infinity
+                    };
+                    for (x = 0, len = listToMin.length; x < len; x += 1) {
+                        if (listToMin[x][0] < result.computed) {
+                            result = {
+                                value: listToMin[x],
+                                computed: listToMin[x][0]
+                            };
+                        }
+                    }
+                    table[i][j] = result.value[0];
+                    solution[i - 1][j - 1] = result.value[1];
+                }
+            }
+            return [table, solution];
+        },
+        linearPartition = function (seq, k) {
+            var i, solution, partitionTable,
+                n = seq.length - 1,
+                ans = [],
+                finalResult = [],
+                partialAns = [];
+            if (k < 1) {
+                return finalResult;
+            }
+            if (k > n) {
+                for (i = 0; i <= n; i += 1) {
+                    finalResult.push([seq[i]]);
+                }
+                return finalResult;
+            }
+            partitionTable = linearPartitionTable(seq, k);
+            solution = partitionTable[1];
+            k -= 2;
+            while (k >= 0) {
+                partialAns = [];
+                for (i = solution[n - 1][k] + 1; i <= n; i += 1) {
+                    partialAns.push(seq[i]);
+                }
+                partialAns = [partialAns];
+                ans = partialAns.concat(ans);
+                n = solution[n - 1][k];
+                k -= 1;
+            }
+            for (i = 0; i <= n; i += 1) {
+                finalResult.push(seq[i]);
+            }
+            finalResult = [finalResult];
+            return finalResult.concat(ans);
+        };
 
     for (i = 0, len = images.length; i < len; i += 1) {
         images[i].aspectRatio = images[i].width / images[i].height;
@@ -212,9 +180,8 @@ var linearPartitionFitPics = function (images, options) {
     return images;
 };
 
-
 // Ambilight effect
-function makeLight() {
+function ambilight_effect() {
     // http://ketluts.net/zepixDemo/scripts/ambilight-image.js
     // http://chikuyonok.ru/2010/03/ambilight-video/
     'use strict';
@@ -315,7 +282,7 @@ function makeLight() {
 }
 
 // Retrieve an array of URL parameters
-var parse_query_string = function () {
+function parse_query_string() {
     'use strict';
     var search = window.location.search,
         params = {};
@@ -326,31 +293,13 @@ var parse_query_string = function () {
     return params;
 };
 
+// Event handler
 function addEvent(element, evnt, funct) {
     'use strict';
     if (element.attachEvent) {
         return element.attachEvent('on' + evnt, funct);
     }
     return element.addEventListener(evnt, funct, false);
-}
-
-function curr_prev_next(key) {
-    'use strict';
-    var i,
-        len = gallery.length,
-        current = false,
-        prev = false,
-        next = false;
-
-    for (i = 0; i < len; i += 1) {
-        if (gallery[i].key === key) {
-            current = gallery[i];
-            if (i > 0) { prev = gallery[i - 1]; }
-            if (i < len - 1) { next = gallery[i + 1]; }
-            break;
-        }
-    }
-    return {'current': current, 'previous': prev, 'next': next};
 }
 
 // From an epoch value, compute the yyyymmdd date.
@@ -366,19 +315,59 @@ function parse_date(value) {
     return y + m + d;
 }
 
-var params = parse_query_string();
-if (!galinear_opt) {
+// Cookies pref storage
+function store_cookie() {
+    'use strict';
+    var today = new Date(),
+        expires = new Date(today.getTime() + 365 * 24 * 60 * 60 * 1000),
+        cookie = 'prefs=' + JSON.stringify(galinear_prefs) +';expires=' + expires + ';';
+
+    if (navigator.cookieEnabled) {
+        document.cookie = cookie;
+    }
+}
+
+// Cookies pref getter
+function read_cookie() {
+    'use strict';
+    var i, json, cookies;
+    if (navigator.cookieEnabled && document.cookie.length > 0) {
+        cookies = document.cookie.split('; ');
+        for (i in cookies) {
+            if (cookies[i].split('=')[0] == 'prefs') {
+                json = JSON.parse(cookies[i].split('=')[1]);
+                for (i in json) {
+                    json[i] = parseInt(json[i], 10);
+                    if (isNaN(json[i])) {
+                        json[i] = 0;
+                    }
+                }
+                return json;
+            }
+        }
+    }
+    return galinear_prefs;
+}
+
+
+/**
+ *
+ * C'est parti mon kiki !
+ *
+ */
+if (!galinear_opt || !galinear_prefs) {
     // Default options
     // See https://github.com/BoboTiG/galinear for more informations.
-    var galinear_opt = {
-        'gallery_url': '/',
-        'img_folder': 'images/',
-        'thumb_folder': 'images/thumbs/',
+    var galinear_prefs = {
         'per_page': 20,
         'lines': 3,
         'show_nsfw': 0,
         'toolbar': 1,
-        'use_ambilight': 1,
+    };
+    var galinear_opt = {
+        'gallery_url': '/',
+        'img_folder': 'images/',
+        'thumb_folder': 'images/thumbs/',
 
         // Translations
         'txt_no_img': 'Aucune image ☹',
@@ -387,65 +376,69 @@ if (!galinear_opt) {
         'txt_home': 'Retour à la galerie',
         'txt_permalink': 'Lien source',
         'txt_source': 'Image originale',
+        'txt_pref_toolbar': 'La barre d\'outils est affichée',
+        'txt_pref_toolbar_no': 'La barre d\'outils n\'est pas affichée',
+        'txt_pref_show_nsfw': 'Les images sensibles ne sont pas filtrées',
+        'txt_pref_show_nsfw_no': 'Les images sensibles sont filtrées',
 
         // Other, do not touch
         'touch_support': 'ontouchend' in document,
     };
 }
 
-
 // URL parameters bypass
-if (params.per_page) {
-    galinear_opt.per_page = parseInt(params.per_page, 10);
-    if (galinear_opt.per_page < 10) { galinear_opt.per_page = 10; }
-}
-if (params.lines) {
-    galinear_opt.lines = parseInt(params.lines, 10);
-    if (galinear_opt.lines < 2) { galinear_opt.lines = 2; }
-}
-if (params.show_nsfw) {
-    galinear_opt.show_nsfw = parseInt(params.show_nsfw, 10);
-    if (galinear_opt.show_nsfw !== 1) { galinear_opt.show_nsfw = 0; }
-}
-if (params.toolbar) {
-    galinear_opt.toolbar = parseInt(params.toolbar, 10);
-    if (galinear_opt.toolbar !== 1) { galinear_opt.toolbar = 0; }
-}
-if (params.al) {
-    galinear_opt.use_ambilight = parseInt(params.al, 10);
-    if (galinear_opt.use_ambilight !== 1) { galinear_opt.use_ambilight = 0; }
-}
+var params = parse_query_string();
+if (params.per_page)  galinear_prefs.per_page = parseInt(params.per_page, 10);
+if (params.lines)     galinear_prefs.lines = parseInt(params.lines, 10);
+if (params.show_nsfw) galinear_prefs.show_nsfw = parseInt(params.show_nsfw, 10);
+if (params.toolbar)   galinear_prefs.toolbar = parseInt(params.toolbar, 10);
 
 // Cookies parameters bypass (> URL > defaults options)
-if (navigator.cookieEnabled && document.cookie.length > 0) {
-    // FIX : à faire
-}
+galinear_prefs = read_cookie();
+
+// Sanitize parmeters
+if (galinear_prefs.per_page < 10)       galinear_prefs.per_page = 10;
+if (galinear_prefs.lines < 2)           galinear_prefs.lines = 2;
+if (galinear_prefs.show_nsfw !== 1)     galinear_prefs.show_nsfw = 0;
+if (galinear_prefs.toolbar !== 1)       galinear_prefs.toolbar = 0;
 
 if (params.i && gallery.length > 0) {
     // Display one image
-    adjust_me = function (){
-        'use strict';
-        var fig = document.getElementsByClassName('image-container-alone')[0],
-            img = fig.getElementsByTagName('img')[0];
-
-        if (img.width < document.documentElement.clientWidth - 2) {
-            img.style.borderLeft = '1px solid #111';
-            img.style.borderRight = '1px solid #111';
-        }
-        if (img.height < document.documentElement.clientHeight - 2) {
-            img.style.borderTop = '1px solid #111';
-            img.style.borderBottom = '1px solid #111';
-        }
-        if (galinear_opt.use_ambilight) {
-            makeLight();
-        }
-    };
-
     var figure, img, title, toolbar, home,
         permalink, source, previous, next,
+        start = 0,
+        adjust_me = function () {
+            var fig = document.getElementsByClassName('image-container-alone')[0],
+                img = fig.getElementsByTagName('img')[0];
+
+            if (img.width < document.documentElement.clientWidth - 2) {
+                img.style.borderLeft = '1px solid #111';
+                img.style.borderRight = '1px solid #111';
+            }
+            if (img.height < document.documentElement.clientHeight - 2) {
+                img.style.borderTop = '1px solid #111';
+                img.style.borderBottom = '1px solid #111';
+            }
+            ambilight_effect();
+        },
+        curr_prev_next = function (key) {
+            var i,
+                len = gallery.length,
+                current = false,
+                prev = false,
+                next = false;
+            for (i = 0; i < len; i += 1) {
+                if (gallery[i].key === key) {
+                    current = gallery[i];
+                    if (i > 0) { prev = gallery[i - 1]; }
+                    if (i < len - 1) { next = gallery[i + 1]; }
+                    break;
+                }
+            }
+            return {'current': current, 'previous': prev, 'next': next};
+        },
         curr_prev_next_img = curr_prev_next(params.i),
-        image = curr_prev_next_img.current,
-        start = 0;;
+        image = curr_prev_next_img.current;
 
     if (image === false) {
         document.write('<p>' + galinear_opt.txt_no_img + '</p>');
@@ -454,14 +447,6 @@ if (params.i && gallery.length > 0) {
         if (image.nsfw) { title += ' [ ☂ NSFW ]'; }
         title += ' - ' + document.title;
         document.title = title;
-
-        if (!galinear_opt.use_ambilight) {
-            if (!image.docolav) {
-                image.docolav = '222';
-            }
-            document.body.style.background = '#' + image.docolav + ' url(assets/img/bg.png)';
-            document.body.style.transition = '1s';
-        }
 
         img = document.createElement('img');
         img.src = galinear_opt.img_folder + image.src;
@@ -489,8 +474,7 @@ if (params.i && gallery.length > 0) {
                         document.location = '?i=' + curr_prev_next_img.next.key;
                     }
                 }
-            }
-            , false);
+            }, false);
         } else {
             // Create the previous/next butons
             if (curr_prev_next_img.previous !== false) {
@@ -527,7 +511,7 @@ if (params.i && gallery.length > 0) {
         }
 
         // Create the toolbar
-        if (galinear_opt.toolbar) {
+        if (galinear_prefs.toolbar) {
             home = document.createElement('a');
             home.className = 'home';
             home.href = galinear_opt.gallery_url;
@@ -567,22 +551,62 @@ if (params.i && gallery.length > 0) {
     linear_me = function () {
         'use strict';
         var i, image, images, figure, a, img, nsfw,
-            pagination, resized_images, tmp, day,
+            footer, resized_images, tmp, day,
             text = '',
             n = 0,
             page = 1,
             start = 0,
             len = gallery.length,
             container = document.getElementById('image-container'),
-            max = Math.ceil(len / galinear_opt.per_page);
+            max = Math.ceil(len / galinear_prefs.per_page);
 
         if (params.p && !params.d) {
             page = parseInt(params.p, 10);
             if (page < 1) { page = 1; }
             if (page > max) { page = max; }
-            start = (page - 1) * galinear_opt.per_page;
+            start = (page - 1) * galinear_prefs.per_page;
         }
 
+        // Cookie pref
+        if (navigator.cookieEnabled) {
+            var prefs = document.createElement('div'),
+                p_toolbar = document.createElement('a'),
+                p_show_nsfw = document.createElement('a');
+
+            // Toolbar
+            text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
+            p_toolbar.text = '♆';
+            p_toolbar.title = text;
+            p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
+            addEvent(p_toolbar, 'click', function () {
+                galinear_prefs.toolbar = !galinear_prefs.toolbar + 0;
+                p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
+                text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
+                p_toolbar.title = text;
+                store_cookie();
+            });
+            prefs.appendChild(p_toolbar);
+
+            // NSFW
+            text = (galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
+            p_show_nsfw.text = '☂';
+            p_show_nsfw.title = text;
+            p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
+            addEvent(p_show_nsfw, 'click', function () {
+                galinear_prefs.show_nsfw = !galinear_prefs.show_nsfw + 0;
+                p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
+                text = (!galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
+                p_show_nsfw.title = text;
+                store_cookie();
+                location.reload(true);
+            });
+            prefs.appendChild(p_show_nsfw);
+
+            prefs.className = 'prefs';
+            container.appendChild(prefs);
+        }
+
+        // The gallery
         if (gallery_images.length === 0) {
             if (params.d) {
                 // Filter by date
@@ -595,7 +619,7 @@ if (params.i && gallery.length > 0) {
                 gallery = tmp;
                 len = gallery.length;
             }
-            for (i = start; i < len && n < galinear_opt.per_page; i += 1, n += 1) {
+            for (i = start; i < len && n < galinear_prefs.per_page; i += 1, n += 1) {
                 img = document.createElement('img');
                 img.width = gallery[i].w;
                 img.height = gallery[i].h;
@@ -608,7 +632,7 @@ if (params.i && gallery.length > 0) {
                 figure.appendChild(a);
 
                 // NSFW
-                if (gallery[i].nsfw && !galinear_opt.show_nsfw) {
+                if (gallery[i].nsfw && !galinear_prefs.show_nsfw) {
                     figure.className = 'nsfw';
                     figure.title = '/!\\ NSFW /!\\';
                 }
@@ -630,7 +654,7 @@ if (params.i && gallery.length > 0) {
 
         resized_images = linearPartitionFitPics(gallery_images, {
             containerWidth: document.documentElement.clientWidth - 16,  // 8px * 2 from body margins
-            preferedImageHeight: parseInt((document.documentElement.clientHeight - 25) / galinear_opt.lines, 10),
+            preferedImageHeight: parseInt((document.documentElement.clientHeight - 25) / galinear_prefs.lines, 10),
             spacing: 4
         });
         images = container.getElementsByTagName('figure');
@@ -644,7 +668,7 @@ if (params.i && gallery.length > 0) {
             //~ addEvent(image.originalImage, 'load', (fancy_load)(images[i], image.originalImage));
 
             // NSFW
-            if (gallery_images[i].nsfw && !galinear_opt.show_nsfw) {
+            if (gallery_images[i].nsfw && !galinear_prefs.show_nsfw) {
                 figure = document.getElementsByTagName('figure')[i];
                 if (resized_images[i].width < 95) {
                     figure.style.backgroundSize = 'contain';
@@ -658,8 +682,10 @@ if (params.i && gallery.length > 0) {
         }
 
         // Pagination
-        if (!params.d) {
-            pagination = document.createElement('div');
+        if (!params.d)
+        {
+            footer = document.createElement('div');
+            text = '';
             if ( page > 0 && page < max ) {
                 text += '<a href="?p='+ (page + 1) + '">' + galinear_opt.txt_older + '</a> &nbsp; ';
             }
@@ -667,14 +693,14 @@ if (params.i && gallery.length > 0) {
             if (page > 1) {
                 text += ' &nbsp; <a href="?p='+ (page - 1) + '">' + galinear_opt.txt_newer + '</a>';
             }
-            pagination.innerHTML = text;
-            pagination.className = 'pagination';
-            container.appendChild(pagination);
+            footer.innerHTML = text;
+            footer.className = 'footer';
+            container.appendChild(footer);
         }
 
         if (!galinear_opt.touch_support) {
             // Keyboard left/right
-            document.onkeydown = function(e) {
+            document.onkeydown = function (e) {
                 e = e || window.event;
                 switch (e.which || e.keyCode) {
                     case 37:
@@ -695,4 +721,3 @@ if (params.i && gallery.length > 0) {
     window.onload = linear_me;
     window.onresize = linear_me;
 }
-

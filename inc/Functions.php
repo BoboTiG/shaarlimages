@@ -191,7 +191,7 @@ class Fct
         self::secure_save(Config::$database, self::serialise($images));
 
         $lines = "var gallery = [\n";
-        $line = "{'key':'%s','src':'%s','w':%d,'h':%d,docolav:'%s','guid':'%s','date':%s,'nsfw':%d},\n";
+        $line = "{'key':'%s','src':'%s','w':%d,'h':%d,'guid':'%s','date':%s,'nsfw':%d},\n";
         foreach ( $images as $key => $data )
         {
             if ( is_file(Config::$img_dir.$data['link']) ) {
@@ -202,7 +202,6 @@ class Fct
                 $lines .= sprintf($line,
                     $key, $data['link'],
                     $width, $height,
-                    $data['docolav'],
                     $data['guid'],
                     $data['date'],
                     $data['nsfw']
@@ -224,32 +223,6 @@ class Fct
             return 0;
         }
         return ( $a['date'] < $b['date'] ) ? 1 : -1;  // invert '1 : -1' for sort()
-    }
-
-    /**
-     * Compute the dominant color average.
-     * http://stackoverflow.com/questions/6962814/average-of-rgb-color-of-image
-     */
-    public static function docolav($file, $width, $height, $type)
-    {
-        if ( $type == 2 ) {  // jpeg
-            $img = imagecreatefromjpeg(Config::$img_dir.$file);
-        } elseif ( $type == 3 ) {  // png
-            $img = imagecreatefrompng(Config::$img_dir.$file);
-        } else {
-            return '222';
-        }
-
-        $tmp_img = ImageCreateTrueColor(1, 1);
-        ImageCopyResampled($tmp_img, $img, 0, 0, 0, 0, 1, 1, $width, $height);
-        $rgb = ImageColorAt($tmp_img, 0, 0);
-        $r = ($rgb >> 16) & 0xFF;
-        $g = ($rgb >> 8) & 0xFF;
-        $b =  $rgb & 0xFF;
-        unset($rgb);
-        imagedestroy($tmp_img);
-        imagedestroy($img);
-        return sprintf('%02X%02X%02X', $r, $g, $b);
     }
 
     /**

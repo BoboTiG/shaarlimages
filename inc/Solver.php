@@ -111,7 +111,7 @@ class Solver
         }
         $url = 'https://backend.deviantart.com/oembed?url='.$link;
         $req = json_decode(Fct::load_url($url), true);
-        //Fct::__($req);
+        //~ Fct::__($req);
         if ( $req['type'] == 'photo' ) {
             $ext = pathinfo($req['url'], 4);
             if ( array_key_exists($ext, self::$ext) ) {
@@ -138,7 +138,7 @@ class Solver
             $url = 'https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&format=php_serial&api_key=%s&photo_id=%s';
             $url = sprintf($url, self::$flickr_auth, $parts[0]);
             $req = unserialize(Fct::load_url($url));
-            //Fct::__($req);
+            //~ Fct::__($req);
             if ( $req['stat'] == 'ok' && $req['sizes']['candownload'] ) {
                 $original = end($req['sizes']['size']);
                 $ext = pathinfo($original['source'], 4);
@@ -242,7 +242,7 @@ class Solver
         $parts = explode('/', trim($link, '/'));
         $url = 'https://xkcd.com/'.end($parts).'/info.0.json';
         $req = json_decode(Fct::load_url($url), true);
-        //Fct::__($req);
+        //~ Fct::__($req);
         if ( !empty($req['img']) ) {
             $parts = explode('/', $req['img']);
             $img = 'https://sslimgs.xkcd.com/comics/'.end($parts);

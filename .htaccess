@@ -28,9 +28,9 @@ AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javasc
         Satisfy all
 </Files>
 
-FileETag Size
+FileETag MTime Size
 
 
-ErrorDocument 401 /
-ErrorDocument 403 /
-ErrorDocument 404 /
+ErrorDocument 401 /index.php?error
+ErrorDocument 403 /index.php?error
+ErrorDocument 404 /index.php?error
