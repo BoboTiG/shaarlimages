@@ -10,7 +10,8 @@
  *
  *  0.3 - add ambilight effect
  *      - remove color average effect
- *      - add preferences by cookie (toolbar, show_nsfw and al)
+ *      - add preferences by cookie (toolbar and show_nsfw)
+ *      - better effect on page images
  *      - code refactor
  *  0.2 - touch events ready!
  *      - filter by date is functional (URL parameter 'd': ?d=yyyymmdd)
@@ -178,7 +179,7 @@ function linearPartitionFitPics(images, options) {
     }
 
     return images;
-};
+}
 
 // Ambilight effect
 function ambilight_effect() {
@@ -191,7 +192,7 @@ function ambilight_effect() {
         grain_ctx = grain.getContext('2d'),
         mask = 'assets/img/mask.png',
         image = new Image(),
-        block_width = 100,
+        block_width = 150,
         calcMidColor = function (data, from, to) {
             var i,
                 result = [0, 0, 0],
@@ -291,10 +292,10 @@ function parse_query_string() {
         params[$1] = $3;
     });
     return params;
-};
+}
 
 // Event handler
-function addEvent(element, evnt, funct) {
+function add_event(element, evnt, funct) {
     'use strict';
     if (element.attachEvent) {
         return element.attachEvent('on' + evnt, funct);
@@ -355,34 +356,36 @@ function read_cookie() {
  * C'est parti mon kiki !
  *
  */
-if (!galinear_opt || !galinear_prefs) {
-    // Default options
-    // See https://github.com/BoboTiG/galinear for more informations.
-    var galinear_prefs = {
-        'per_page': 20,
-        'lines': 3,
-        'show_nsfw': 0,
-        'toolbar': 1,
-    };
+// Default options
+// See https://github.com/BoboTiG/galinear for more informations.
+if (!galinear_opt) {
     var galinear_opt = {
-        'gallery_url': '/',
-        'img_folder': 'images/',
+        'gallery_url' : '/',
+        'img_folder'  : 'images/',
         'thumb_folder': 'images/thumbs/',
 
         // Translations
-        'txt_no_img': 'Aucune image ☹',
-        'txt_older': '◄ Vieilleries',
-        'txt_newer': 'Nouveautés ►',
-        'txt_home': 'Retour à la galerie',
-        'txt_permalink': 'Lien source',
-        'txt_source': 'Image originale',
-        'txt_pref_toolbar': 'La barre d\'outils est affichée',
-        'txt_pref_toolbar_no': 'La barre d\'outils n\'est pas affichée',
-        'txt_pref_show_nsfw': 'Les images sensibles ne sont pas filtrées',
+        'txt_no_img'           : 'Aucune image ☹',
+        'txt_older'            : '◄ Vieilleries',
+        'txt_newer'            : 'Nouveautés ►',
+        'txt_home'             : 'Retour à la galerie',
+        'txt_permalink'        : 'Lien source',
+        'txt_source'           : 'Image originale',
+        'txt_pref_toolbar'     : 'La barre d\'outils est affichée',
+        'txt_pref_toolbar_no'  : 'La barre d\'outils n\'est pas affichée',
+        'txt_pref_show_nsfw'   : 'Les images sensibles ne sont pas filtrées',
         'txt_pref_show_nsfw_no': 'Les images sensibles sont filtrées',
 
         // Other, do not touch
         'touch_support': 'ontouchend' in document,
+    };
+}
+if (!galinear_prefs) {
+    var galinear_prefs = {
+        'per_page' : 20,
+        'lines'    : 3,
+        'show_nsfw': 0,
+        'toolbar'  : 1,
     };
 }
 
@@ -402,25 +405,11 @@ if (galinear_prefs.lines < 2)           galinear_prefs.lines = 2;
 if (galinear_prefs.show_nsfw !== 1)     galinear_prefs.show_nsfw = 0;
 if (galinear_prefs.toolbar !== 1)       galinear_prefs.toolbar = 0;
 
+// Display one image
 if (params.i && gallery.length > 0) {
-    // Display one image
     var figure, img, title, toolbar, home,
         permalink, source, previous, next,
         start = 0,
-        adjust_me = function () {
-            var fig = document.getElementsByClassName('image-container-alone')[0],
-                img = fig.getElementsByTagName('img')[0];
-
-            if (img.width < document.documentElement.clientWidth - 2) {
-                img.style.borderLeft = '1px solid #111';
-                img.style.borderRight = '1px solid #111';
-            }
-            if (img.height < document.documentElement.clientHeight - 2) {
-                img.style.borderTop = '1px solid #111';
-                img.style.borderBottom = '1px solid #111';
-            }
-            ambilight_effect();
-        },
         curr_prev_next = function (key) {
             var i,
                 len = gallery.length,
@@ -458,10 +447,10 @@ if (params.i && gallery.length > 0) {
 
         if (galinear_opt.touch_support) {
             // Use fingers :)
-            addEvent(document, 'touchstart', function (e) {
+            add_event(document, 'touchstart', function (e) {
                 start = e.targetTouches[0].clientX;
             }, false);
-            addEvent(document, 'touchmove', function (e) {
+            add_event(document, 'touchmove', function (e) {
                 e.preventDefault();
                 if (start - e.targetTouches[0].clientX < 0) {
                     // Sliding to left
@@ -537,187 +526,192 @@ if (params.i && gallery.length > 0) {
         }
     }
 
-    window.onload = adjust_me;
-    window.onresize = adjust_me;
-} else {
-    // Display all images
-    var gallery_images = [];
-
-    //~ fancy_load = function (tag_figure, tag_img) {
-        //~ 'use strict';
-        //~ tag_img.style.visibility = 'visible';
-    //~ };
-
-    linear_me = function () {
-        'use strict';
-        var i, image, images, figure, a, img, nsfw,
-            footer, resized_images, tmp, day,
-            text = '',
-            n = 0,
-            page = 1,
-            start = 0,
-            len = gallery.length,
-            container = document.getElementById('image-container'),
-            max = Math.ceil(len / galinear_prefs.per_page);
-
-        if (params.p && !params.d) {
-            page = parseInt(params.p, 10);
-            if (page < 1) { page = 1; }
-            if (page > max) { page = max; }
-            start = (page - 1) * galinear_prefs.per_page;
-        }
-
-        // Cookie pref
-        if (navigator.cookieEnabled) {
-            var prefs = document.createElement('div'),
-                p_toolbar = document.createElement('a'),
-                p_show_nsfw = document.createElement('a');
-
-            // Toolbar
-            text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
-            p_toolbar.text = '♆';
-            p_toolbar.title = text;
-            p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
-            addEvent(p_toolbar, 'click', function () {
-                galinear_prefs.toolbar = !galinear_prefs.toolbar + 0;
-                p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
-                text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
-                p_toolbar.title = text;
-                store_cookie();
-            });
-            prefs.appendChild(p_toolbar);
-
-            // NSFW
-            text = (galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
-            p_show_nsfw.text = '☂';
-            p_show_nsfw.title = text;
-            p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
-            addEvent(p_show_nsfw, 'click', function () {
-                galinear_prefs.show_nsfw = !galinear_prefs.show_nsfw + 0;
-                p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
-                text = (!galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
-                p_show_nsfw.title = text;
-                store_cookie();
-                location.reload(true);
-            });
-            prefs.appendChild(p_show_nsfw);
-
-            prefs.className = 'prefs';
-            container.appendChild(prefs);
-        }
-
-        // The gallery
-        if (gallery_images.length === 0) {
-            if (params.d) {
-                // Filter by date
-                tmp = [];
-                for (i = 0; i < len; i += 1) {
-                    if (parse_date(gallery[i].date) === params.d) {
-                        tmp.push(gallery[i]);
-                    }
-                }
-                gallery = tmp;
-                len = gallery.length;
+    window.onload = ambilight_effect;
+}
+// Display all images
+else {
+    var gallery_images = [],
+        linear_me = function () {
+            if (typeof(gallery) == 'undefined') {
+                document.write('<p>' + galinear_opt.txt_no_img + '</p>');
+                return;
             }
-            for (i = start; i < len && n < galinear_prefs.per_page; i += 1, n += 1) {
-                img = document.createElement('img');
-                img.width = gallery[i].w;
-                img.height = gallery[i].h;
+            var i, image, images, figure, a, img, fake_img, nsfw,
+                footer, resized_images, tmp, day,
+                text = '',
+                n = 0,
+                page = 1,
+                start = 0,
+                len = gallery.length,
+                container = document.getElementById('image-container'),
+                max = Math.ceil(len / galinear_prefs.per_page);
 
-                a = document.createElement('a');
-                a.href = '?i=' + gallery[i].key;
-                a.appendChild(img);
+            if (params.p && !params.d) {
+                page = parseInt(params.p, 10);
+                if (page < 1) { page = 1; }
+                if (page > max) { page = max; }
+                start = (page - 1) * galinear_prefs.per_page;
+            }
 
-                figure = document.createElement('figure');
-                figure.appendChild(a);
+            // Cookie pref
+            if (navigator.cookieEnabled) {
+                var prefs = document.createElement('div'),
+                    p_toolbar = document.createElement('a'),
+                    p_show_nsfw = document.createElement('a');
+
+                // Toolbar
+                text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
+                p_toolbar.text = '♆';
+                p_toolbar.title = text;
+                p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
+                add_event(p_toolbar, 'click', function () {
+                    galinear_prefs.toolbar = !galinear_prefs.toolbar + 0;
+                    p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
+                    text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
+                    p_toolbar.title = text;
+                    store_cookie();
+                });
+                prefs.appendChild(p_toolbar);
 
                 // NSFW
-                if (gallery[i].nsfw && !galinear_prefs.show_nsfw) {
-                    figure.className = 'nsfw';
-                    figure.title = '/!\\ NSFW /!\\';
-                }
-                container.appendChild(figure);
-
-                gallery_images.push({
-                    originalImage: container.getElementsByTagName('figure')[n].getElementsByTagName('img')[0],
-                    width: gallery[i].w,
-                    height: gallery[i].h,
-                    nsfw: gallery[i].nsfw
+                text = (galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
+                p_show_nsfw.text = '☂';
+                p_show_nsfw.title = text;
+                p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
+                add_event(p_show_nsfw, 'click', function () {
+                    galinear_prefs.show_nsfw = !galinear_prefs.show_nsfw + 0;
+                    p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
+                    text = (!galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
+                    p_show_nsfw.title = text;
+                    store_cookie();
+                    location.reload(true);
                 });
+                prefs.appendChild(p_show_nsfw);
+
+                prefs.className = 'prefs';
+                container.appendChild(prefs);
             }
-        }
 
-        if (len === 0) {
-            document.write('<p>' + galinear_opt.txt_no_img + '</p>');
-            return;
-        }
+            // The gallery
+            if (gallery_images.length === 0) {
+                if (params.d) {
+                    // Filter by date
+                    tmp = [];
+                    for (i = 0; i < len; i += 1) {
+                        if (parse_date(gallery[i].date) === params.d) {
+                            tmp.push(gallery[i]);
+                        }
+                    }
+                    gallery = tmp;
+                    len = gallery.length;
+                }
+                for (i = start; i < len && n < galinear_prefs.per_page; i += 1, n += 1) {
+                    fake_img = document.createElement('img');
+                    fake_img.width = gallery[i].w;
+                    fake_img.height = gallery[i].h;
+                    fake_img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+                    fake_img.setAttribute('data-type', 'fake');
 
-        resized_images = linearPartitionFitPics(gallery_images, {
-            containerWidth: document.documentElement.clientWidth - 16,  // 8px * 2 from body margins
-            preferedImageHeight: parseInt((document.documentElement.clientHeight - 25) / galinear_prefs.lines, 10),
-            spacing: 4
-        });
-        images = container.getElementsByTagName('figure');
+                    img = document.createElement('img');
+                    img.width = gallery[i].w;
+                    img.height = gallery[i].h;
+                    img.setAttribute('data-type', 'zzzblah');
 
-        for (i = 0, len = gallery_images.length; i < len; i += 1) {
-            image = gallery_images[i];
-            image.originalImage.width = resized_images[i].width;
-            image.originalImage.height = resized_images[i].height;
+                    a = document.createElement('a');
+                    a.href = '?i=' + gallery[i].key;
+                    a.appendChild(img);
+                    a.appendChild(fake_img);
 
-            // FIX : fonctionne pas
-            //~ addEvent(image.originalImage, 'load', (fancy_load)(images[i], image.originalImage));
+                    figure = document.createElement('figure');
+                    figure.appendChild(a);
 
-            // NSFW
-            if (gallery_images[i].nsfw && !galinear_prefs.show_nsfw) {
-                figure = document.getElementsByTagName('figure')[i];
-                if (resized_images[i].width < 95) {
-                    figure.style.backgroundSize = 'contain';
+                    // NSFW
+                    if (gallery[i].nsfw && !galinear_prefs.show_nsfw) {
+                        figure.className = 'nsfw';
+                    }
+                    container.appendChild(figure);
+
+                    gallery_images.push({
+                        originalImage: img,
+                        fakeImage: fake_img,
+                        width: gallery[i].w,
+                        height: gallery[i].h,
+                        nsfw: gallery[i].nsfw
+                    });
                 }
             }
 
-            image.originalImage.src = galinear_opt.thumb_folder + gallery[start + i].src;
-            if (!image.last) {
-                images[i].style.marginRight = '4px';
+            if (len === 0) {
+                document.write('<p>' + galinear_opt.txt_no_img + '</p>');
+                return;
             }
-        }
 
-        // Pagination
-        if (!params.d)
-        {
-            footer = document.createElement('div');
-            text = '';
-            if ( page > 0 && page < max ) {
-                text += '<a href="?p='+ (page + 1) + '">' + galinear_opt.txt_older + '</a> &nbsp; ';
-            }
-            text += ' &nbsp; page ' + page + '/' + max + ' &nbsp; ';
-            if (page > 1) {
-                text += ' &nbsp; <a href="?p='+ (page - 1) + '">' + galinear_opt.txt_newer + '</a>';
-            }
-            footer.innerHTML = text;
-            footer.className = 'footer';
-            container.appendChild(footer);
-        }
+            resized_images = linearPartitionFitPics(gallery_images, {
+                containerWidth: document.documentElement.clientWidth - 16,  // 8px * 2 from body margins
+                preferedImageHeight: parseInt((document.documentElement.clientHeight - 25) / galinear_prefs.lines, 10),
+                spacing: 4
+            });
+            images = container.getElementsByTagName('figure');
 
-        if (!galinear_opt.touch_support) {
-            // Keyboard left/right
-            document.onkeydown = function (e) {
-                e = e || window.event;
-                switch (e.which || e.keyCode) {
-                    case 37:
-                        if ( page > 0 && page < max ) {
-                            document.location = '?p=' + (page + 1);
-                        }
-                        break;
-                    case 39:
-                        if (page > 1) {
-                             document.location = '?p=' + (page - 1);
-                        }
-                        break;
+            for (i = 0, len = gallery_images.length; i < len; i += 1) {
+                image = gallery_images[i];
+                image.fakeImage.width = resized_images[i].width;
+                image.fakeImage.height = resized_images[i].height;
+                image.fakeImage.style.marginLeft = '-' + resized_images[i].width + 'px';
+                image.originalImage.width = resized_images[i].width;
+                image.originalImage.height = resized_images[i].height;
+                add_event(image.originalImage, 'load', (function (fake) {
+                    fake.style.opacity = 0.0;
+                    fake.style.zIndex = 0;
+                })(image.fakeImage));
+                image.originalImage.src = galinear_opt.thumb_folder + gallery[start + i].src;
+                if (!image.last) {
+                    images[i].style.marginRight = '4px';
                 }
-            };
-        }
-    };
+
+                // NSFW
+                if (gallery_images[i].nsfw && !galinear_prefs.show_nsfw && (resized_images[i].width < 95)) {
+                    document.getElementsByTagName('figure')[i].style.backgroundSize = 'contain';
+                }
+            }
+            images[len - 1].style.marginBottom = '8px';
+
+            // Pagination
+            if (!params.d && max > 1)
+            {
+                footer = document.createElement('div');
+                text = '';
+                if ( page > 0 && page < max ) {
+                    text += '<a href="?p='+ (page + 1) + '">' + galinear_opt.txt_older + '</a> &nbsp; ';
+                }
+                text += ' &nbsp; page ' + page + '/' + max + ' &nbsp; ';
+                if (page > 1) {
+                    text += ' &nbsp; <a href="?p='+ (page - 1) + '">' + galinear_opt.txt_newer + '</a>';
+                }
+                footer.innerHTML = text;
+                footer.className = 'footer';
+                container.appendChild(footer);
+            }
+
+            if (!galinear_opt.touch_support) {
+                // Keyboard left/right
+                document.onkeydown = function (e) {
+                    e = e || window.event;
+                    switch (e.which || e.keyCode) {
+                        case 37:
+                            if ( page > 0 && page < max ) {
+                                document.location = '?p=' + (page + 1);
+                            }
+                            break;
+                        case 39:
+                            if (page > 1) {
+                                 document.location = '?p=' + (page - 1);
+                            }
+                            break;
+                    }
+                };
+            }
+        };
 
     window.onload = linear_me;
-    window.onresize = linear_me;
 }
