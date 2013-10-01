@@ -4,7 +4,7 @@ class Rss
 {
 
     /**
-     * RSS cached page file name.
+     * Images database.
      */
     private $images = array();
 
@@ -15,6 +15,7 @@ class Rss
 
 
     public function __construct($nb = 50) {
+        Fct::create_dir(Config::$rss_dir);
         $this->images = Fct::unserialise(Config::$database);
         if ( $nb == 'all' ) {
             Config::$number = count($this->images);
@@ -22,13 +23,10 @@ class Rss
             Config::$number = max(1, min(count($this->images), $nb + 0));
         }
         $this->filename = Config::$rss_dir.Fct::small_hash(Config::$number).'.xml';
-        Fct::create_dir(Config::$rss_dir);
     }
 
     /**
-    * Create RSS Feed
-    * https://github.com/mknexen/shaarli-river/blob/master/includes/create_rss.php
-    * Inspired from http://www.phpntips.com/xmlwriter-2009-06/
+    * Get RSS feed contents.
     */
     public function get_data()
     {
@@ -90,8 +88,6 @@ class Rss
 
         foreach ( $entries as $key => $entry )
         {
-            list($width, $height, $type) = getimagesize(Config::$img_dir.$entry['link']);
-
             // item
             $xml->startElement('item');
             if ( $entry['nsfw'] ) {
