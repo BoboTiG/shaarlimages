@@ -8,8 +8,6 @@
  * Each function have to return array('link' => null) on error.
  * Or an array with at least : type, width, height, nsfw, link
  * If the Api does not handle one of these, set it to NULL.
- *
- * Idée : http://www.commitstrip.com/fr/2013/09/24/yen-a-pour-2-minutes/
  */
 class Solver
 {
@@ -19,16 +17,18 @@ class Solver
      * domain => function name
      */
     public static $domains = array(
-        'www.bonjourmadame.fr' => 'bonjourmadame',
-        'i.chzbgr.com'         => 'cheezburger',
-        'deviantart.com'       => 'deviantart',
-        'flickr.com'           => 'flickr',
-        'secure.flickr.com'    => 'flickr',
-        'www.flickr.com'       => 'flickr',
-        'imgur.com'            => 'imgur',
-        'www.luc-damas.fr'     => 'luc',
-        'twitter.com'          => 'twitter',
-        'xkcd.com'             => 'xkcd',
+        'www.bonjourmadame.fr'  => 'bonjourmadame',
+        'i.chzbgr.com'          => 'cheezburger',
+        'www.commitstrip.com'   => 'commitstrip',
+        'deviantart.com'        => 'deviantart',
+        'flickr.com'            => 'flickr',
+        'secure.flickr.com'     => 'flickr',
+        'www.flickr.com'        => 'flickr',
+        'googleusercontent.com' => 'googleusercontent',
+        'imgur.com'             => 'imgur',
+        'www.luc-damas.fr'      => 'luc',
+        'twitter.com'           => 'twitter',
+        'xkcd.com'              => 'xkcd',
     );
 
     /**
@@ -69,22 +69,22 @@ class Solver
             foreach ( $doc->getElementsByTagName('meta') as $meta ) {
                 if ( $meta->getAttribute('property') == 'og:image' ) {
                     return array(
-                        'type' => 0,
-                        'width' => 0,
+                        'type'   => 0,
+                        'width'  => 0,
                         'height' => 0,
-                        'nsfw' => true,
-                        'link' => $meta->getAttribute('content')
+                        'nsfw'   => true,
+                        'link'   => $meta->getAttribute('content')
                     );
                 }
             }
         } elseif ( $parts[3] == 'image' ) {
             $image = $doc->getElementById('content')->getElementsByTagName('img')->item(0);
             return array(
-                'type' => 0,
-                'width' => 0,
+                'type'   => 0,
+                'width'  => 0,
                 'height' => 0,
-                'nsfw' => true,
-                'link' => $image->getAttribute('data-src')
+                'nsfw'   => true,
+                'link'   => $image->getAttribute('data-src')
             );
         }
         return array('link' => null);
@@ -98,6 +98,29 @@ class Solver
     public static function cheezburger($link)
     {
         return array('link' => $link);
+    }
+
+
+    /**
+     * commitstrip.com - "Eux, ce sont de vrais codeurs !"
+     */
+    public static function commitstrip($link)
+    {
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $doc->loadHTML(Fct::load_url($link));
+        $data = $doc->getElementsByTagName('article')->item(0)->getElementsByTagName('img')->item(0);
+        $ext = pathinfo($data->getAttribute('src'), 4);
+        if ( array_key_exists($ext, self::$ext) ) {
+            return array(
+                'type'   => self::$ext[$ext],
+                'width'  => (int)$data->getAttribute('width'),
+                'height' => (int)$data->getAttribute('height'),
+                'nsfw'   => false,
+                'link'   => $data->getAttribute('src')
+            );
+        }
+        return array('link' => null);
     }
 
 
@@ -117,11 +140,11 @@ class Solver
             if ( array_key_exists($ext, self::$ext) ) {
                 $nsfw = isset($req['rating']) ? $req['rating'] == 'adult' : 0;
                 return array(
-                    'type' => self::$ext[$ext],
-                    'width' => (int)$req['width'],
+                    'type'   => self::$ext[$ext],
+                    'width'  => (int)$req['width'],
                     'height' => (int)$req['height'],
-                    'nsfw' => (bool)$nsfw,
-                    'link' => $req['url']
+                    'nsfw'   => (bool)$nsfw,
+                    'link'   => $req['url']
                 );
             }
         }
@@ -144,13 +167,43 @@ class Solver
                 $ext = pathinfo($original['source'], 4);
                 if ( array_key_exists($ext, self::$ext) ) {
                     return array(
-                        'type' => self::$ext[$ext],
-                        'width' => (int)$original['width'],
+                        'type'   => self::$ext[$ext],
+                        'width'  => (int)$original['width'],
                         'height' => (int)$original['height'],
-                        'nsfw' => (bool)false,
-                        'link' => (string)$original['source']
+                        'nsfw'   => false,
+                        'link'   => (string)$original['source']
                     );
                 }
+            }
+        }
+        return array('link' => null);
+    }
+
+
+    /**
+     * googleusercontent.com
+     */
+    public static function googleusercontent($link)
+    {
+        $bytes = Fct::load_url($link, Fct::PARTIAL);
+        if ( $bytes !== false )
+        {
+            $ret = false;
+            $sig = substr(bin2hex($bytes), 0, 4);
+            if ( $sig == 'ffd8' ) {  // jpeg
+                $ret = true;
+            }
+            elseif ( $sig == '8950' ) {  // png
+                $ret = true;
+            }
+            if ( $ret === true ) {
+                return array(
+                    'type'   => 0,
+                    'width'  => 0,
+                    'height' => 0,
+                    'nsfw'   => false,
+                    'link'   => $link
+                );
             }
         }
         return array('link' => null);
@@ -171,11 +224,11 @@ class Solver
             //~ Fct::__($req);
             if ( $req['success'] && $req['data']['section'] != 'pics' && array_key_exists($req['data']['type'], self::$ext) ) {
                 return array(
-                    'type' => self::$ext[$req['data']['type']],
-                    'width' => (int)$req['data']['width'],
+                    'type'   => self::$ext[$req['data']['type']],
+                    'width'  => (int)$req['data']['width'],
                     'height' => (int)$req['data']['height'],
-                    'nsfw' => (bool)$req['data']['nsfw'],
-                    'link' => (string)$req['data']['link']
+                    'nsfw'   => (bool)$req['data']['nsfw'],
+                    'link'   => (string)$req['data']['link']
                 );
             }
         }
@@ -195,11 +248,11 @@ class Solver
         $src = $image->getAttribute('src');
         $ext = strtolower(pathinfo($src, 4));
         return array(
-            'type' => self::$ext[$ext],
-            'width' => (int)$image->getAttribute('width'),
+            'type'   => self::$ext[$ext],
+            'width'  => (int)$image->getAttribute('width'),
             'height' => (int)$image->getAttribute('height'),
-            'nsfw' => false,
-            'link' => $src
+            'nsfw'   => false,
+            'link'   => $src
         );
         return array('link' => null);
     }
@@ -221,11 +274,11 @@ class Solver
                     $img = substr($src, 0, -6);
                     $ext = strtolower(pathinfo($img, 4));
                     return array(
-                        'type' => self::$ext[$ext],
-                        'width' => (int)$image->getAttribute('width'),
+                        'type'   => self::$ext[$ext],
+                        'width'  => (int)$image->getAttribute('width'),
                         'height' => (int)$image->getAttribute('height'),
-                        'nsfw' => false,
-                        'link' => $src
+                        'nsfw'   => false,
+                        'link'   => $src
                     );
                 }
             }
@@ -247,11 +300,11 @@ class Solver
             $parts = explode('/', $req['img']);
             $img = 'https://sslimgs.xkcd.com/comics/'.end($parts);
             return array(
-                'type' => 0,
-                'width' => 0,
+                'type'   => 0,
+                'width'  => 0,
                 'height' => 0,
-                'nsfw' => false,
-                'link' => $img
+                'nsfw'   => false,
+                'link'   => $img
             );
         }
         return array('link' => null);
