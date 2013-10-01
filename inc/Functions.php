@@ -226,7 +226,7 @@ class Fct
     }
 
     /**
-     * Create an optimized and progressive JPEG small-szized file
+     * Create an optimized and progressive JPEG small-sized file
      * from original (big) image.
      */
     public static function create_thumb($file, $width, $height, $type)
