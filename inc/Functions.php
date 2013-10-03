@@ -128,7 +128,7 @@ class Fct
         $url = preg_replace('#\&([A-za-z]{2})(?:lig)\;#', '\1', $url);
         $url = stripslashes(strtok(urldecode(strtolower(trim($url))), '?'));
         filter_var(htmlentities($url, ENT_QUOTES, 'UTF-8'), FILTER_SANITIZE_STRING);
-        return str_replace(' ', '-', $url);
+        return str_replace(array(' ', '#'), '-', $url);
     }
 
     /**
