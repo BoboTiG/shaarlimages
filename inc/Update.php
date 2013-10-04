@@ -11,8 +11,9 @@ class Update
     const BAD          = 0;  // Host is the same as the current one or a simple URL
     const GOOD_EXT     = 1;  // URL ends with an image extension
     const GOOD_SOLVER  = 2;  // Host is in the Solvers
-    const SOLVER_DA    = 3;  // host is *.deviantart.com
+    const SOLVER_DVA   = 3;  // host is *.deviantart.com
     const SOLVER_GUC   = 4;  // Host is *.googleusercontent.com
+    const SOLVER_TUM   = 5;  // Host is *.tumblr.com
 
     /**
      * Shaarlis feed's URL.
@@ -107,10 +108,10 @@ class Update
                 $data = false;
                 $req = array();
                 if ( $lflag >= self::GOOD_SOLVER ) {
-                    if ( $lflag == self::SOLVER_DA ) {
-                        $host = 'deviantart.com';
-                    } elseif ( $lflag == self::SOLVER_GUC ) {
-                        $host = 'googleusercontent.com';
+                    switch ( $lflag ) {
+                        case self::SOLVER_TUM: $host = 'tumblr.com'; break;
+                        case self::SOLVER_DVA: $host = 'deviantart.com'; break;
+                        case self::SOLVER_GUC: $host = 'googleusercontent.com'; break;
                     }
                     $func = Solver::$domains[$host];
                     $req = Solver::$func($link);
@@ -197,8 +198,10 @@ class Update
             return self::GOOD_EXT;
         if ( array_key_exists($host, Solver::$domains) )
             return self::GOOD_SOLVER;
+        if ( substr($host, -10) == 'tumblr.com' )
+            return self::SOLVER_TUM;
         if ( substr($host, -14) == 'deviantart.com' )
-            return self::SOLVER_DA;
+            return self::SOLVER_DVA;
         if ( substr($host, -21) == 'googleusercontent.com' )
             return self::SOLVER_GUC;
         return self::BAD;

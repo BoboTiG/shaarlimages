@@ -27,6 +27,7 @@ class Solver
         'googleusercontent.com' => 'googleusercontent',
         'imgur.com'             => 'imgur',
         'www.luc-damas.fr'      => 'luc',
+        'tumblr.com'            => 'tumblr',
         'twitter.com'           => 'twitter',
         'xkcd.com'              => 'xkcd',
     );
@@ -40,6 +41,11 @@ class Solver
      * Authorization token to use imgur API (Client-ID)
      */
     public static $imgur_auth = '578aa28d5b8bac5';
+
+    /**
+     * Authorization token to use imgur API (Client-ID)
+     */
+    public static $tumblr_auth = '5JSziBTlDIAxfLGV532QWZ7YpE87UhVa0ueoGfKHTQJMC0bkpi';
 
     /**
      * Authorized extensions
@@ -157,7 +163,7 @@ class Solver
      */
     public static function flickr($link)
     {
-        if ( preg_match('/\d+/', $link, $parts) !== false ) {
+        if ( preg_match('/\d+/', $link, $parts) ) {
             $url = 'https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&format=php_serial&api_key=%s&photo_id=%s';
             $url = sprintf($url, self::$flickr_auth, $parts[0]);
             $req = unserialize(Fct::load_url($url));
@@ -254,6 +260,47 @@ class Solver
             'nsfw'   => false,
             'link'   => $src
         );
+        return array('link' => null);
+    }
+
+
+    /**
+     * tumblr.com - http://www.tumblr.com/docs/en/api/v2
+     */
+    public static function tumblr($link)
+    {
+        if ( preg_match('#image/(\d+)#', $link, $parts) ) {
+            $url = sprintf('http://api.tumblr.com/v2/blog/derekg.org/posts?id=%d&api_key=%s', end($parts), self::$tumblr_auth);
+            $req = json_decode(Fct::load_url($url), true);
+            //~ Fct::__($req);
+            if (
+                $req['meta']['status'] == 200 &&
+                $req['response']['total_posts'] == 1 &&
+                $req['response']['posts'][0]['type'] == 'photo'
+            ) {
+                $nsfw = (bool)$req['response']['blog']['is_nsfw'];
+                if ( !$nsfw ) {
+                    foreach ( $req['response']['posts'][0]['tags'] as $tag ) {
+                        if ( preg_match('/nsfw/', strtolower($tag)) ) {
+                            $nsfw = true;
+                            break;
+                        }
+                    }
+                }
+                $photo = $req['response']['posts'][0]['photos'][0]['original_size'];
+                //~ Fct::__($photo);
+                $ext = pathinfo($photo['url'], 4);
+                if ( array_key_exists($ext, self::$ext) ) {
+                    return array(
+                        'type'   => self::$ext[$ext],
+                        'width'  => (int)$photo['width'],
+                        'height' => (int)$photo['height'],
+                        'nsfw'   => $nsfw,
+                        'link'   => $photo['url']
+                    );
+                }
+            }
+        }
         return array('link' => null);
     }
 
