@@ -6,6 +6,25 @@ include 'inc/Update.php';
 
 $up = new Update();
 
+if ( $argc > 1 ) {
+    if ( $argv[1] == 'u=all' ) {
+        $i = 1;
+        $n = 0;
+        foreach ( $up->get_feeds() as $domain => $feed ) {
+            $ret = $up->read_feed($domain);
+            if ( $ret !== false ) {
+                echo "$i - $domain : $ret\n";
+                $n += $ret;
+                ++$i;
+            }
+        }
+        if ( $n > 0 ) {
+            Fct::generate_json();
+            system('bash sync.sh');
+        }
+    }
+    exit;
+}
 $selected = !empty($_GET['u']) ? $_GET['u'] : NULL;
 if ( $selected !== NULL ) {
     $ret = $up->read_feed($selected);
