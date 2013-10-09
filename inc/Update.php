@@ -121,11 +121,11 @@ class Update
                 {
                     list($width, $height, $type, $nsfw) = array(0, 0, 0, false);
                     if ( count($req) > 1 ) {
-                        $link = $req['link'];
-                        $width = $req['width'];
+                        $link   = $req['link'];
+                        $width  = $req['width'];
                         $height = $req['height'];
-                        $type = $req['type'];
-                        $nsfw = $req['nsfw'];
+                        $type   = $req['type'];
+                        $nsfw   = $req['nsfw'];
                     }
                     if ( $width == 0 || $height == 0 || $type == 0 ) {
                         list($width, $height, $type) = getimagesizefromstring($data);
@@ -152,11 +152,14 @@ class Update
                                     Fct::create_thumb($filename, $width, $height, $type);
                                 }
                                 $images[$key] = array();
-                                $images[$key]['date'] = $pubDate;
-                                $images[$key]['link'] = $filename;
-                                $images[$key]['guid'] = (string)$item->guid;
-                                $images[$key]['nsfw'] = $nsfw;
-                                // NSFW check, for sensible persons ... =]
+                                $images[$key]['date']  = $pubDate;
+                                $images[$key]['link']  = $filename;
+                                $images[$key]['guid']  = (string)$item->guid;
+                                $images[$key]['nsfw']  = $nsfw;
+                                $images[$key]['title'] = (string)$item->title;
+                                $images[$key]['desc']  = (string)$item->description;
+                                $images[$key]['tags']  = !empty($item->category) ? $item->category : array();
+                                // NSFW check, for sensible souls ... =]
                                 if ( !$nsfw && !empty($item->category) )
                                 {
                                     foreach ( $item->category as $category ) {
@@ -169,8 +172,11 @@ class Update
                                 }
                                 if ( !$images[$key]['nsfw'] )
                                 {
-                                    $sensible = preg_match('/nsfw/', strtolower((string)$item->title.(string)$item->description));
+                                    $sensible = (bool)preg_match('/nsfw/', strtolower((string)$item->title.(string)$item->description));
                                     $images[$key]['nsfw'] = $sensible;
+                                    if ( $sensible ) {
+                                        $images[$key]['tags'][] = 'nsfw';
+                                    }
                                 }
                             }
                         }
@@ -184,10 +190,7 @@ class Update
     }
 
     /**
-     * Check a link syntax.
-     * If it seems to be an image or does not finish by a slash, then it
-     * seems okay.
-     *
+     * Check a link.
      * Returns: check flags at the top of this file.
      */
     private function link_seems_ok($host, $link)

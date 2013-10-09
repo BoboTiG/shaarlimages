@@ -90,28 +90,26 @@ class Rss
         {
             // item
             $xml->startElement('item');
-            if ( $entry['nsfw'] ) {
-                $xml->writeElement('title', '[NSFW] '.$entry['link']);
+            if ( $entry['nsfw'] && !preg_match('/nsfw/', strtolower($entry['title'])) ) {
+                $xml->writeElement('title', '[NSFW] '.$entry['title']);
             } else {
-                $xml->writeElement('title', $entry['link']);
+                $xml->writeElement('title', $entry['title']);
             }
 
-            //$xml->writeElement('guid', $entry['guid']);
             $xml->writeElement('guid', $entry['guid']);
 
             $xml->startElement('description');
             $xml->writeCData(
+                '<p>'.$entry['desc'].'</p><br />'.
                 '<a href="'.Config::$link.'/?i='.$key.'"><img src="'.Config::$link.'/'.Config::$thumb_dir.$entry['link'].'"/></a>'
             );
             $xml->endElement();
             $xml->writeElement('pubDate', date('r', $entry['date']));
 
             // category
-            if ( $entry['nsfw'] ) {
-                $xml->startElement('category');
-                $xml->text('nsfw');
-                $xml->endElement();
-            }
+            $xml->startElement('category');
+            $xml->text(implode(', ', $entry['tags']));
+            $xml->endElement();
 
             // end item
             $xml->endElement();
