@@ -58,6 +58,8 @@ class Rss
                 } else {
                     Config::$number = max(1, min(count($this->images), $nb + 0));
                 }
+            } else {
+                Config::$number = 50;
             }
         }
     }
