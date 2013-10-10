@@ -14,15 +14,52 @@ class Rss
     private $filename = '';
 
 
-    public function __construct($nb = 50) {
+    public function __construct($params = array()) {
         Fct::create_dir(Config::$rss_dir);
         $this->images = Fct::unserialise(Config::$database);
-        if ( $nb == 'all' ) {
-            Config::$number = count($this->images);
-        } else {
-            Config::$number = max(1, min(count($this->images), $nb + 0));
+        $this->filters($params);
+        $this->filename = Config::$rss_dir.Fct::small_hash(Config::$number.implode('-', $params)).'.xml';
+    }
+
+    /**
+    * Few URL filters.
+    */
+    public function filters($params)
+    {
+        if ( !empty($params) ) {
+            // Filter on tags
+            if ( isset($params['tag']) )
+            {
+                $images = array();
+                $tags = array();
+                foreach ( explode(',', strtolower($params['tag'])) as $tag ) {
+                    $tags[$tag] = true;
+                }
+                foreach ( $this->images as $key => $entry ) {
+                    $ok = false;
+                    foreach ( $entry['tags'] as $tag ) {
+                        if ( isset($tags[$tag]) ) {
+                            $ok = true;
+                            break;
+                        }
+                    }
+                    if ( $ok === true ) {
+                        $images[] = $this->images[$key];
+                    }
+                }
+                $this->images = $images;
+            }
+            // Filter number of entries
+            if ( isset($params['nb']) )
+            {
+                $nb = $params['nb'];
+                if ( $nb == 'all' ) {
+                    Config::$number = count($this->images);
+                } else {
+                    Config::$number = max(1, min(count($this->images), $nb + 0));
+                }
+            }
         }
-        $this->filename = Config::$rss_dir.Fct::small_hash(Config::$number).'.xml';
     }
 
     /**
@@ -100,8 +137,8 @@ class Rss
 
             $xml->startElement('description');
             $xml->writeCData(
-                '<p>'.$entry['desc'].'</p><br />'.
-                '<a href="'.Config::$link.'/?i='.$key.'"><img src="'.Config::$link.'/'.Config::$thumb_dir.$entry['link'].'"/></a>'
+                '<a href="'.Config::$link.'/?i='.$key.'"><img src="'.Config::$link.'/'.Config::$thumb_dir.$entry['link'].'"/></a>'.
+                '<p>'.$entry['desc'].'</p>'
             );
             $xml->endElement();
             $xml->writeElement('pubDate', date('r', $entry['date']));

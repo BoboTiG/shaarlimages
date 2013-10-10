@@ -10,8 +10,7 @@ if ( $do !== NULL ) {
         include 'inc/Config.php';
         include 'inc/Functions.php';
         include 'inc/Rss.php';
-        $nb = !empty($_GET['n']) ? $_GET['n'] : 50;
-        $rss = new RSS($nb);
+        $rss = new RSS($_GET);
         echo $rss->get_data();
         exit;
     }

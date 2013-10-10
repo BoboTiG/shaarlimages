@@ -223,7 +223,7 @@ class Solver
     {
         $parts = explode('/', $link);
         // Ignore albums
-        if ( $parts[3] != 'a' ) {
+        if ( isset($parts[3]) && $parts[3] != 'a' ) {
             $headers = array('Authorization: Client-ID '.self::$imgur_auth);
             $url = 'https://api.imgur.com/3/image/'.end($parts);
             $req = json_decode(Fct::load_url($url, false, $headers), true);

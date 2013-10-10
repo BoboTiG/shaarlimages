@@ -85,7 +85,10 @@ class Fct
     public static function secure_save($file, $data)
     {
         $ret = file_put_contents($file, $data, LOCK_EX);
-        if ( $ret === false ) {
+        if ( $ret ) {
+            @chgrp($file, 'www-data');
+            @chmod($file, 0775);
+        } else {
             self::__(error_get_last());
         }
         return $ret;
@@ -128,16 +131,18 @@ class Fct
         $url = preg_replace('#\&([A-za-z]{2})(?:lig)\;#', '\1', $url);
         $url = stripslashes(strtok(urldecode(strtolower(trim($url))), '?'));
         filter_var(htmlentities($url, ENT_QUOTES, 'UTF-8'), FILTER_SANITIZE_STRING);
-        return str_replace(array(' ', '#'), '-', $url);
+        return str_replace(array(' ', '#', "'"), '-', $url);
     }
 
     /**
      * Create a directory, if not present.
      */
-    public static function create_dir($dir, $mode = 0750)
+    public static function create_dir($dir, $mode = 0777)
     {
         if ( !is_dir($dir) ) {
-            mkdir($dir, 0750);
+            mkdir($dir, $mode);
+            @chgrp($file, 'www-data');
+            @chmod($dir, $mode);
         }
     }
 
@@ -169,13 +174,12 @@ class Fct
      * Generate the JSON file.
      */
     public static function generate_json() {
-        usleep(1000000);  // 1 sec
         $images = array();
         $tmp = array();
         foreach ( glob(Config::$cache_dir.'*.php') as $db )
         {
             $tmp = self::unserialise($db);
-            $tmp = array_splice($tmp, 1);  // Remove the 'date' key
+            unset($tmp['date']);
             foreach ( array_keys($tmp) as $key )
             {
                 if ( empty($images[$key]) ) {
@@ -191,7 +195,7 @@ class Fct
         self::secure_save(Config::$database, self::serialise($images));
 
         $lines = "var gallery = [\n";
-        $line = "{'key':'%s','src':'%s','w':%d,'h':%d,'guid':'%s','date':%s,'nsfw':%d},\n";
+        $line = "{'key':'%s','src':'%s','w':%d,'h':%d,'guid':'%s','date':%d,'nsfw':%d},\n";
         foreach ( $images as $key => $data )
         {
             if ( is_file(Config::$img_dir.$data['link']) ) {
@@ -202,7 +206,7 @@ class Fct
                 $lines .= sprintf($line,
                     $key, $data['link'],
                     $width, $height,
-                    $data['guid'],
+                    str_replace("'", "\\'", $data['guid']),
                     $data['date'],
                     $data['nsfw']
                 );
@@ -254,9 +258,6 @@ class Fct
         imageinterlace($thumb, $progressive);
         imagecopyresized($thumb, $source, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
         imagejpeg($thumb, Config::$thumb_dir.$file, $quality);
-
-        chmod(Config::$thumb_dir.$file, 0644);
-
         imagedestroy($source);
         imagedestroy($thumb);
         return array($new_width, $new_height);

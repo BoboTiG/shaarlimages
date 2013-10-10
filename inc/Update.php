@@ -23,8 +23,8 @@ class Update
 
     public function __construct()
     {
-        Fct::create_dir(Config::$img_dir, 0755);
-        Fct::create_dir(Config::$thumb_dir, 0755);
+        Fct::create_dir(Config::$img_dir);
+        Fct::create_dir(Config::$thumb_dir);
         Fct::create_dir(Config::$data_dir);
         Fct::create_dir(Config::$cache_dir);
         self::get_opml(is_file(Config::$ompl_file));
@@ -91,6 +91,7 @@ class Update
             return -2;
         }
 
+        $count = 0;
         foreach ( $test->channel->item as $item )
         {
             $pubDate = date('U', strtotime($item->pubDate));
@@ -102,9 +103,10 @@ class Update
             // http://stackoverflow.com/questions/1251582/beautiful-way-to-remove-get-variables-with-php/1251650#1251650
             $link = strtok((string)$item->link, '?');
 
+            $key = Fct::small_hash((string)$item->link);
             $host = parse_url($link, 1);
             $lflag = $this->link_seems_ok($host, $link);
-            if ( $lflag > self::BAD ) {
+            if ( empty($images[$key]) && $lflag > self::BAD ) {
                 $data = false;
                 $req = array();
                 if ( $lflag >= self::GOOD_SOLVER ) {
@@ -117,8 +119,7 @@ class Update
                     $req = Solver::$func($link);
                     $link = $req['link'];
                 }
-                if ( ($data = Fct::load_url($link, Fct::IMAGE)) !== false )
-                {
+                if ( ($data = Fct::load_url($link, Fct::IMAGE)) !== false ) {
                     list($width, $height, $type, $nsfw) = array(0, 0, 0, false);
                     if ( count($req) > 1 ) {
                         $link   = $req['link'];
@@ -132,53 +133,46 @@ class Update
                     }
                     if ( $type == 2 || $type == 3 )  // jpeg, png
                     {
-                        $key = Fct::small_hash($data);
-                        if ( empty($images[$key]) )
+                        $img = basename($link);
+                        if ( $host == 'twitter.com' && substr($img, -6) == ':large' ) {
+                            $img = substr($img, 0, -6);  // delete ':large'
+                        }
+                        if ( strlen(pathinfo($img, 4)) == 0 ) {
+                            $img .= Config::$ext[$type];
+                        }
+                        $filename = $key.'_'.Fct::friendly_url($img);
+                        Fct::secure_save(Config::$img_dir.$filename, $data);
+                        Fct::create_thumb($filename, $width, $height, $type);
+                        $images[$key] = array();
+                        $images[$key]['date']  = $pubDate;
+                        $images[$key]['link']  = $filename;
+                        $images[$key]['guid']  = (string)$item->guid;
+                        $images[$key]['nsfw']  = $nsfw;
+                        $images[$key]['title'] = utf8_decode((string)$item->title);
+                        $images[$key]['desc']  = utf8_decode((string)$item->description);
+                        $images[$key]['tags']  = array();
+                        foreach ( $item->category as $category ) {
+                            $images[$key]['tags'][] = utf8_decode(strtolower((string)$category));
+                        }
+                        // NSFW check, for sensible souls ... =]
+                        if ( !$images[$key]['nsfw'] )
                         {
-                            $img = basename($link);
-                            if ( $host == 'twitter.com' ) {
-                                $img = substr($img, 0, -6);  // delete ':large'
+                            if ( in_array('nsfw', $images[$key]['tags']) ) {
+                                $images[$key]['nsfw'] = true;
+                            } elseif ( in_array('sexy', $images[$key]['tags']) ) {
+                                $images[$key]['nsfw'] = true;
+                                $images[$key]['tags'][] = 'nsfw';
+                            } elseif ( preg_match('/nsfw/', strtolower($images[$key]['title'].$images[$key]['desc'])) ) {
+                                $images[$key]['nsfw'] = true;
+                                $images[$key]['tags'][] = 'nsfw';
                             }
-                            if ( strlen(pathinfo($img, 4)) == 0 ) {
-                                $img .= $this->ext[$type];
-                            }
-                            $filename = Fct::friendly_url($img);
-                            if ( is_file(Config::$img_dir.$filename) ) {
-                                $filename = $key.'_'.$filename;
-                            }
-                            if ( Fct::secure_save(Config::$img_dir.$filename, $data) !== false ) {
-                                ++$ret;
-                                if ( !is_file(Config::$thumb_dir.$filename) ) {
-                                    Fct::create_thumb($filename, $width, $height, $type);
-                                }
-                                $images[$key] = array();
-                                $images[$key]['date']  = $pubDate;
-                                $images[$key]['link']  = $filename;
-                                $images[$key]['guid']  = (string)$item->guid;
-                                $images[$key]['nsfw']  = $nsfw;
-                                $images[$key]['title'] = (string)$item->title;
-                                $images[$key]['desc']  = (string)$item->description;
-                                $images[$key]['tags']  = !empty($item->category) ? $item->category : array();
-                                // NSFW check, for sensible souls ... =]
-                                if ( !$nsfw && !empty($item->category) )
-                                {
-                                    foreach ( $item->category as $category ) {
-                                        if ( strtolower($category) == 'nsfw' )
-                                        {
-                                            $images[$key]['nsfw'] = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if ( !$images[$key]['nsfw'] )
-                                {
-                                    $sensible = (bool)preg_match('/nsfw/', strtolower((string)$item->title.(string)$item->description));
-                                    $images[$key]['nsfw'] = $sensible;
-                                    if ( $sensible ) {
-                                        $images[$key]['tags'][] = 'nsfw';
-                                    }
-                                }
-                            }
+                        } elseif ( !in_array('nsfw', $images[$key]['tags']) ) {
+                            $images[$key]['tags'][] = 'nsfw';
+                        }
+                        ++$ret;
+                        if ( ++$count > 20 ) {
+                            Fct::secure_save($output, Fct::serialise($images));
+                            $count = 0;
                         }
                     }
                 }
@@ -218,7 +212,7 @@ class Update
     }
 
     public function get_url($domain) {
-        return $this->feeds['domains'][$domain]['url'];
+        return $this->feeds['domains'][$domain]['url']/*.'&nb=all'*/;
     }
 
 }
