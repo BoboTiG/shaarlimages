@@ -172,6 +172,8 @@ class Fct
 
     /**
      * Generate the JSON file.
+     * Added a RATIO limit for images with width/height too small or too big,
+     * it prevents to have a gallery as beautiful as Internet Explorer ...
      */
     public static function generate_json() {
         $images = array();
@@ -182,13 +184,18 @@ class Fct
             unset($tmp['date']);
             foreach ( array_keys($tmp) as $key )
             {
-                if ( empty($images[$key]) ) {
-                    $images[$key] = $tmp[$key];
-                }
-                elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
-                    // Older is better (could be the first to share)
-                    $images[$key] = $tmp[$key];
-                }
+                /* RATIO limit */list($width, $height) = getimagesize(Config::$img_dir.$tmp[$key]['link']);
+                /* RATIO limit */$ratio = $width / $height;
+                /* RATIO limit */if ( $ratio >= 0.3 && $ratio <= 3.0 )
+                /* RATIO limit */{
+                    if ( empty($images[$key]) ) {
+                        $images[$key] = $tmp[$key];
+                    }
+                    elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
+                        // Older is better (could be the first to share)
+                        $images[$key] = $tmp[$key];
+                    }
+                /* RATIO limit */}
             }
         }
         uasort($images, 'self::compare_date');
