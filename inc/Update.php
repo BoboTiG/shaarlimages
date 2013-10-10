@@ -159,7 +159,7 @@ class Update
                         {
                             if ( in_array('nsfw', $images[$key]['tags']) ) {
                                 $images[$key]['nsfw'] = true;
-                            } elseif ( in_array('sexy', $images[$key]['tags']) ) {
+                            } elseif ( in_array(array('sexe', 'sexy'), $images[$key]['tags']) ) {
                                 $images[$key]['nsfw'] = true;
                                 $images[$key]['tags'][] = 'nsfw';
                             } elseif ( preg_match('/nsfw/', strtolower($images[$key]['title'].$images[$key]['desc'])) ) {
