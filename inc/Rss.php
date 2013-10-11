@@ -44,7 +44,7 @@ class Rss
                         }
                     }
                     if ( $ok === true ) {
-                        $images[] = $this->images[$key];
+                        $images[$key] = $this->images[$key];
                     }
                 }
                 $this->images = $images;
