@@ -131,7 +131,7 @@ class Fct
         $url = preg_replace('#\&([A-za-z]{2})(?:lig)\;#', '\1', $url);
         $url = stripslashes(strtok(urldecode(strtolower(trim($url))), '?'));
         filter_var(htmlentities($url, ENT_QUOTES, 'UTF-8'), FILTER_SANITIZE_STRING);
-        return str_replace(array(' ', '#', "'"), '-', $url);
+        return str_replace(array(' ', '#', "'", '\\', '/'), '-', $url);
     }
 
     /**
@@ -211,11 +211,8 @@ class Fct
                     list($width, $height) = self::create_thumb($data['link'], $width, $height, $type);
                 }
                 $lines .= sprintf($line,
-                    $key, $data['link'],
-                    $width, $height,
-                    str_replace("'", "\\'", $data['guid']),
-                    $data['date'],
-                    $data['nsfw']
+                    $key, $data['link'], $width, $height,
+                    $data['guid'], $data['date'], $data['nsfw']
                 );
             }
         }
