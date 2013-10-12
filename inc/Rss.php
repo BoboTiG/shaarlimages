@@ -14,11 +14,19 @@ class Rss
     private $filename = '';
 
 
-    public function __construct($params = array()) {
+    public function __construct($params = array())
+    {
         Fct::create_dir(Config::$rss_dir);
         $this->images = Fct::unserialise(Config::$database);
-        $this->filters($params);
         $this->filename = Config::$rss_dir.Fct::small_hash(Config::$number.implode('-', $params)).'.xml';
+        $this->start = microtime(1);
+        $this->version = 'Cached';
+        if ( !file_exists($this->filename) ) {
+            $this->version = 'Generated';
+            $this->filters($params);
+            $this->images = array_slice($this->images, 0, Config::$number);
+            $this->create_rss();
+        }
     }
 
     /**
@@ -30,7 +38,6 @@ class Rss
             // Filter on tags
             if ( isset($params['tag']) )
             {
-                $images = array();
                 $tags = array();
                 foreach ( explode(',', strtolower($params['tag'])) as $tag ) {
                     $tags[$tag] = true;
@@ -43,11 +50,10 @@ class Rss
                             break;
                         }
                     }
-                    if ( $ok === true ) {
-                        $images[$key] = $this->images[$key];
+                    if ( $ok === false ) {
+                        unset($this->images[$key]);
                     }
                 }
-                $this->images = $images;
             }
             // Filter number of entries
             if ( isset($params['nb']) )
@@ -63,37 +69,11 @@ class Rss
     }
 
     /**
-    * Get RSS feed contents.
-    */
-    public function get_data()
-    {
-        if ( !$this->is_cached() ) {
-            $images = array_slice($this->images, 0, Config::$number);
-            $this->create_rss($images);
-        }
-        return $this->get_cached();
-    }
-
-    /**
-    * Check if a RSS cached page exists.
-    */
-    private function is_cached() {
-        return is_file($this->filename);
-    }
-
-    /**
-    * Retrieve the cached RSS page.
-    */
-    private function get_cached() {
-        return file_get_contents($this->filename);
-    }
-
-    /**
     * Create RSS Feed.
     * https://github.com/mknexen/shaarli-river/blob/master/includes/create_rss.php
     * Inspired from http://www.phpntips.com/xmlwriter-2009-06/
     */
-    private function create_rss($entries)
+    private function create_rss()
     {
         $xml = new XMLWriter();
 
@@ -123,7 +103,7 @@ class Rss
         $xml->writeElement('link', Config::$link);
         $xml->writeElement('pubDate', date('r'));
 
-        foreach ( $entries as $key => $entry )
+        foreach ( $this->images as $key => $entry )
         {
             // item
             $xml->startElement('item');
@@ -163,6 +143,15 @@ class Rss
 
         // flush
         $xml->flush();
+    }
+
+    /**
+    * Get RSS feed contents.
+    */
+    public function get_data()
+    {
+        $cached = '<!--'.$this->version.' version in '.(microtime(1) - $this->start).'-->'."\n";
+        return file_get_contents($this->filename).$cached;
     }
 
 }
