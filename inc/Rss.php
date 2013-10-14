@@ -21,7 +21,7 @@ class Rss
         $this->filename = Config::$rss_dir.Fct::small_hash(Config::$number.implode('-', $params)).'.xml';
         $this->start = microtime(1);
         $this->version = 'Cached';
-        if ( !file_exists($this->filename) ) {
+        if ( !is_file($this->filename) ) {
             $this->version = 'Generated';
             $this->filters($params);
             $this->images = array_slice($this->images, 0, Config::$number);
