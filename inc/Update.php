@@ -141,38 +141,40 @@ class Update
                             $img .= Config::$ext[$type];
                         }
                         $filename = $key.'_'.Fct::friendly_url($img);
-                        Fct::secure_save(Config::$img_dir.$filename, $data);
-                        Fct::create_thumb($filename, $width, $height, $type);
-                        $images[$key] = array();
-                        $images[$key]['date']  = $pubDate;
-                        $images[$key]['link']  = $filename;
-                        $images[$key]['guid']  = (string)$item->guid;
-                        $images[$key]['nsfw']  = $nsfw;
-                        $images[$key]['title'] = utf8_decode((string)$item->title);
-                        $images[$key]['desc']  = utf8_decode((string)$item->description);
-                        $images[$key]['tags']  = array();
-                        foreach ( $item->category as $category ) {
-                            $images[$key]['tags'][] = utf8_decode(strtolower((string)$category));
-                        }
-                        // NSFW check, for sensible souls ... =]
-                        if ( !$images[$key]['nsfw'] )
-                        {
-                            if ( in_array('nsfw', $images[$key]['tags']) ) {
-                                $images[$key]['nsfw'] = true;
-                            } elseif ( in_array(array('sexe', 'sexy'), $images[$key]['tags']) ) {
-                                $images[$key]['nsfw'] = true;
-                                $images[$key]['tags'][] = 'nsfw';
-                            } elseif ( preg_match('/nsfw/', strtolower($images[$key]['title'].$images[$key]['desc'])) ) {
-                                $images[$key]['nsfw'] = true;
+                        if ( !is_file(Config::$img_dir.$filename) ) {
+                            Fct::secure_save(Config::$img_dir.$filename, $data);
+                            Fct::create_thumb($filename, $width, $height, $type);
+                            $images[$key] = array();
+                            $images[$key]['date']  = $pubDate;
+                            $images[$key]['link']  = $filename;
+                            $images[$key]['guid']  = (string)$item->guid;
+                            $images[$key]['nsfw']  = $nsfw;
+                            $images[$key]['title'] = utf8_decode((string)$item->title);
+                            $images[$key]['desc']  = utf8_decode((string)$item->description);
+                            $images[$key]['tags']  = array();
+                            foreach ( $item->category as $category ) {
+                                $images[$key]['tags'][] = utf8_decode(strtolower((string)$category));
+                            }
+                            // NSFW check, for sensible souls ... =]
+                            if ( !$images[$key]['nsfw'] )
+                            {
+                                if ( in_array('nsfw', $images[$key]['tags']) ) {
+                                    $images[$key]['nsfw'] = true;
+                                } elseif ( in_array(array('hentai', 'sexe', 'sexy'), $images[$key]['tags']) ) {
+                                    $images[$key]['nsfw'] = true;
+                                    $images[$key]['tags'][] = 'nsfw';
+                                } elseif ( preg_match('/nsfw/', strtolower($images[$key]['title'].$images[$key]['desc'])) ) {
+                                    $images[$key]['nsfw'] = true;
+                                    $images[$key]['tags'][] = 'nsfw';
+                                }
+                            } elseif ( !in_array('nsfw', $images[$key]['tags']) ) {
                                 $images[$key]['tags'][] = 'nsfw';
                             }
-                        } elseif ( !in_array('nsfw', $images[$key]['tags']) ) {
-                            $images[$key]['tags'][] = 'nsfw';
-                        }
-                        ++$ret;
-                        if ( ++$count > 20 ) {
-                            Fct::secure_save($output, Fct::serialise($images));
-                            $count = 0;
+                            ++$ret;
+                            if ( ++$count > 20 ) {
+                                Fct::secure_save($output, Fct::serialise($images));
+                                $count = 0;
+                            }
                         }
                     }
                 }
