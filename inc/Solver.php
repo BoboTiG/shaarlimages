@@ -17,6 +17,8 @@ class Solver
      * domain => function name
      */
     public static $domains = array(
+        '9gag.com'              => 'neufgag',
+        'www.9gag.com'          => 'neufgag',
         'www.bonjourmadame.fr'  => 'bonjourmadame',
         'i.chzbgr.com'          => 'cheezburger',
         'www.commitstrip.com'   => 'commitstrip',
@@ -260,6 +262,29 @@ class Solver
             'nsfw'   => false,
             'link'   => $src
         );
+        return array('link' => null);
+    }
+
+
+    /**
+     * 9gag.com
+     */
+    public static function neufgag($link)
+    {
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $doc->loadHTML(Fct::load_url($link));
+        foreach ( $doc->getElementsByTagName('link') as $meta ) {
+            if ( $meta->getAttribute('rel') == 'image_src' ) {
+                return array(
+                    'type'   => 0,
+                    'width'  => 0,
+                    'height' => 0,
+                    'nsfw'   => false,
+                    'link'   => $meta->getAttribute('href')
+                );
+            }
+        }
         return array('link' => null);
     }
 
