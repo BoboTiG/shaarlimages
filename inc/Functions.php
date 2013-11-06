@@ -205,7 +205,7 @@ class Fct
         self::secure_save(Config::$database, self::serialise($images));
 
         $lines = "var gallery = [\n";
-        $line = "{'key':'%s','src':'%s','w':%d,'h':%d,'guid':'%s','date':%d,'nsfw':%d},\n";
+        $line = "{'k':'%s','s':'%s','w':%d,'h':%d,'g':'%s','d':%d,'n':%d},\n";
         foreach ( $images as $key => $data )
         {
             if ( is_file(Config::$img_dir.$data['link']) ) {

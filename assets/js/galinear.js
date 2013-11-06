@@ -1,13 +1,13 @@
 /*
  *
  * Galinear (gallery using linear partition algorithm).
- * Version 0.3.
  *
  * Tiger-222  https://github.com/BoboTiG/galinear
  *
  *
  * Changelog:
  *
+ *  0.4 - smaller keys into images.json (key => k, src => s, guid => g, date => d, nsfw => n)
  *  0.3 - add ambilight effect
  *      - remove color average effect
  *      - add preferences by cookie (toolbar and show_nsfw)
@@ -417,7 +417,7 @@ if (params.i && gallery.length > 0) {
                 prev = false,
                 next = false;
             for (i = 0; i < len; i += 1) {
-                if (gallery[i].key === key) {
+                if (gallery[i].k === key) {
                     current = gallery[i];
                     if (i > 0) { prev = gallery[i - 1]; }
                     if (i < len - 1) { next = gallery[i + 1]; }
@@ -432,13 +432,13 @@ if (params.i && gallery.length > 0) {
     if (image === false) {
         document.write('<p>' + galinear_opt.txt_no_img + '</p>');
     } else {
-        title = image.src;
-        if (image.nsfw) { title += ' [ ☂ NSFW ]'; }
+        title = image.s;
+        if (image.n) { title += ' [ ☂ NSFW ]'; }
         title += ' - ' + document.title;
         document.title = title;
 
         img = document.createElement('img');
-        img.src = galinear_opt.img_folder + image.src;
+        img.src = galinear_opt.img_folder + image.s;
 
         figure = document.createElement('figure');
         figure.className = 'image-container-alone';
@@ -455,12 +455,12 @@ if (params.i && gallery.length > 0) {
                 if (start - e.targetTouches[0].clientX < 0) {
                     // Sliding to left
                     if (curr_prev_next_img.previous !== false) {
-                        document.location = '?i=' + curr_prev_next_img.previous.key;
+                        document.location = '?i=' + curr_prev_next_img.previous.k;
                     }
                 } else {
                     // Sliding to right
                     if (curr_prev_next_img.next !== false) {
-                        document.location = '?i=' + curr_prev_next_img.next.key;
+                        document.location = '?i=' + curr_prev_next_img.next.k;
                     }
                 }
             }, false);
@@ -469,14 +469,14 @@ if (params.i && gallery.length > 0) {
             if (curr_prev_next_img.previous !== false) {
                 previous = document.createElement('a');
                 previous.className = 'image-container-previous';
-                previous.href = '?i=' + curr_prev_next_img.previous.key;
+                previous.href = '?i=' + curr_prev_next_img.previous.k;
                 previous.text = '◄';
                 document.body.appendChild(previous);
             }
             if (curr_prev_next_img.next !== false) {
                 next = document.createElement('a');
                 next.className = 'image-container-next';
-                next.href = '?i=' + curr_prev_next_img.next.key;
+                next.href = '?i=' + curr_prev_next_img.next.k;
                 next.text = '►';
                 document.body.appendChild(next);
             }
@@ -487,12 +487,12 @@ if (params.i && gallery.length > 0) {
                 switch (e.which || e.keyCode) {
                     case 37:
                         if (curr_prev_next_img.previous !== false) {
-                            document.location = '?i=' + curr_prev_next_img.previous.key;
+                            document.location = '?i=' + curr_prev_next_img.previous.k;
                         }
                         break;
                     case 39:
                         if (curr_prev_next_img.next !== false) {
-                            document.location = '?i=' + curr_prev_next_img.next.key;
+                            document.location = '?i=' + curr_prev_next_img.next.k;
                         }
                         break;
                 }
@@ -508,7 +508,7 @@ if (params.i && gallery.length > 0) {
 
             permalink = document.createElement('a');
             permalink.className = 'permalink';
-            if (image.guid) { permalink.href = image.guid; }
+            if (image.g) { permalink.href = image.g; }
             permalink.title = galinear_opt.txt_permalink;
 
             source = document.createElement('a');
@@ -598,7 +598,7 @@ else {
                     // Filter by date
                     tmp = [];
                     for (i = 0; i < len; i += 1) {
-                        if (parse_date(gallery[i].date) === params.d) {
+                        if (parse_date(gallery[i].d) === params.d) {
                             tmp.push(gallery[i]);
                         }
                     }
@@ -618,7 +618,7 @@ else {
                     img.setAttribute('data-type', 'zzzblah');
 
                     a = document.createElement('a');
-                    a.href = '?i=' + gallery[i].key;
+                    a.href = '?i=' + gallery[i].k;
                     a.appendChild(img);
                     a.appendChild(fake_img);
 
@@ -626,7 +626,7 @@ else {
                     figure.appendChild(a);
 
                     // NSFW
-                    if (gallery[i].nsfw && !galinear_prefs.show_nsfw) {
+                    if (gallery[i].n && !galinear_prefs.show_nsfw) {
                         figure.className = 'nsfw';
                     }
                     container.appendChild(figure);
@@ -636,7 +636,7 @@ else {
                         fakeImage: fake_img,
                         width: gallery[i].w,
                         height: gallery[i].h,
-                        nsfw: gallery[i].nsfw
+                        nsfw: gallery[i].n
                     });
                 }
             }
@@ -664,13 +664,13 @@ else {
                     fake.style.opacity = 0.0;
                     fake.style.zIndex = 0;
                 })(image.fakeImage));
-                image.originalImage.src = galinear_opt.thumb_folder + gallery[start + i].src;
+                image.originalImage.src = galinear_opt.thumb_folder + gallery[start + i].s;
                 if (!image.last) {
                     images[i].style.marginRight = '4px';
                 }
 
                 // NSFW
-                if (gallery_images[i].nsfw && !galinear_prefs.show_nsfw && (resized_images[i].width < 95)) {
+                if (gallery_images[i].n && !galinear_prefs.show_nsfw && (resized_images[i].width < 95)) {
                     document.getElementsByTagName('figure')[i].style.backgroundSize = 'contain';
                 }
             }
