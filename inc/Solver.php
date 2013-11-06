@@ -28,6 +28,7 @@ class Solver
         'www.flickr.com'        => 'flickr',
         'googleusercontent.com' => 'googleusercontent',
         'imgur.com'             => 'imgur',
+        'kuvaton.com'           => 'kuvaton',
         'www.luc-damas.fr'      => 'luc',
         'tumblr.com'            => 'tumblr',
         'twitter.com'           => 'twitter',
@@ -239,6 +240,25 @@ class Solver
                     'link'   => (string)$req['data']['link']
                 );
             }
+        }
+        return array('link' => null);
+    }
+
+
+    /**
+     * kuvaton.com
+     */
+    public static function kuvaton($link)
+    {
+        $content = Fct::load_url($link);
+        if ( preg_match('#src="(http://pics.kuvaton.com/.+)" alt=#', $content, $res) ) {
+            return array(
+                'type'   => 0,
+                'width'  => 0,
+                'height' => 0,
+                'nsfw'   => false,
+                'link'   => $res[1]
+            );
         }
         return array('link' => null);
     }

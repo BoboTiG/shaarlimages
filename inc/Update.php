@@ -14,6 +14,7 @@ class Update
     const SOLVER_DVA   = 3;  // host is *.deviantart.com
     const SOLVER_GUC   = 4;  // Host is *.googleusercontent.com
     const SOLVER_TUM   = 5;  // Host is *.tumblr.com
+    const SOLVER_KON   = 6;  // Host is kuvaton.com
 
     /**
      * Shaarlis feed's URL.
@@ -194,6 +195,9 @@ class Update
         if ( $host == Config::$current_host )
             return self::BAD;
         if ( in_array(strtolower(pathinfo($link, 4)), Config::$ext_ok) )
+            if ( $host == 'kuvaton.com' ) {
+                return self::SOLVER_KON;
+            }
             return self::GOOD_EXT;
         if ( array_key_exists($host, Solver::$domains) )
             return self::GOOD_SOLVER;
