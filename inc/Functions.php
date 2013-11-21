@@ -180,7 +180,6 @@ class Fct
      */
     public static function generate_json() {
         $images = array();
-        $tmp = array();
         foreach ( glob(Config::$cache_dir.'*.php') as $db )
         {
             $tmp = self::unserialise($db);
