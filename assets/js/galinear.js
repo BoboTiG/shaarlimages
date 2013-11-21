@@ -475,14 +475,14 @@ if (params.i && gallery.length > 0) {
                 previous = document.createElement('a');
                 previous.className = 'image-container-previous';
                 previous.href = '?i=' + curr_prev_next_img.previous.k;
-                previous.text = '◄';
+                previous.text = '⍃';
                 document.body.appendChild(previous);
             }
             if (curr_prev_next_img.next !== false) {
                 next = document.createElement('a');
                 next.className = 'image-container-next';
                 next.href = '?i=' + curr_prev_next_img.next.k;
-                next.text = '►';
+                next.text = '⍄';
                 document.body.appendChild(next);
             }
 

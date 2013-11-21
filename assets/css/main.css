@@ -1,7 +1,7 @@
 body { background-color: #eee; margin: 8px }
+a:hover, a:focus, a:active   { outline: 1px dashed #222 }
 
 #image-container a { float: left; margin-bottom: 4px }
-#image-container a:hover, #image-container a:focus { outline: 1px dashed #222 }
 #image-container img {
     display: inline-block;
     vertical-align: middle;
@@ -24,7 +24,7 @@ footer {
     line-height: 25px;
     text-align: center;
     background: #45484d linear-gradient(to bottom, #45484d 0%,#000222 100%);
-    text-shadow: 1px 1px 1px #000;
+    text-shadow: 1px 1px 1px #000
 }
 footer a { color: #999; text-decoration: none }
 footer a:hover { color: orange }
@@ -33,7 +33,7 @@ footer a:hover { color: orange }
     float: right;
     margin-bottom: -30px;
     display: inline;
-    font-size: 1.2em;
+    font-size: 1.2em
 }
 .prefs .enabled { color: limegreen }
 .prefs .disabled { color: orange }
@@ -44,6 +44,7 @@ footer a:hover { color: orange }
     text-shadow: 0 0 5px #eee;
     transition: .5s
 }
+
 
 /*
  * One image to show
@@ -61,6 +62,7 @@ footer a:hover { color: orange }
     transition: 1s;
 }
 
+
 /*
  * Previous/next
  */
@@ -68,27 +70,24 @@ footer a:hover { color: orange }
     position: absolute;
     top: 50%;
     display: inline-block;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
+    text-align: center;
     color: #eee;
-    text-decoration: none;
-    font-size: 50px;
-    outline: 0;
+    padding: 5px;
+    font-size: 3em;
     opacity: .1;
     transition: .5s;
 }
 
 .image-container-previous:hover, .image-container-next:hover {
-    opacity: 1.0;
+    opacity: 1;
     transition: .5s;
 }
 
 .image-container-next {
-    right: 0px;
+    right: 0;
     margin-right: 10px;
-    text-align: right;
 }
+
 
 /*
  * Toolbar
