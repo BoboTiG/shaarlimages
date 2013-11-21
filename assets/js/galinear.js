@@ -28,7 +28,7 @@
  *  0.0 - first release
  */
 
-// Sytem of the gallery
+// System of the gallery
 function linearPartitionFitPics(images, options) {
     'use strict';
 
