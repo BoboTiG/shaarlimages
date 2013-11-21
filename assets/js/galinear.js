@@ -7,6 +7,10 @@
  *
  * Changelog:
  *
+ *  0.5 - better image transition
+ *      - remove <img> from <figure>
+ *      - remove obsolete CSS code
+ *      - add outline on images
  *      - use of <footer> instead of <div class="footer">
  *  0.4 - smaller keys into images.json (key => k, src => s, guid => g, date => d, nsfw => n)
  *  0.3 - add ambilight effect
@@ -433,9 +437,9 @@ if (params.i && gallery.length > 0) {
     if (image === false) {
         document.write('<p>' + galinear_opt.txt_no_img + '</p>');
     } else {
-        title = image.s;
-        if (image.n) { title += ' [ ☂ NSFW ]'; }
-        title += ' - ' + document.title;
+        title = '';
+        if (image.n) { title += '[ ☂ NSFW ] '; }
+        title += image.s + ' - ' + document.title;
         document.title = title;
 
         img = document.createElement('img');
@@ -537,7 +541,7 @@ else {
                 document.write('<p>' + galinear_opt.txt_no_img + '</p>');
                 return;
             }
-            var i, image, images, figure, a, img, fake_img, nsfw,
+            var i, image, images, a, img, nsfw,
                 footer, resized_images, tmp, day,
                 text = '',
                 n = 0,
@@ -554,45 +558,6 @@ else {
                 start = (page - 1) * galinear_prefs.per_page;
             }
 
-            // Cookie pref
-            if (navigator.cookieEnabled) {
-                var prefs = document.createElement('div'),
-                    p_toolbar = document.createElement('a'),
-                    p_show_nsfw = document.createElement('a');
-
-                // Toolbar
-                text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
-                p_toolbar.text = '♆';
-                p_toolbar.title = text;
-                p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
-                add_event(p_toolbar, 'click', function () {
-                    galinear_prefs.toolbar = !galinear_prefs.toolbar + 0;
-                    p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
-                    text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
-                    p_toolbar.title = text;
-                    store_cookie();
-                });
-                prefs.appendChild(p_toolbar);
-
-                // NSFW
-                text = (galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
-                p_show_nsfw.text = '☂';
-                p_show_nsfw.title = text;
-                p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
-                add_event(p_show_nsfw, 'click', function () {
-                    galinear_prefs.show_nsfw = !galinear_prefs.show_nsfw + 0;
-                    p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
-                    text = (!galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
-                    p_show_nsfw.title = text;
-                    store_cookie();
-                    location.reload(true);
-                });
-                prefs.appendChild(p_show_nsfw);
-
-                prefs.className = 'prefs';
-                container.appendChild(prefs);
-            }
-
             // The gallery
             if (gallery_images.length === 0) {
                 if (params.d) {
@@ -607,34 +572,22 @@ else {
                     len = gallery.length;
                 }
                 for (i = start; i < len && n < galinear_prefs.per_page; i += 1, n += 1) {
-                    fake_img = document.createElement('img');
-                    fake_img.width = gallery[i].w;
-                    fake_img.height = gallery[i].h;
-                    fake_img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
-                    fake_img.setAttribute('data-type', 'fake');
-
                     img = document.createElement('img');
-                    img.width = gallery[i].w;
-                    img.height = gallery[i].h;
-                    img.setAttribute('data-type', 'zzzblah');
 
                     a = document.createElement('a');
                     a.href = '?i=' + gallery[i].k;
+                    a.style.width = gallery[i].w + 'px';
+                    a.style.height = gallery[i].h + 'px';
                     a.appendChild(img);
-                    a.appendChild(fake_img);
-
-                    figure = document.createElement('figure');
-                    figure.appendChild(a);
 
                     // NSFW
                     if (gallery[i].n && !galinear_prefs.show_nsfw) {
-                        figure.className = 'nsfw';
+                        a.className = 'nsfw';
                     }
-                    container.appendChild(figure);
+                    container.appendChild(a);
 
                     gallery_images.push({
                         originalImage: img,
-                        fakeImage: fake_img,
                         width: gallery[i].w,
                         height: gallery[i].h,
                         nsfw: gallery[i].n
@@ -648,38 +601,37 @@ else {
             }
 
             resized_images = linearPartitionFitPics(gallery_images, {
-                containerWidth: document.documentElement.clientWidth - 16,  // 8px * 2 from body margins
-                preferedImageHeight: parseInt((document.documentElement.clientHeight - 25) / galinear_prefs.lines, 10),
+                containerWidth: document.documentElement.clientWidth - 16,  // body margins
+                preferedImageHeight: parseInt((document.documentElement.clientHeight) / galinear_prefs.lines, 10),
                 spacing: 4
             });
-            images = container.getElementsByTagName('figure');
+            images = container.getElementsByTagName('a');
 
             for (i = 0, len = gallery_images.length; i < len; i += 1) {
                 image = gallery_images[i];
-                image.fakeImage.width = resized_images[i].width;
-                image.fakeImage.height = resized_images[i].height;
-                image.fakeImage.style.marginLeft = '-' + resized_images[i].width + 'px';
+                images[i].style.width = resized_images[i].width + 'px';
+                images[i].style.height = resized_images[i].height + 'px';
                 image.originalImage.width = resized_images[i].width;
                 image.originalImage.height = resized_images[i].height;
-                add_event(image.originalImage, 'load', (function (fake) {
-                    fake.style.opacity = 0.0;
-                    fake.style.zIndex = 0;
-                })(image.fakeImage));
                 image.originalImage.src = galinear_opt.thumb_folder + gallery[start + i].s;
+
+                add_event(image.originalImage, 'load', (function (img) {
+                    img.className = 'show-off';
+                })(image.originalImage));
+
                 if (!image.last) {
                     images[i].style.marginRight = '4px';
                 }
-
-                // NSFW
-                if (gallery_images[i].n && !galinear_prefs.show_nsfw && (resized_images[i].width < 95)) {
-                    document.getElementsByTagName('figure')[i].style.backgroundSize = 'contain';
+                // NSFW -- 95 is the width of the NSFW bandeau
+                if (gallery_images[i].nsfw && !galinear_prefs.show_nsfw && (resized_images[i].width < 95)) {
+                    images[i].style.backgroundSize = 'contain';
                 }
             }
             images[len - 1].style.marginBottom = '8px';
 
-            // Pagination
             if (!params.d && max > 1)
             {
+                // Pagination
                 footer = document.createElement('footer');
                 text = '';
                 if ( page > 0 && page < max ) {
@@ -690,7 +642,46 @@ else {
                     text += ' &nbsp; <a href="?p='+ (page - 1) + '">' + galinear_opt.txt_newer + '</a>';
                 }
                 footer.innerHTML = text;
-                container.appendChild(footer);
+                document.body.appendChild(footer);
+
+                // Cookie pref
+                if (navigator.cookieEnabled) {
+                    var prefs = document.createElement('div'),
+                        p_toolbar = document.createElement('a'),
+                        p_show_nsfw = document.createElement('a');
+
+                    // Toolbar
+                    text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
+                    p_toolbar.text = '♆';
+                    p_toolbar.title = text;
+                    p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
+                    add_event(p_toolbar, 'click', function () {
+                        galinear_prefs.toolbar = !galinear_prefs.toolbar + 0;
+                        p_toolbar.className = (galinear_prefs.toolbar) ? 'enabled' : 'disabled';
+                        text = (galinear_prefs.toolbar) ? galinear_opt.txt_pref_toolbar : galinear_opt.txt_pref_toolbar_no;
+                        p_toolbar.title = text;
+                        store_cookie();
+                    });
+                    prefs.appendChild(p_toolbar);
+
+                    // NSFW
+                    text = (galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
+                    p_show_nsfw.text = '☂';
+                    p_show_nsfw.title = text;
+                    p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
+                    add_event(p_show_nsfw, 'click', function () {
+                        galinear_prefs.show_nsfw = !galinear_prefs.show_nsfw + 0;
+                        p_show_nsfw.className = (!galinear_prefs.show_nsfw) ? 'enabled' : 'disabled';
+                        text = (!galinear_prefs.show_nsfw) ? galinear_opt.txt_pref_show_nsfw : galinear_opt.txt_pref_show_nsfw_no;
+                        p_show_nsfw.title = text;
+                        store_cookie();
+                        location.reload(true);
+                    });
+                    prefs.appendChild(p_show_nsfw);
+
+                    prefs.className = 'prefs';
+                    container.appendChild(prefs);
+                }
             }
 
             if (!galinear_opt.touch_support) {
