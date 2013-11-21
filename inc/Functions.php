@@ -277,6 +277,68 @@ class Fct
         array_map('unlink', glob(Config::$rss_dir.'*.xml'));
     }
 
+    /**
+     * Check 1: [Just in case, not really used]
+     * Delete images which are in double in all the feeds.
+     * As the hash is the image's URL, it could happen that 2 images are
+     * the same, but their keys are differents.
+     * So, we keep only the older.
+     *
+     * Check 2:
+     * Delete unused images files and thumbnails.
+     *
+     * Return number of doubles and arrays of images files and thumbnails deleted.
+     */
+    public static function delete_doubles_and_unused()
+    {
+        $files = glob(Config::$img_dir.'*');
+        unset($files[array_search('images/thumbs', $files)]);
+        $thumb = glob(Config::$thumb_dir.'*');
+        $I = array();
+        $count = 0;
+
+        foreach ( glob(Config::$cache_dir.'*.php') as $db )
+        {
+            $img = Fct::unserialise($db);
+            unset($img['date']);
+
+            // Check 1
+            foreach ( $img as $key => $i ) {
+                if ( isset($I[$key]) ) {
+                    if ( $i['date'] < $I[$key]['date'] ) {
+                        //~ $dbfile = Config::$cache_dir.$I[$key]['db'];
+                        //~ $idb = Fct::unserialise($dbfile);
+                        //~ unset($idb[$key]);
+                        //~ Fct::secure_save($dbfile, Fct::serialise($idb));
+                        $I[$key] = $i;
+                        $I[$key]['db'] = $db;
+                    }
+                } else {
+                    $I[$key] = $i;
+                    $I[$key]['db'] = $db;
+                }
+                ++$count;
+            }
+        }
+        $total = $count;
+        $count -= count($I);
+
+        // Check 2
+        foreach ( $I as $img ) {
+            $fname = $img['link'];
+            if ( ($key = array_search(Config::$img_dir.$fname, $files)) !== false ) {
+                unset($files[$key]);
+            }
+            if ( ($key = array_search(Config::$thumb_dir.$fname, $thumb)) !== false ) {
+                unset($thumb[$key]);
+            }
+        }
+        array_map('unlink', $files);
+        array_map('unlink', $thumb);
+
+        return array($total, $count, $files, $thumb);
+    }
+
 }
 
 ?>
