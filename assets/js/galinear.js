@@ -7,6 +7,7 @@
  *
  * Changelog:
  *
+ *      - use of <footer> instead of <div class="footer">
  *  0.4 - smaller keys into images.json (key => k, src => s, guid => g, date => d, nsfw => n)
  *  0.3 - add ambilight effect
  *      - remove color average effect
@@ -400,10 +401,10 @@ if (params.toolbar)   galinear_prefs.toolbar = parseInt(params.toolbar, 10);
 galinear_prefs = read_cookie();
 
 // Sanitize parmeters
-if (galinear_prefs.per_page < 10)       galinear_prefs.per_page = 10;
-if (galinear_prefs.lines < 2)           galinear_prefs.lines = 2;
-if (galinear_prefs.show_nsfw !== 1)     galinear_prefs.show_nsfw = 0;
-if (galinear_prefs.toolbar !== 1)       galinear_prefs.toolbar = 0;
+if (galinear_prefs.per_page < 10)   galinear_prefs.per_page = 10;
+if (galinear_prefs.lines < 2)       galinear_prefs.lines = 2;
+if (galinear_prefs.show_nsfw !== 1) galinear_prefs.show_nsfw = 0;
+if (galinear_prefs.toolbar !== 1)   galinear_prefs.toolbar = 0;
 
 // Display one image
 if (params.i && gallery.length > 0) {
@@ -679,7 +680,7 @@ else {
             // Pagination
             if (!params.d && max > 1)
             {
-                footer = document.createElement('div');
+                footer = document.createElement('footer');
                 text = '';
                 if ( page > 0 && page < max ) {
                     text += '<a href="?p='+ (page + 1) + '">' + galinear_opt.txt_older + '</a> &nbsp; ';
@@ -689,7 +690,6 @@ else {
                     text += ' &nbsp; <a href="?p='+ (page - 1) + '">' + galinear_opt.txt_newer + '</a>';
                 }
                 footer.innerHTML = text;
-                footer.className = 'footer';
                 container.appendChild(footer);
             }
 
