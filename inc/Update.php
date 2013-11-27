@@ -87,13 +87,14 @@ class Update
         }
 
         try {
+            libxml_use_internal_errors(true);
             $test = new SimpleXMLElement($feed);
         } catch (Exception $e) {
             return -2;
         }
 
         $count = 0;
-        foreach ( $test->channel->item as $item )
+        if ( !empty($test->channel->item) ) foreach ( $test->channel->item as $item )
         {
             $pubDate = date('U', strtotime($item->pubDate));
             if ( $pubDate < $images['date'] ){
@@ -197,11 +198,12 @@ class Update
     {
         if ( $host == Config::$current_host )
             return self::BAD;
-        if ( in_array(strtolower(pathinfo($link, 4)), Config::$ext_ok) )
+        if ( in_array(strtolower(pathinfo($link, 4)), Config::$ext_ok) ) {
             if ( $host == 'kuvaton.com' ) {
                 return self::SOLVER_KON;
             }
             return self::GOOD_EXT;
+        }
         if ( array_key_exists($host, Solver::$domains) )
             return self::GOOD_SOLVER;
         if ( substr($host, -10) == 'tumblr.com' )
