@@ -7,7 +7,7 @@ include 'inc/Update.php';
 $up = new Update();
 
 if ( isset($argc) && $argc > 1 ) {
-    if ( $argv[1] == 'u=all' ) {
+    if ( $argv[1] == 'all' ) {
         $i = 1;
         $n = 0;
         foreach ( $up->get_feeds() as $domain => $feed ) {
@@ -21,6 +21,12 @@ if ( isset($argc) && $argc > 1 ) {
         if ( $n > 0 ) {
             Fct::generate_json();
             system('bash sync.sh');
+        }
+    } else {
+        $ret = $up->read_feed($argv[1]);
+        if ( $ret !== false ) {
+            echo $ret;
+            exit;
         }
     }
     exit;
