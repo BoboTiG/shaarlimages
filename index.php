@@ -16,6 +16,35 @@ if ( $do !== NULL ) {
     }
 }
 
+/*
+ * Search:
+ *  1) global   = ?search=VALUE
+ *  2) in tags  = ?searchtags=VALUE
+ *  3) in terms = ?searchterms=VALUE
+ */
+$search = !empty($_GET['search']) ? $_GET['search'] : NULL;
+if ( $search !== NULL ) {
+    $value = $search;
+    $where = 'search';
+} else {
+    $search = !empty($_GET['searchtags']) ? $_GET['searchtags'] : NULL;
+    if ( $search !== NULL ) {
+        $value = $search;
+        $where = 'searchtags';
+    } else {
+        $search = !empty($_GET['searchterms']) ? $_GET['searchterms'] : NULL;
+        if ( $search !== NULL ) {
+            $value = $search;
+            $where = 'searchterms';
+        }
+    }
+}
+if ( isset($where) ) {
+    include 'inc/Config.php';
+    include 'inc/Functions.php';
+    $data = Fct::look_for($value, $where);
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -46,7 +75,13 @@ if ( $do !== NULL ) {
 <noscript>Oups ! JavaScript doit être activé pour voir la galerie ☹</noscript>
 <div id="image-container"></div>
 
-<script src="images.json"></script>
+<?php
+    if ( isset($data) ) {
+        echo '<script>', Fct::generate_json($data, 1), '</script>';
+    } else {
+        echo '<script src="images.json"></script>';
+    }
+?>
 <script src="assets/js/galinear.min.js"></script>
 
 </body>

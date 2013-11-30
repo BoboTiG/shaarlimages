@@ -178,30 +178,35 @@ class Fct
      * Added a RATIO limit for images with width/height too small or too big,
      * it prevents to have a gallery as beautiful as Internet Explorer ...
      */
-    public static function generate_json() {
+    public static function generate_json($data = NULL, $output = NULL) {
         $images = array();
-        foreach ( glob(Config::$cache_dir.'*.php') as $db )
-        {
-            $tmp = self::unserialise($db);
-            unset($tmp['date']);
-            foreach ( array_keys($tmp) as $key )
+
+        if ( $data === NULL ) {
+            foreach ( glob(Config::$cache_dir.'*.php') as $db )
             {
-                /* RATIO limit */list($width, $height) = getimagesize(Config::$img_dir.$tmp[$key]['link']);
-                /* RATIO limit */$ratio = $width / $height;
-                /* RATIO limit */if ( $ratio >= 0.3 && $ratio <= 3.0 )
-                /* RATIO limit */{
-                    if ( empty($images[$key]) ) {
-                        $images[$key] = $tmp[$key];
-                    }
-                    elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
-                        // Older is better (could be the first to share)
-                        $images[$key] = $tmp[$key];
-                    }
-                /* RATIO limit */}
+                $tmp = self::unserialise($db);
+                unset($tmp['date']);
+                foreach ( array_keys($tmp) as $key )
+                {
+                    /* RATIO limit */list($width, $height) = getimagesize(Config::$img_dir.$tmp[$key]['link']);
+                    /* RATIO limit */$ratio = $width / $height;
+                    /* RATIO limit */if ( $ratio >= 0.3 && $ratio <= 3.0 )
+                    /* RATIO limit */{
+                        if ( empty($images[$key]) ) {
+                            $images[$key] = $tmp[$key];
+                        }
+                        elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
+                            // Older is better (could be the first to share)
+                            $images[$key] = $tmp[$key];
+                        }
+                    /* RATIO limit */}
+                }
             }
+            uasort($images, 'self::compare_date');
+            self::secure_save(Config::$database, self::serialise($images));
+        } else {
+            $images = $data;
         }
-        uasort($images, 'self::compare_date');
-        self::secure_save(Config::$database, self::serialise($images));
 
         $lines = "var gallery = [\n";
         $line = "{'k':'%s','s':'%s','w':%d,'h':%d,'g':'%s','d':%d,'n':%d},\n";
@@ -219,8 +224,12 @@ class Fct
             }
         }
         $lines .= "];\n";
-        self::secure_save(Config::$json_file, $lines);
-        self::invalidate_caches();
+        if ( $output === NULL ) {
+            self::secure_save(Config::$json_file, $lines);
+            self::invalidate_caches();
+        } else {
+            return $lines.'// Generated in '.$images[0]." sec\n";
+        }
     }
 
     /**
@@ -337,6 +346,40 @@ class Fct
         array_map('unlink', $thumb);
 
         return array($total, $count, $files, $thumb);
+    }
+
+    /**
+     * Invalidate all RSS caches.
+     */
+    public static function look_for($value, $where = 'search')
+    {
+        $value = strtolower($value);
+        $res = array(0);
+        $images = Fct::unserialise(Config::$img_file);
+        $t1 = microtime(1);
+
+        if ( $where == 'search' ) {
+            foreach ( $images as $key => $img ) {
+                if ( strpos(strtolower($img['title'].$img['desc']), $value) !== false || in_array($value, $img['tags']) ) {
+                    $res[$key] = $img;
+                }
+            }
+        } elseif ( $where == 'searchterms' ) {
+            foreach ( $images as $key => $img ) {
+                if ( strpos(strtolower($img['title'].$img['desc']), $value) !== false ) {
+                    $res[$key] = $img;
+                }
+            }
+        } elseif ( $where == 'searchtags' ) {
+            foreach ( $images as $key => $img ) {
+                if ( in_array($value, $img['tags']) ) {
+                    $res[$key] = $img;
+                }
+            }
+        }
+
+        $res[0] = microtime(1) - $t1;
+        return $res;
     }
 
 }

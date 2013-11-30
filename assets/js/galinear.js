@@ -12,6 +12,7 @@
  *      - remove obsolete CSS code
  *      - add outline on images
  *      - use of <footer> instead of <div class="footer">
+ *      - prevent pagination in case of search
  *  0.4 - smaller keys into images.json (key => k, src => s, guid => g, date => d, nsfw => n)
  *  0.3 - add ambilight effect
  *      - remove color average effect
@@ -400,6 +401,7 @@ if (params.per_page)  galinear_prefs.per_page = parseInt(params.per_page, 10);
 if (params.lines)     galinear_prefs.lines = parseInt(params.lines, 10);
 if (params.show_nsfw) galinear_prefs.show_nsfw = parseInt(params.show_nsfw, 10);
 if (params.toolbar)   galinear_prefs.toolbar = parseInt(params.toolbar, 10);
+params.search = (params.search || params.searchtags || params.searchterms);
 
 // Cookies parameters bypass (> URL > defaults options)
 galinear_prefs = read_cookie();
@@ -409,6 +411,7 @@ if (galinear_prefs.per_page < 10)   galinear_prefs.per_page = 10;
 if (galinear_prefs.lines < 2)       galinear_prefs.lines = 2;
 if (galinear_prefs.show_nsfw !== 1) galinear_prefs.show_nsfw = 0;
 if (galinear_prefs.toolbar !== 1)   galinear_prefs.toolbar = 0;
+if (params.search)                  galinear_prefs.per_page = 1024;
 
 // Display one image
 if (params.i && gallery.length > 0) {
@@ -629,7 +632,7 @@ else {
             }
             images[len - 1].style.marginBottom = '8px';
 
-            if (!params.d && max > 1)
+            if (!params.search && !params.d && max > 1)
             {
                 // Pagination
                 footer = document.createElement('footer');
