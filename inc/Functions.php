@@ -349,7 +349,7 @@ class Fct
     }
 
     /**
-     * Invalidate all RSS caches.
+     * Search: look for a tag, term or both.
      */
     public static function look_for($value, $where = 'search')
     {
