@@ -150,7 +150,7 @@ class Fct
     }
 
     /**
-     * Returns the small hash of a string
+     * Returns the small hash of a string, using RFC 4648 base64url format
      * http://sebsauvage.net/wiki/doku.php?id=php:shaarli
      * eg. smallHash('20111006_131924') --> yZH23w
      * Small hashes:
@@ -166,11 +166,7 @@ class Fct
     public static function small_hash($text)
     {
         $hash = rtrim(base64_encode(hash('crc32', $text, true)), '=');
-        // Get rid of characters which need encoding in URLs.
-        $hash = str_replace('+', '-', $hash);
-        $hash = str_replace('/', '_', $hash);
-        $hash = str_replace('=', '@', $hash);
-        return $hash;
+        return strtr($hash, '+/', '-_');
     }
 
     /**
