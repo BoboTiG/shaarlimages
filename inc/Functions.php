@@ -353,26 +353,30 @@ class Fct
      */
     public static function look_for($value, $where = 'search')
     {
-        $value = strtolower($value);
         $res = array(0);
+        if ( strlen($value) < 2 ) {
+            return $res;
+        }
+
+        $value = strtolower($value);
         $images = Fct::unserialise(Config::$img_file);
         $t1 = microtime(1);
 
         if ( $where == 'search' ) {
             foreach ( $images as $key => $img ) {
-                if ( strpos(strtolower($img['title'].$img['desc']), $value) !== false || in_array($value, $img['tags']) ) {
-                    $res[$key] = $img;
-                }
-            }
-        } elseif ( $where == 'searchterms' ) {
-            foreach ( $images as $key => $img ) {
-                if ( strpos(strtolower($img['title'].$img['desc']), $value) !== false ) {
+                if ( strpos(strtolower($img['guid'].$img['title'].$img['desc']), $value) !== false || in_array($value, $img['tags']) ) {
                     $res[$key] = $img;
                 }
             }
         } elseif ( $where == 'searchtags' ) {
             foreach ( $images as $key => $img ) {
                 if ( in_array($value, $img['tags']) ) {
+                    $res[$key] = $img;
+                }
+            }
+        } elseif ( $where == 'searchterms' ) {
+            foreach ( $images as $key => $img ) {
+                if ( strpos(strtolower($img['guid'].$img['title'].$img['desc']), $value) !== false ) {
                     $res[$key] = $img;
                 }
             }

@@ -39,7 +39,7 @@ if ( $search !== NULL ) {
         }
     }
 }
-if ( isset($where) ) {
+if ( isset($where) && isset($value) ) {
     include 'inc/Config.php';
     include 'inc/Functions.php';
     $data = Fct::look_for($value, $where);
