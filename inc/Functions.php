@@ -184,18 +184,21 @@ class Fct
                 unset($tmp['date']);
                 foreach ( array_keys($tmp) as $key )
                 {
-                    /* RATIO limit */list($width, $height) = getimagesize(Config::$img_dir.$tmp[$key]['link']);
-                    /* RATIO limit */$ratio = $width / $height;
-                    /* RATIO limit */if ( $ratio >= 0.3 && $ratio <= 3.0 )
-                    /* RATIO limit */{
-                        if ( empty($images[$key]) ) {
-                            $images[$key] = $tmp[$key];
-                        }
-                        elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
-                            // Older is better (could be the first to share)
-                            $images[$key] = $tmp[$key];
-                        }
-                    /* RATIO limit */}
+                    if ( is_file(Config::$img_dir.$tmp[$key]['link']) ) {
+                        /* RATIO limit */list($width, $height) = getimagesize(Config::$img_dir.$tmp[$key]['link']);
+                        /* RATIO limit */if ( $height == 0 ) $height = 1;
+                        /* RATIO limit */$ratio = $width / $height;
+                        /* RATIO limit */if ( $ratio >= 0.3 && $ratio <= 3.0 )
+                        /* RATIO limit */{
+                            if ( empty($images[$key]) ) {
+                                $images[$key] = $tmp[$key];
+                            }
+                            elseif ( $tmp[$key]['date'] < $images[$key]['date'] ) {
+                                // Older is better (could be the first to share)
+                                $images[$key] = $tmp[$key];
+                            }
+                        /* RATIO limit */}
+                    }
                 }
             }
             uasort($images, 'self::compare_date');
@@ -213,10 +216,12 @@ class Fct
                 if ( !is_file(Config::$thumb_dir.$data['link']) ) {
                     list($width, $height) = self::create_thumb($data['link'], $width, $height, $type);
                 }
-                $lines .= sprintf($line,
-                    $key, $data['link'], $width, $height,
-                    $data['guid'], $data['date'], $data['nsfw']
-                );
+                if ( $width !== false && $height !== false ) {
+                    $lines .= sprintf($line,
+                        $key, $data['link'], $width, $height,
+                        $data['guid'], $data['date'], $data['nsfw']
+                    );
+                }
             }
         }
         $lines .= "];\n";
@@ -263,6 +268,9 @@ class Fct
             $source = imagecreatefromjpeg(Config::$img_dir.$file);
         } else {  // png
             $source = imagecreatefrompng(Config::$img_dir.$file);
+        }
+        if ( $source === false ) {
+            return array(false, false);
         }
 
         $thumb = imagecreatetruecolor($new_width, $new_height);

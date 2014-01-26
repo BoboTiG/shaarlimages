@@ -54,6 +54,8 @@ class Solver
      * Authorized extensions
      */
     public static $ext = array(
+        'image/gif'  => -1,
+        'gif'        => -1,
         'image/jpeg' => 2,
         'jpg'        => 2,
         'jpeg'       => 2,
