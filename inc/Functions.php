@@ -117,7 +117,7 @@ class Fct
             )
         )));
         if ( $ret === false ) {
-            self::__(error_get_last());
+            self::__(array($file, error_get_last()));
         }
         return $ret;
     }
