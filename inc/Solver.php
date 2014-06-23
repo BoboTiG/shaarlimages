@@ -120,16 +120,21 @@ class Solver
         libxml_use_internal_errors(true);
         $doc = new DOMDocument();
         $doc->loadHTML(Fct::load_url($link));
-        $data = $doc->getElementsByTagName('article')->item(0)->getElementsByTagName('img')->item(0);
-        $ext = pathinfo($data->getAttribute('src'), 4);
-        if ( array_key_exists($ext, self::$ext) ) {
-            return array(
-                'type'   => self::$ext[$ext],
-                'width'  => (int)$data->getAttribute('width'),
-                'height' => (int)$data->getAttribute('height'),
-                'nsfw'   => false,
-                'link'   => $data->getAttribute('src')
-            );
+        $data = $doc->getElementsByTagName('article')->item(0)->getElementsByTagName('img');
+        foreach ( $data as $img ) {
+            $src = $img->getAttribute('src');
+            if ( preg_match('/final/', $src) ) {
+                $ext = pathinfo($src, 4);
+                if ( array_key_exists($ext, self::$ext) ) {
+                    return array(
+                        'type'   => self::$ext[$ext],
+                        'width'  => (int)$img->getAttribute('width'),
+                        'height' => (int)$img->getAttribute('height'),
+                        'nsfw'   => false,
+                        'link'   => $src
+                    );
+                }
+            }
         }
         return array('link' => null);
     }
