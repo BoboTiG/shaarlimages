@@ -76,6 +76,9 @@ class Solver
         libxml_use_internal_errors(true);
         $doc = new DOMDocument();
         $doc->loadHTML(Fct::load_url($link));
+        if ( !is_object($doc) ) {
+            return array('link' => null);
+        }
         if ( $parts[3] == 'post' ) {
             foreach ( $doc->getElementsByTagName('meta') as $meta ) {
                 if ( $meta->getAttribute('property') == 'og:image' ) {
@@ -89,7 +92,10 @@ class Solver
                 }
             }
         } elseif ( $parts[3] == 'image' ) {
-            $image = $doc->getElementById('content')->getElementsByTagName('img')->item(0);
+            $image = $doc
+                ->getElementById('content')
+                ->getElementsByTagName('img')
+                ->item(0);
             return array(
                 'type'   => 0,
                 'width'  => 0,
@@ -120,7 +126,13 @@ class Solver
         libxml_use_internal_errors(true);
         $doc = new DOMDocument();
         $doc->loadHTML(Fct::load_url($link));
-        $data = $doc->getElementsByTagName('article')->item(0)->getElementsByTagName('img');
+        if ( !is_object($doc) ) {
+            return array('link' => null);
+        }
+        $data = $doc
+            ->getElementsByTagName('article')
+            >item(0)
+            ->getElementsByTagName('img');
         foreach ( $data as $img ) {
             $src = $img->getAttribute('src');
             if ( preg_match('/final/', $src) ) {
@@ -279,7 +291,13 @@ class Solver
         libxml_use_internal_errors(true);
         $doc = new DOMDocument();
         $doc->loadHTML(Fct::load_url($link));
-        $image = $doc->getElementById('content')->getElementsByTagName('img')->item(0);
+        if ( !is_object($doc) ) {
+            return array('link' => null);
+        }
+        $image = $doc
+            ->getElementById('content')
+            ->getElementsByTagName('img')
+            ->item(0);
         $src = $image->getAttribute('src');
         $ext = strtolower(pathinfo($src, 4));
         return array(
@@ -301,6 +319,9 @@ class Solver
         libxml_use_internal_errors(true);
         $doc = new DOMDocument();
         $doc->loadHTML(Fct::load_url($link));
+        if ( !is_object($doc) ) {
+            return array('link' => null);
+        }
         foreach ( $doc->getElementsByTagName('link') as $meta ) {
             if ( $meta->getAttribute('rel') == 'image_src' ) {
                 return array(
@@ -367,6 +388,9 @@ class Solver
             libxml_use_internal_errors(true);
             $doc = new DOMDocument();
             $doc->loadHTML(Fct::load_url($url));
+            if ( !is_object($doc) ) {
+                return array('link' => null);
+            }
             foreach ( $doc->getElementsByTagName('img') as $image ) {
                 $src = $image->getAttribute('src');
                 if ( substr($src, -6) == ':large' ) {
