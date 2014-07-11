@@ -397,6 +397,21 @@ class Fct
         return $res;
     }
 
+    /**
+     * Retrieve data from XML file.
+     */
+    public static function load_xml($link)
+    {
+        libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $doc->loadHTML(Fct::load_url($link));
+        if ( is_null($doc) || !is_object($doc) ) {
+            //~ Fct::__($doc);
+            return false;
+        }
+        return $doc;
+    }
+
 }
 
 ?>
