@@ -186,11 +186,16 @@ class Fct
                     foreach ( array_keys($tmp) as $key )
                     {
                         if ( is_file(Config::$img_dir.$tmp[$key]['link']) ) {
-                            /* RATIO limit */list($width, $height) = getimagesize(Config::$img_dir.$tmp[$key]['link']);
-                            /* RATIO limit */if ( $height == 0 ) $height = 1;
-                            /* RATIO limit */$ratio = $width / $height;
-                            /* RATIO limit */if ( $ratio >= 0.3 && $ratio <= 3.0 )
-                            /* RATIO limit */{
+                            /* RATIO limit START */
+                            try {
+                                list($width, $height) = getimagesize(Config::$img_dir.$tmp[$key]['link']);
+                            } catch ( Exception $ex ) {
+                                continue;
+                            }
+                            if ( $height == 0 ) $height = 1;
+                            $ratio = $width / $height;
+                            if ( $ratio >= 0.3 && $ratio <= 3.0 )
+                            {
                                 if ( empty($images[$key]) ) {
                                     $images[$key] = $tmp[$key];
                                 }
@@ -198,7 +203,7 @@ class Fct
                                     // Older is better (could be the first to share)
                                     $images[$key] = $tmp[$key];
                                 }
-                            /* RATIO limit */}
+                            /* RATIO limit END */}
                         }
                     }
                 }
