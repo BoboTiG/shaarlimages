@@ -1,0 +1,15 @@
+black
+boddle
+bottle==0.12.25
+docopt==0.6.2
+feedparser==6.0.8
+flake8-pyproject
+isort
+mypy
+opencv-contrib-python-headless==4.5.5.62
+paste==3.5.3
+pytest
+pytest-cov
+requests==2.28.1
+responses==0.23.1
+types-requests

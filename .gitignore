@@ -1,8 +1,12 @@
-images/
-geany_run_script.sh
-.httmp
-.shaarli.opml
-images.json
+# Files
+.coverage
+
+# Folders
 data/
-sync.sh
-test.php
+.mypy_cache/
+__pycache__/
+.pytest_cache/
+venv/
+
+# Keep those
+!tests/data/

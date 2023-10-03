@@ -1,6 +1,1 @@
-
-[  ] Mise en cache des recherches
-[  ] Pagination en JS (pour ne plus avoir à recharger images.json)
-[  ] Ne charger les images que lorsqu'elles sont dans la zone visible de l'écran
-
-D'autres idées d'amélioration ?
+- [ ] Mise en cache des recherches
