@@ -10,10 +10,14 @@ function makeAllRequests() {
 function makeRequest(id) {
     "use strict";
 
+    if (id === 0) {
+        return;
+    }
+
     let items = document.getElementById("feed-" + id);
 
     items.innerHTML  = loading;
-    fetch("update/" + id)
+    fetch("/update/" + id)
         .then((response) => {
             if (response.ok) {
                 return response.json();
