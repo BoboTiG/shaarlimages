@@ -51,6 +51,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
         parts = urlparse(link)
         file = parts.path
         if parts.fragment and functions.is_image_link(parts.fragment):
+            # Ex: https://commons.wikimedia.org/wiki/Gustave_Dor%C3%A9#/media/File:Paradise_Lost_12.jpg
             file += f"_{parts.fragment}"
         path = Path(file)
         file = f"{functions.small_hash(link)}_{functions.safe_filename(path.stem)}{path.suffix.lower()}"
@@ -63,34 +64,39 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
             output_file.write_bytes(image)
 
         key = str(published)
-        if key not in cache:
-            if not (size := functions.get_size(output_file)):
-                output_file.unlink(missing_ok=True)
-                continue
+        if key in cache:
+            continue
 
-            metadata = {
-                "desc": item.description,
-                "docolav": functions.docolav(output_file),
-                "guid": item.guid,
-                "height": size.height,
-                "link": file,
-                "tags": [tag.term.lower().strip() for tag in getattr(item, "tags", [])],
-                "title": item.title,
-                "width": size.width,
-            }
+        if not (size := functions.get_size(output_file)):
+            output_file.unlink(missing_ok=True)
+            continue
 
-            # NSFW
-            if (
-                any(tag in constants.NSFW_TAGS for tag in metadata["tags"])
-                or constants.NSFW in item.title.lower()
-                or constants.NSFW in item.description.lower()
-            ) and constants.NSFW not in metadata["tags"]:
-                metadata["tags"].append(constants.NSFW)
+        metadata = {
+            "desc": item.description,
+            "docolav": functions.docolav(output_file),
+            "guid": item.guid,
+            "height": size.height,
+            "link": file,
+            "tags": [tag.term.lower().strip() for tag in getattr(item, "tags", [])],
+            "title": item.title,
+            "width": size.width,
+        }
 
-            metadata["tags"] = sorted(metadata["tags"])
+        # NSFW
+        if (
+            any(tag in constants.NSFW_TAGS for tag in metadata["tags"])
+            or constants.NSFW in item.title.lower()
+            or constants.NSFW in item.description.lower()
+        ) and constants.NSFW not in metadata["tags"]:
+            metadata["tags"].append(constants.NSFW)
 
-            cache[key] = metadata
-            new_images += 1
+        metadata["tags"] = sorted(metadata["tags"])
+
+        cache[key] = metadata
+        new_images += 1
+
+        if new_images % 10 == 0:
+            functions.persist(cache_file, cache)
 
     if new_images:
         functions.persist(cache_file, cache)
