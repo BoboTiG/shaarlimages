@@ -7,9 +7,9 @@ SITE = {
     "description": "Shaarlimages, la galerie des shaarlis !",
     "display_last_n_images": 56,
     # Hostname running the galery -- to prevent re-downloading our images.
-    "host": "tiger222.pythonanywhere.com",
+    "host": "www.shaarlimages.net",
     "title": "Shaarlimages",
-    "url": "https://tiger222.pythonanywhere.com",
+    "url": "https://www.shaarlimages.net",
 }
 
 SYNC = {

@@ -20,26 +20,24 @@ function makeRequest(id) {
             }
             throw new Error("Something went wrong");
         })
-        .then((data) => alertContents(data, id))
-        .catch((error) => { console.log(error); });
+        .then((data) => alertContents(data.count, id))
+        .catch((error) => { alertContents(-1, id); });
 }
 
-function alertContents(data, id) {
+function alertContents(itemsCount, id) {
     "use strict";
 
-    let ret = data.count;
     let items = document.getElementById("feed-" + id);
     let sum = document.getElementById("sum");
+    let response = "✅";
 
-    if (ret > 0) {
+    if (itemsCount > 0) {
         sum.innerHTML = parseInt(sum.innerHTML, 10) + ret;
         document.title = "(" + sum.innerHTML + ") " + title;
         items.style.color = "green";
-        ret = "⭐ (+ " + ret + ")";
-    } else if (ret < 0) {
-        ret = "❌";
-    } else {
-        ret = "✅";
+        response = "⭐ (+ " + itemsCount + ")";
+    } else if (itemsCount < 0) {
+        response = "❌";
     }
-    items.innerHTML = ret;
+    items.innerHTML = response;
 }
