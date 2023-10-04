@@ -305,7 +305,7 @@ def is_image_data(raw: bytes) -> bool:
 
 
 def is_image_link(url: str) -> bool:
-    f"""
+    """
     Check whenever the given `url` points to a supported image format.
     It will also prevent downloading again images from Shaarlimages.
 
@@ -319,9 +319,10 @@ def is_image_link(url: str) -> bool:
         True
         >>> is_image_link("bad.html")
         False
-        >>> is_image_link("https://{config.SITE['host']}/image/ok.jpg")
+
+        >>> is_image_link(f"https://{config.SITE['host']}/image/ok.jpg")
         False
-        >>> is_image_link("{config.SITE['url']}/image/ok.png")
+        >>> is_image_link(f"{config.SITE['url']}/image/ok.png")
         False
 
     """
