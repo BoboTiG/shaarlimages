@@ -31,6 +31,7 @@ disallow_any_generics = true
 strict_equality = true
 
 [tool.pytest.ini_options]
+pythonpath = "host"
 addopts = """
     --cov-report=term-missing:skip-covered
     --cov=host

@@ -5,7 +5,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 from pathlib import Path
 
-from .types import Size
+from custom_types import Size
 
 # Folders
 ROOT = Path(__file__).parent.parent

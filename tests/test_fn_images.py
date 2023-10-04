@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 
 from host import functions
-from host.types import Size
+from host.custom_types import Size
 
 from .constants import IMAGE_JPG, IMAGE_JPG_IS_PNG, IMAGE_PNG
 
@@ -26,7 +26,7 @@ def test_create_thumbnail(file: Path, expected_file_size: int, expected_size: in
     dest_file = tmp_path / file.name
     assert not dest_file.is_file()
 
-    with patch("host.constants.THUMBNAILS", tmp_path):
+    with patch("constants.THUMBNAILS", tmp_path):
         assert functions.create_thumbnail(file) == dest_file
         assert dest_file.is_file()
         assert functions.get_size(dest_file) == expected_size
@@ -38,7 +38,7 @@ def test_create_thumbnail_already_exist(tmp_path: Path) -> None:
     assert not dest_file.is_file()
     dest_file.write_bytes(b"")
 
-    with patch("host.constants.THUMBNAILS", tmp_path):
+    with patch("constants.THUMBNAILS", tmp_path):
         assert functions.create_thumbnail(IMAGE_JPG) == dest_file
         assert dest_file.is_file()
         assert dest_file.stat().st_size == 0

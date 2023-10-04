@@ -14,9 +14,9 @@ Options:
 """
 
 if __name__ == "__main__":
+    import functions
+    import helpers
     from docopt import docopt
-
-    from . import functions, helpers
 
     args = docopt(__doc__)
     force = args["--force"]

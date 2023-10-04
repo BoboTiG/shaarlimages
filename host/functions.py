@@ -14,13 +14,14 @@ from shutil import copyfile
 from typing import Any
 from urllib.parse import urlparse
 
+import config
+import constants
+import custom_types
 import cv2
 import feedparser
 import numpy
 import requests
 import urllib3
-
-from . import config, constants, types
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -174,13 +175,13 @@ def generate_images_file(force: bool = False) -> list[tuple[str, list[str], str]
     return uniq_images
 
 
-def get_last(page: int, count: int) -> tuple[int, types.Images]:
+def get_last(page: int, count: int) -> tuple[int, custom_types.Images]:
     """Get last N images."""
     all_images = generate_images_file()
     return len(all_images), all_images[(page - 1) * count : page * count]
 
 
-def get_metadata(image: str) -> types.Metadata:
+def get_metadata(image: str) -> custom_types.Metadata:
     all_cache = read(constants.CACHE_HOME_ALL)
 
     if not (feed := next((stored_feed for stored_image, *_, stored_feed in all_cache if stored_image == image), "")):
@@ -210,12 +211,12 @@ def get_prev_next(image: str) -> tuple[str, str]:
     return "", ""
 
 
-def get_size(file: Path) -> types.Size | None:
+def get_size(file: Path) -> custom_types.Size | None:
     """Retrieve the file width & height."""
     if (im := cv2.imread(str(file))) is None:
         return None
 
-    return types.Size(width=im.shape[1], height=im.shape[0])
+    return custom_types.Size(width=im.shape[1], height=im.shape[0])
 
 
 def fetch(url: str) -> requests.Response:
@@ -304,7 +305,7 @@ def is_image_data(raw: bytes) -> bool:
 
 
 def is_image_link(url: str) -> bool:
-    """
+    f"""
     Check whenever the given `url` points to a supported image format.
     It will also prevent downloading again images from Shaarlimages.
 
@@ -318,7 +319,9 @@ def is_image_link(url: str) -> bool:
         True
         >>> is_image_link("bad.html")
         False
-        >>> is_image_link("https://shaarlimages.net/image/ok.png")
+        >>> is_image_link("https://{config.SITE['host']}/image/ok.jpg")
+        False
+        >>> is_image_link("{config.SITE['url']}/image/ok.png")
         False
 
     """

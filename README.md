@@ -9,9 +9,9 @@ URL : [shaarlimages.net](https://shaarlimages.net)
 Copy all files from the `host` folder to the [PythonAnywhere](https://www.pythonanywhere.com) hosting account.
 
 Details:
+- Web app type: Bottle
 - Python version: `3.10`
 - Force HTTPS: enabled
-- Web app type: Bottle
 
 Check [Batteries Included](https://www.pythonanywhere.com/batteries_included/) to know what modules are already provided.
 

@@ -8,9 +8,12 @@ from pathlib import Path
 from time import mktime
 from urllib.parse import urlparse
 
+import config
+import constants
+import custom_types
+import functions
+import version
 from bottle import FormsDict, redirect, template
-
-from . import config, constants, functions, types, version
 
 #
 # Sync
@@ -23,7 +26,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
     host = urlparse(url).hostname
     cache_key = functions.small_hash(host)
     cache_file = constants.CACHE_FEEDS / f"{cache_key}.json"
-    cache: types.Cache = functions.read(cache_file)
+    cache: custom_types.Cache = functions.read(cache_file)
     latest_image = float(max(cache.keys(), key=float)) if cache else 0.0
 
     # First sync, starts from the begining
@@ -97,7 +100,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
     return {"count": new_images}
 
 
-def sync_feeds(force: bool = False) -> types.Shaarlis:
+def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
     """Retrieve the JSON file containing all shaarlis feed's."""
     data = {"feeds": [], "updated": functions.now()}
     file = constants.SHAARLIS
@@ -127,7 +130,7 @@ def sync_them_all(force: bool = False) -> None:
 #
 
 
-def lookup(value: str) -> types.Images:
+def lookup(value: str) -> custom_types.Images:
     """Search for images."""
     value = value.lower()
 
@@ -159,7 +162,7 @@ def lookup(value: str) -> types.Images:
     return uniq_images[::-1]
 
 
-def lookup_tag(tag: str) -> types.Images:
+def lookup_tag(tag: str) -> custom_types.Images:
     """Search for images by tag."""
     tag = tag.lower()
     return [metadata for metadata in functions.read(constants.CACHE_HOME_ALL) if tag in metadata[1]]
@@ -194,7 +197,7 @@ def render_rss_feed(params: FormsDict) -> str:
     return ""
 
 
-def render_search(images: types.Images) -> str:
+def render_search(images: custom_types.Images) -> str:
     """Render search results."""
     total = len(images)
     page = last = 0

@@ -33,7 +33,7 @@ def test_sync_feeds(tmp_path: Path) -> None:
     ]
     resp = responses.add(method="GET", url=config.SYNC["url"], json=body)
 
-    with patch("host.constants.SHAARLIS", file):
+    with patch("constants.SHAARLIS", file):
         helpers.sync_feeds()
 
     assert resp.call_count == 1
