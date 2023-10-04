@@ -2,7 +2,7 @@
 
 Shaarlimages, la galerie des shaarlis !
 
-URL : [shaarlimages.net](https://shaarlimages.net)
+URL : [www.shaarlimages.net](https://www.shaarlimages.net)
 
 ## Production
 
@@ -12,6 +12,11 @@ Details:
 - Web app type: Bottle
 - Python version: `3.10`
 - Force HTTPS: enabled
+
+Tasks:
+- "Sync all shaarlis":
+  - when: daily at 00:00
+  - command: `PYTHONPATH='/home/tiger222/shaarlimages:/home/tiger222/shaarlimages/host' python -m host --sync`
 
 Check [Batteries Included](https://www.pythonanywhere.com/batteries_included/) to know what modules are already provided.
 
@@ -44,29 +49,17 @@ $ python -m pytest --doctest-modules host tests
 $ python server.py
 ```
 
---
+---
 
-### Informations
+### Historique
 
 Suite à [cette requête](http://sebsauvage.net/paste/?b1176a415f9bbe17#CIT+sEj+1tsMW8IAWBipoVJiNBcgLt81Gm79rxuiVnU).  
-Cette galerie s'inspire honteusement de [celle-ci](http://www.chromatic.io/FQrLQsb), et repose 
-sur le principe de [partition linéaire](http://www.crispymtn.com/stories/the-algorithm-for-a-perfectly-balanced-photo-gallery) (pas de perte d'espace).  
-Le code javascript a été largement inspiré par celui de [jakobholmelund / fitpicsjs](https://github.com/jakobholmelund/fitpicsjs), 
-amélioré et porté en javascript natif (plus besoin de grosses bibliothèques telles que jQuery, Prototype, ...).
 
 ### Ajouter un shaarli
 
-J'utilise la liste d'export de [shaarli.fr](http://shaarli.fr/opml?mod=opml), donc il vous suffira d'être ajouté sur ce site pour que vous soyez pris en compte.  
-
-
-### Améliorations possibles
-
-Dans l'immédiat, la couleur de fond pour chaque image est calculée (couleur moyenne dominante) et une image est ajoutée par dessus pour le grain. Bien que ça rende pas trop mal, il faudrait revoir le mécanisme pour se rapprocher un peu plus de [cette galerie](http://www.chromatic.io/FQrLQsb).  
-Pour le reste, libre à vous de forker, bidouiller et proposer des patches ;)
-
-### Détails techniques
-
-Reportez-vous au dépôt [Galinear](https://github.com/BoboTiG/galinear) pour plus d'informations. Il s'agit du système de la galerie seul, plus facile pour bidouiller.
+La liste des instances shaarli est récupérée depuis cette [source](host/config.py#L17).
+Si une meilleure source existe, n'hésitez pas à proposer une patch.
+Et si votre instance ne figure pas dans cette source, il vous suffira d'être ajouté à celle-ci site pour que vous soyez pris en compte moins de 24h plus tard.
 
 ### Remerciements
 
