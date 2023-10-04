@@ -150,6 +150,7 @@ footer a:hover {
 .update th {
     padding: 5px;
     text-align: unset;
+    font-weight: bold;
 }
 .update tr:hover td {
     background-color: orange;
@@ -179,9 +180,6 @@ footer a:hover {
 .update .num, .update .maj, .update .nouveautes {
     text-align: center;
     font-weight: bold;
-}
-.update .nouveautes {
-    color: gray;
 }
 .update .center {
     text-align: center;
