@@ -69,7 +69,9 @@ def search_by_tag(tag: str) -> str:
 @route("/assets/<file:path>")
 def static_asset(file: str) -> HTTPResponse:
     """Get a resource file used by the website."""
-    return static_file(file, root=constants.ASSETS)
+    response = static_file(file, root=constants.ASSETS)
+    response.set_header("Cache-Control", "public, max-age=31536000")
+    return response
 
 
 @route("/favicon.png")
@@ -85,7 +87,9 @@ def static_image(image: str) -> str:
         functions.purge({image})
         redirect("/favicon.png")
 
-    return static_file(image, root=constants.IMAGES)
+    response = static_file(image, root=constants.IMAGES)
+    response.set_header("Cache-Control", "public, max-age=31536000")
+    return response
 
 
 @route("/robots.txt")
@@ -104,7 +108,9 @@ def static_thumbnail(image: str) -> HTTPResponse:
         redirect("/favicon.png")
 
     dest_file = thumbnail.relative_to(constants.DATA)
-    return static_file(str(dest_file), root=constants.DATA)
+    response = static_file(str(dest_file), root=constants.DATA)
+    response.set_header("Cache-Control", "public, max-age=31536000")
+    return response
 
 
 @route("/update/<value:int>")
