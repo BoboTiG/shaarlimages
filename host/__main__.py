@@ -24,10 +24,13 @@ if __name__ == "__main__":
     match args["ACTION"]:
         case "fix":
             functions.fix_images_medatadata(force=force)
+        case "purge":
+            if idx := args["--index"]:
+                functions.purge({idx})
         case "sync":
             if idx := args["--index"]:
                 helpers.sync_feed(int(idx), force=force)
             else:
                 helpers.sync_them_all(force=force)
 
-    functions.generate_images_file(force=force)
+    functions.generate_images_file(force=True)
