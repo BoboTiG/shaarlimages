@@ -63,11 +63,11 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
 
             output_file.write_bytes(image)
 
-        if (key := str(published)) in cache:
-            continue
-
         if not (size := functions.get_size(output_file)) or not functions.create_thumbnail(output_file):
             output_file.unlink(missing_ok=True)
+            continue
+
+        if (key := str(published)) in cache:
             continue
 
         metadata = {
