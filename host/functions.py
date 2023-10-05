@@ -234,7 +234,10 @@ def fetch_json(url: str) -> dict[str, Any]:
 
 def fetch_image(url: str) -> bytes | None:
     """Fetch an image."""
-    url = guess_url(url)
+    # Prevent a circular import error
+    import solvers
+
+    url = solvers.guess_url(url)
     try:
         req = fetch(url)
         req.raise_for_status()
@@ -254,34 +257,6 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
     """Fetch a XML RSS feed."""
     print(">>> 📜", url)
     return feedparser.parse(fetch(url).text)
-
-
-def guess_url_from_wikimedia(url: str) -> str:
-    """
-    Resolve the original image URL from Wikimedia.
-
-        >>> guess_url_from_wikimedia("http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg")
-        'http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg'
-
-    """
-    parts = urlparse(url)
-    path = parts.path if ":" in parts.path else parts.fragment if ":" in parts.fragment else ""
-    if ":" not in path:
-        return url
-
-    file = path.split(":", 1)[1]
-    files = fetch_json(f"https://api.wikimedia.org/core/v1/commons/file/File:{file}")
-    return files.get("original", {}).get("url", url)
-
-
-def guess_url(url: str) -> str:
-    """Try to resolve a specific URL."""
-    hostname = urlparse(url).hostname
-
-    if hostname.endswith((".wikimedia.org", ".wikipedia.org")):
-        return guess_url_from_wikimedia(url)
-
-    return url
 
 
 def invalidate_cache() -> None:
