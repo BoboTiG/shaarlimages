@@ -22,7 +22,6 @@ import feedparser
 import numpy
 import requests
 import urllib3
-from unidecode import unidecode
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -389,18 +388,6 @@ def safe_filename(name: str, func=re.compile(constants.SAFE_FILENAME_REGEXP).sub
         'a-b-c-d-e-f-g-h-i-j-k-l-@'
     """
     return func("-", name.strip())
-
-
-def safe_tag(tag: str) -> str:
-    """
-    Uniformize a given `tag`.
-
-        >>> safe_tag("jeux_vidéo")
-        'jeux-video'
-        >>> safe_tag("jeux vidéo")
-        'jeux-video'
-    """
-    return unidecode(safe_filename(tag.lower())).replace("_", "-").replace(" ", "-")
 
 
 def small_hash(value: str) -> str:
