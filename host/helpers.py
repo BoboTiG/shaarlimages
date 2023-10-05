@@ -63,8 +63,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
 
             output_file.write_bytes(image)
 
-        key = str(published)
-        if key in cache:
+        if (key := str(published)) in cache:
             continue
 
         if not (size := functions.get_size(output_file)):
