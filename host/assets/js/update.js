@@ -10,11 +10,11 @@ function makeAllRequests() {
 function makeRequest(id) {
     "use strict";
 
-    if (id === 0) {
+    let items = document.getElementById("feed-" + id);
+
+    if (!items) {
         return;
     }
-
-    let items = document.getElementById("feed-" + id);
 
     items.innerHTML  = loading;
     fetch("/update/" + id)
