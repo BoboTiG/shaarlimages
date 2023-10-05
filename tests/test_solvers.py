@@ -24,7 +24,7 @@ def test_guess_url() -> None:
         "https://fr.wikipedia.org/wiki/Fichier:Chess_Single_Image_Stereogram_by_3Dimka.jpg",
     ],
 )
-def test_guess_url_wikimedia_wikipedia(url: str) -> None:
+def test_wikimedia(url: str) -> None:
     url_files = "https://api.wikimedia.org/core/v1/commons/file/File:Chess_Single_Image_Stereogram_by_3Dimka.jpg"
     body = {
         "title": "Chess Single Image Stereogram by 3Dimka.jpg",
@@ -61,7 +61,7 @@ def test_guess_url_wikimedia_wikipedia(url: str) -> None:
 
 
 @responses.activate
-def test_guess_url_wikimedia_wikipedia_not_found() -> None:
+def test_wikimedia_not_found() -> None:
     url = "https://en.wikipedia.org/wiki/File:CE_marks.jpg"
     url_files = "https://api.wikimedia.org/core/v1/commons/file/File:CE_marks.jpg"
     body = {
