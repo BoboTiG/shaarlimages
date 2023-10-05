@@ -147,10 +147,10 @@ def lookup(value: str) -> custom_types.Images:
         for feed in constants.CACHE_FEEDS.glob("*.json")
         for date, metadata in functions.read(feed).items()
         if (
-            value in metadata["title"]
-            or value in metadata["desc"]
-            or value in metadata["guid"]
-            or value in metadata["link"]
+            value in metadata["title"].lower()
+            or value in metadata["desc"].lower()
+            or value in metadata["guid"].lower()
+            or value in metadata["link"].lower()
             or value in metadata["tags"]
         )
     )
