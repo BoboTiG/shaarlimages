@@ -76,7 +76,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
             "guid": item.guid,
             "height": size.height,
             "link": file,
-            "tags": [tag.term.lower().strip() for tag in getattr(item, "tags", [])],
+            "tags": [functions.safe_tag(tag.term) for tag in getattr(item, "tags", [])],
             "title": item.title,
             "width": size.width,
         }
