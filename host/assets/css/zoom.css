@@ -1,3 +1,7 @@
+body {
+    overflow: hidden;
+}
+
 .image-container-alone img {
     margin: auto;
     position: absolute;
@@ -54,4 +58,25 @@
 .image-container-alone-toolbar a:hover {
     opacity: 1;
     transition: .1s;
+}
+
+#tags {
+    position: absolute;
+    display: block;
+    line-height: 25px;
+    bottom: -23px;
+}
+#tags a {
+    display: inline-block;
+    text-decoration: none;
+    color: #eee;
+    text-shadow: 0px 0px 0px #000;
+    background-color: var(--bg-color);
+    border-top: 3px solid orange;
+    padding: 1px 10px;
+    transition: transform .3s ease-out;
+}
+#tags a:hover {
+    text-shadow: 0px 0px 0px #fff;
+    transform: translate(0, -23px);
 }
