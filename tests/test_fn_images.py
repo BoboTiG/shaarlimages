@@ -7,11 +7,21 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from freezegun import freeze_time
 
 from host import functions
 from host.custom_types import Size
 
 from .constants import IMAGE_JPG, IMAGE_JPG_IS_PNG, IMAGE_PNG
+
+
+def test_any_css_class_question() -> None:
+    assert functions.any_css_class_question() == ""
+
+
+@freeze_time("1969-06-28")
+def test_any_css_class_question_gray_pride() -> None:
+    assert functions.any_css_class_question() == "gay-pride"
 
 
 @pytest.mark.parametrize(

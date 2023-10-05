@@ -66,7 +66,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
         if (key := str(published)) in cache:
             continue
 
-        if not (size := functions.get_size(output_file)):
+        if not (size := functions.get_size(output_file)) or not functions.create_thumbnail(output_file):
             output_file.unlink(missing_ok=True)
             continue
 
@@ -133,44 +133,6 @@ def sync_them_all(force: bool = False) -> None:
 #
 # Web
 #
-
-
-def lookup(value: str) -> custom_types.Images:
-    """Search for images."""
-    value = value.lower()
-
-    if len(value) < 3:
-        return []
-
-    res = sorted(
-        (float(date), (metadata["link"], metadata["tags"], ""))
-        for feed in constants.CACHE_FEEDS.glob("*.json")
-        for date, metadata in functions.read(feed).items()
-        if (
-            value in metadata["title"].lower()
-            or value in metadata["desc"].lower()
-            or value in metadata["guid"].lower()
-            or value in metadata["link"].lower()
-            or value in metadata["tags"]
-        )
-    )
-
-    # Uniquify
-    know_images = set()
-    uniq_images = []
-    for _, images in res:
-        if images[0] in know_images:
-            continue
-        uniq_images.append(images)
-        know_images.add(images[0])
-
-    return uniq_images[::-1]
-
-
-def lookup_tag(tag: str) -> custom_types.Images:
-    """Search for images by tag."""
-    tag = tag.lower()
-    return [metadata for metadata in functions.read(constants.CACHE_HOME_ALL) if tag in metadata[1]]
 
 
 def render(tpl: str, **kwargs) -> str:

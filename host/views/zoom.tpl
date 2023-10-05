@@ -1,29 +1,29 @@
 % this_site = site.copy()
-% prefix = "[ ☂ NSFW ] " if "nsfw" in metadata["tags"] else ""
-% this_site["title"] = f"{prefix}{metadata['link']} • {this_site['title']}"
+% prefix = "[ ☂ NSFW ] " if "nsfw" in metadata.tags else ""
+% this_site["title"] = f"{prefix}{metadata.link} • {this_site['title']}"
 % headers.append(f'<link rel="stylesheet" href="/assets/css/zoom.css?v={version}" />')
 % headers.append('<meta property="og:title" content="' + this_site["title"] + '" />')
 % headers.append('<meta property="og:type" content="website" />')
-% headers.append('<meta property="og:url" content="' + this_site["url"] + '/zoom/' + metadata["link"] + '" />')
-% headers.append('<meta property="og:image:url" content="' + this_site["url"] + '/thumbnail/' + metadata["link"] + '" />')
+% headers.append('<meta property="og:url" content="' + this_site["url"] + '/zoom/' + metadata.link + '" />')
+% headers.append('<meta property="og:image:url" content="' + this_site["url"] + '/thumbnail/' + metadata.link + '" />')
 % headers.append('<meta property="og:description" content="' + this_site["description"] + '" />')
 %include("header", site=this_site)
 
 <div class="image-container-alone-toolbar">
     <a href="/" title="Retour à la galerie">🏠</a>
-    <a href="/image/{{ metadata["link"] }}" title="Zoom" target="_blank">🔎</a>
-    %if metadata["guid"].startswith("http"):
-    <a href="{{ metadata["guid"] }}" title="Source" target="_blank">🔗</a>
+    <a href="/image/{{ metadata.link }}" title="Zoom" target="_blank">🔎</a>
+    %if metadata.guid.startswith("http"):
+    <a href="{{ metadata.guid }}" title="Source" target="_blank">🔗</a>
     %end
 </div>
 
 <figure class="image-container-alone">
-    <img src="/image/{{ metadata["link"] }}"{{!f' class="{css_class}"' if css_class else '' }} />
+    <img src="/image/{{ metadata.link }}"{{!f' class="{css_class}"' if css_class else '' }} />
 </figure>
 
-%if metadata["tags"]:
+%if metadata.tags:
 <div id="tags">
-    %for tag in metadata["tags"]:
+    %for tag in metadata.tags:
     <a onclick="document.location = '/search/tag/{{ tag }}'; return false;">{{ tag }}</a>
     %end
 </div>

@@ -7,7 +7,7 @@ import constants
 import functions
 import helpers
 import version
-from bottle import HTTPResponse, default_app, redirect, request, route, static_file
+from bottle import HTTPResponse, default_app, route, static_file
 
 __version__ = version.__version__
 __author__ = "Mickaël Schoentgen"
@@ -21,13 +21,6 @@ and that both that copyright notice and this permission notice appear
 in supporting documentation or portions thereof, including
 modifications, that you make.
 """
-
-
-@route("/rss")
-def feed_rss() -> str:
-    """Generate the RSS feed."""
-    assert 0, "TODO"
-    return helpers.render_rss_feed(request.query)
 
 
 @route("/")
@@ -57,13 +50,13 @@ def page_zoom(image: str) -> str:
 @route("/search/<value>")
 def search(value: str) -> str:
     """Search for images."""
-    return helpers.render_search(helpers.lookup(value))
+    return helpers.render_search(functions.lookup(value))
 
 
 @route("/search/tag/<tag>")
 def search_by_tag(tag: str) -> str:
     """Search for images by tag."""
-    return helpers.render_search(helpers.lookup_tag(tag))
+    return helpers.render_search(functions.lookup_tag(tag))
 
 
 @route("/assets/<file:path>")
@@ -83,10 +76,6 @@ def static_favicon() -> HTTPResponse:
 @route("/image/<image>")
 def static_image(image: str) -> str:
     """Get an image."""
-    if not (constants.IMAGES / image).is_file():
-        functions.purge({image})
-        redirect("/favicon.png")
-
     response = static_file(image, root=constants.IMAGES)
     response.set_header("Cache-Control", "public, max-age=31536000")
     return response
@@ -101,14 +90,7 @@ def static_robots() -> HTTPResponse:
 @route("/thumbnail/<image>")
 def static_thumbnail(image: str) -> HTTPResponse:
     """Get a thumbnail."""
-    source_file = constants.IMAGES / image
-
-    if not (thumbnail := functions.create_thumbnail(source_file)):
-        functions.purge({image})
-        redirect("/favicon.png")
-
-    dest_file = thumbnail.relative_to(constants.DATA)
-    response = static_file(str(dest_file), root=constants.DATA)
+    response = static_file(image, root=constants.THUMBNAILS)
     response.set_header("Cache-Control", "public, max-age=31536000")
     return response
 

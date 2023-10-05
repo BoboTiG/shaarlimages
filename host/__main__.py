@@ -32,5 +32,3 @@ if __name__ == "__main__":
                 helpers.sync_feed(int(idx), force=force)
             else:
                 helpers.sync_them_all(force=force)
-
-    functions.generate_images_file(force=True)

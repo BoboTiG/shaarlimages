@@ -4,6 +4,7 @@ bottle==0.12.25
 docopt==0.6.2
 feedparser==6.0.8
 flake8-pyproject
+freezegun==1.2.2
 isort
 mypy
 opencv-contrib-python-headless==4.5.5.62

@@ -11,7 +11,7 @@ from contextlib import suppress
 from datetime import datetime, timezone
 from pathlib import Path
 from shutil import copyfile
-from typing import Any
+from typing import Any, Generator
 from urllib.parse import urlparse
 
 import config
@@ -115,110 +115,6 @@ def docolav(file: Path) -> str:
     return "".join(f"{int(n):02X}" for n in avg_color[::-1])
 
 
-def fix_images_medatadata(force: bool = False):
-    errors = set()
-    for feed in constants.CACHE_FEEDS.glob("*.json"):
-        changed = False
-
-        if not (data := read(feed)):
-            continue
-
-        for k, v in data.items():
-            file = constants.IMAGES / v["link"]
-
-            if force or "width" not in v:
-                if not (size := get_size(file)):
-                    errors.add(v["link"])
-                    continue
-
-                data[k] |= {"width": size.width, "height": size.height}
-                changed = True
-
-            if force or "docolav" not in v:
-                if not (color := docolav(file)):
-                    errors.add(v["link"])
-                    continue
-
-                data[k] |= {"docolav": color}
-                changed = True
-
-        if changed:
-            persist(feed, data)
-
-    if errors:
-        purge(errors)
-
-
-def generate_images_file(force: bool = False) -> list[tuple[str, list[str], str]]:
-    """Craft the JSON file containing all images."""
-    if force or not (uniq_images := read(constants.CACHE_HOME_ALL)):
-        all_images = sorted(
-            (
-                (float(key), feed.stem, value["link"], value["tags"], value["width"], value["height"], value["docolav"])
-                for feed in constants.CACHE_FEEDS.glob("*.json")
-                for key, value in read(feed).items()
-            ),
-            reverse=True,
-        )
-
-        know_images = set()
-        uniq_images = []
-        for _, feed, image, tags, width, height, color in all_images[::-1]:
-            if image in know_images:
-                continue
-            uniq_images.append((image, tags, width, height, color, feed))
-            know_images.add(image)
-
-        uniq_images = uniq_images[::-1]
-        persist(constants.CACHE_HOME_ALL, uniq_images)
-
-    return uniq_images
-
-
-def get_last(page: int, count: int) -> tuple[int, custom_types.Images]:
-    """Get last N images."""
-    all_images = generate_images_file()
-    return len(all_images), all_images[(page - 1) * count : page * count]
-
-
-def get_metadata(image: str) -> custom_types.Metadata:
-    all_cache = read(constants.CACHE_HOME_ALL)
-
-    if not (feed := next((stored_feed for stored_image, *_, stored_feed in all_cache if stored_image == image), "")):
-        assert 0, "TODO #1"
-
-    if not (cache := read(constants.CACHE_FEEDS / f"{feed}.json")):
-        assert 0, "TODO #2"
-
-    for metadata in cache.values():
-        if metadata["link"] == image:
-            return metadata
-
-    assert 0, "TODO #3"
-
-
-def get_prev_next(image: str) -> tuple[str, str]:
-    all_cache = read(constants.CACHE_HOME_ALL)
-
-    for idx, (stored_image, *_) in enumerate(all_cache):
-        if stored_image != image:
-            continue
-
-        prev_key = all_cache[idx - 1][0] if idx > 0 else ""
-        next_key = all_cache[idx + 1][0] if idx < len(all_cache) - 1 else ""
-        return prev_key, next_key
-
-    return "", ""
-
-
-def get_size(file: Path) -> custom_types.Size | None:
-    """Retrieve the file width & height."""
-    if (im := cv2.imread(str(file))) is None:
-        return None
-
-    return custom_types.Size(width=im.shape[1], height=im.shape[0])
-
-
 def fetch(url: str) -> requests.Response:
     """Make a HTTP call."""
     with requests.get(url, headers=constants.HTTP_REQ_HEADERS, timeout=120.0, verify=False) as req:
@@ -258,8 +154,69 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
     return feedparser.parse(fetch(url).text)
 
 
-def invalidate_cache() -> None:
-    constants.CACHE_HOME_ALL.unlink(missing_ok=True)
+def fix_images_medatadata(force: bool = False):
+    errors = set()
+    for feed in constants.CACHE_FEEDS.glob("*.json"):
+        changed = False
+
+        if not (data := read(feed)):
+            continue
+
+        for k, v in data.items():
+            file = constants.IMAGES / v["link"]
+
+            if force or "width" not in v:
+                if not (size := get_size(file)):
+                    errors.add(v["link"])
+                    continue
+
+                data[k] |= {"width": size.width, "height": size.height}
+                changed = True
+
+            if force or "docolav" not in v:
+                if not (color := docolav(file)):
+                    errors.add(v["link"])
+                    continue
+
+                data[k] |= {"docolav": color}
+                changed = True
+
+        if changed:
+            persist(feed, data)
+
+    if errors:
+        purge(errors)
+
+
+def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
+    """Get last N images."""
+    all_images = list(retrieve_all_uniq_metadata())
+    return len(all_images), all_images[(page - 1) * count : page * count]
+
+
+def get_metadata(image: str) -> custom_types.Metadata:
+    return next((metadata for metadata in retrieve_all_uniq_metadata() if metadata.link == image))
+
+
+def get_prev_next(image: str) -> tuple[str, str]:
+    all_cache = list(retrieve_all_uniq_metadata())
+    for idx, metadata in enumerate(all_cache):
+        if metadata.link != image:
+            continue
+
+        prev_img = all_cache[idx - 1].link if idx > 0 else ""
+        next_img = all_cache[idx + 1].link if idx < len(all_cache) - 1 else ""
+        return prev_img, next_img
+
+    return "", ""
+
+
+def get_size(file: Path) -> custom_types.Size | None:
+    """Retrieve the file width & height."""
+    if (im := cv2.imread(str(file))) is None:
+        return None
+
+    return custom_types.Size(width=im.shape[1], height=im.shape[0])
 
 
 def is_image_data(raw: bytes) -> bool:
@@ -305,13 +262,50 @@ def is_image_link(url: str) -> bool:
     return url.lower().endswith(constants.IMAGE_EXT) and hostname != config.SITE["host"]
 
 
+def load_metadata(feed: Path) -> list[tuple[float, custom_types.Metadata]]:
+    """Load a given `feed` into more a readable object."""
+    cls = custom_types.Metadata
+    return [(float(date), cls(**metadata)) for date, metadata in read(feed).items()]
+
+
+def lookup(value: str) -> custom_types.Metadatas:
+    """
+    Search for images.
+
+        >>> lookup('ab')
+        []
+
+    """
+    if len(value) < 3:
+        return []
+
+    value = value.lower()
+    return [
+        metadata
+        for metadata in retrieve_all_uniq_metadata()
+        if (
+            value in metadata.title.lower()
+            or value in metadata.desc.lower()
+            or value in metadata.guid.lower()
+            or value in metadata.link.lower()
+            or value in metadata.tags
+        )
+    ]
+
+
+def lookup_tag(tag: str) -> custom_types.Metadatas:
+    """Search for images by tag."""
+    tag = tag.lower()
+    return [metadata for metadata in retrieve_all_uniq_metadata() if tag in metadata.tags]
+
+
 def now() -> float:
     return today().timestamp()
 
 
 def persist(file: Path, data: dict[str, Any]) -> None:
     with file.open(mode="w") as fh:
-        json.dump(data, fh, sort_keys=True, indent=4)
+        json.dump(data, fh, sort_keys=True, indent=0)
         os.fsync(fh)
 
 
@@ -350,20 +344,13 @@ def purge(files: set[str]) -> None:
         changed = False
         cache = read(feed)
 
-        for key, value in cache.copy().items():
-            if value["link"] in files:
-                cache.pop(key)
+        for date, metadata in cache.copy().items():
+            if metadata["link"] in files:
+                cache.pop(date)
                 changed = True
 
         if changed:
             persist(feed, cache)
-
-    if all_cache := read(constants.CACHE_HOME_ALL):
-        if indexes := [idx for idx, (name, *_) in enumerate(all_cache) if name in files]:
-            for idx in [idx - count for count, idx in enumerate(indexes)]:
-                del all_cache[idx]
-
-            persist(constants.CACHE_HOME_ALL, all_cache)
 
     for file in files:
         (constants.IMAGES / file).unlink(missing_ok=True)
@@ -373,6 +360,21 @@ def read(file: Path) -> dict[str, Any]:
     with suppress(FileNotFoundError):
         return json.loads(file.read_text())
     return {}
+
+
+def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None]:
+    """Retrieve all images with no duplicates, sorted by latest first."""
+    know_images = set()
+    uniq_images = []
+
+    for feed in constants.CACHE_FEEDS.glob("*.json"):
+        for date, metadata in load_metadata(feed):
+            if metadata.link in know_images:
+                continue
+            uniq_images.append((date, metadata))
+            know_images.add(metadata.link)
+
+    return (metadata for _, metadata in sorted(uniq_images)[::-1])
 
 
 def safe_filename(name: str, func=re.compile(constants.SAFE_FILENAME_REGEXP).sub) -> str:

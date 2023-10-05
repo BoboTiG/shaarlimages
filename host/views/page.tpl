@@ -38,9 +38,8 @@ window.onload = function () {
     // The gallery
     let container = document.getElementById("images-container");
     const images = [
-        % # images is list([link, tags, width, height, docolav, feed])
-        %for link, tags, width, height, docolav, _ in images:
-        {"src": "{{ link }}", "width": {{ width }}, "height": {{ height }}, "docolav": "#{{ docolav }}"{{!', "class": "nsfw"' if "nsfw" in tags else '' }}},
+        %for metadata in images:
+        {"src": "{{ metadata.link }}", "width": {{ metadata.width }}, "height": {{ metadata.height }}, "docolav": "#{{ metadata.docolav }}"{{!', "class": "nsfw"' if "nsfw" in metadata.tags else '' }}},
         %end 
     ];
     const rows = linearPartition(images);
