@@ -359,12 +359,7 @@ def purge(files: set[str]) -> None:
             persist(feed, cache)
 
     if all_cache := read(constants.CACHE_HOME_ALL):
-        indexes = []
-        for idx, (name, *_) in enumerate(all_cache):
-            if name in files:
-                indexes.append(idx)
-
-        if indexes:
+        if indexes := [idx for idx, (name, *_) in enumerate(all_cache) if name in files]:
             for idx in [idx - count for count, idx in enumerate(indexes)]:
                 del all_cache[idx]
 
