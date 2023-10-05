@@ -11,6 +11,26 @@ import functions
 IMGUR_SUFFIX = tuple(f"_d{ext}" for ext in constants.IMAGE_EXT)
 
 
+def imgur(url: str) -> str:
+    """
+    Resolve the original image URL from Imgut.
+
+        >>> imgur("https://i.imgur.com/qypAs0A_d.jpg")
+        'https://i.imgur.com/qypAs0A.jpg'
+        >>> imgur("https://i.imgur.com/qypAs0A_d.jpeg")
+        'https://i.imgur.com/qypAs0A.jpeg'
+        >>> imgur("https://i.imgur.com/qypAs0A_d.png")
+        'https://i.imgur.com/qypAs0A.png'
+        >>> imgur("https://i.imgur.com/qypAs0A_dd.png")
+        'https://i.imgur.com/qypAs0A_dd.png'
+
+    """
+    if url.endswith(IMGUR_SUFFIX):
+        for ext in constants.IMAGE_EXT:
+            url = url.replace(f"_d{ext}", ext)
+    return url
+
+
 def wikimedia(url: str) -> str:
     """
     Resolve the original image URL from Wikimedia.
@@ -29,31 +49,19 @@ def wikimedia(url: str) -> str:
     return files.get("original", {}).get("url", url)
 
 
-def imgur(url: str) -> str:
-    """
-    Resolve the original image URL from Imgut.
-
-        >>> imgur("https://i.imgur.com/qypAs0A_d.jpg")
-        'https://i.imgur.com/qypAs0A.jpg'
-        >>> imgur("https://i.imgur.com/qypAs0A_d.jpeg")
-        'https://i.imgur.com/qypAs0A.jpeg'
-        >>> imgur("https://i.imgur.com/qypAs0A_d.png")
-        'https://i.imgur.com/qypAs0A.png'
-
-    """
-    for ext in constants.IMAGE_EXT:
-        url = url.replace(f"_d{ext}", ext)
-    return url
+SOLVERS = {
+    "i.imgur.com": imgur,
+}
 
 
 def guess_url(url: str) -> str:
     """Resolve a specific URL."""
     hostname = urlparse(url).hostname
 
+    if solver := SOLVERS.get(hostname):
+        return solver(url)
+
     if hostname.endswith((".wikimedia.org", ".wikipedia.org")):
         return wikimedia(url)
-
-    if hostname == "i.imgur.com" and url.endswith(IMGUR_SUFFIX):
-        return imgur(url)
 
     return url

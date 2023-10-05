@@ -13,7 +13,7 @@ import constants
 import custom_types
 import functions
 import version
-from bottle import FormsDict, redirect, template
+from bottle import redirect, template
 
 #
 # Sync
@@ -161,11 +161,6 @@ def render_home_pagination_page(page: int) -> str:
     return render_home_page(page)
 
 
-def render_rss_feed(params: FormsDict) -> str:
-    """Render the XML RSS feed."""
-    return ""
-
-
 def render_search(images: custom_types.Images) -> str:
     """Render search results."""
     total = len(images)
@@ -178,7 +173,7 @@ def render_update_page() -> str:
     return render("update", feeds=sync_feeds())
 
 
-def render_zoom_page(image: str) -> str:
+def render_zoom_page(image: custom_types.Image) -> str:
     """Render an image page."""
     metadata = functions.get_metadata(image)
     prev_img, next_img = functions.get_prev_next(image)
