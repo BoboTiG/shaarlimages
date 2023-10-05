@@ -1,5 +1,6 @@
 % this_site = site.copy()
 % this_site["title"] += " • MàJ"
+% headers.append(f'<link rel="stylesheet" href="/assets/css/update.css?v={version}" />')
 %include("header", site=this_site)
 
 <div class="update">

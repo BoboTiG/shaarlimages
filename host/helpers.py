@@ -175,7 +175,9 @@ def lookup_tag(tag: str) -> custom_types.Images:
 
 def render(tpl: str, **kwargs) -> str:
     """Render a template with provided keyword arguments."""
-    return template(tpl, **kwargs, version=version.__version__, site=config.SITE, template_lookup=[constants.VIEWS])
+    return template(
+        tpl, **kwargs, headers=[], version=version.__version__, site=config.SITE, template_lookup=[constants.VIEWS]
+    )
 
 
 def render_home_page(page: int) -> str:

@@ -9,6 +9,9 @@
     <meta name="description" content="{{ site["description"] }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>{{ site["title"] }}</title>
+    %for header in headers:
+    {{ !header }}
+    %end
 </head>
 
 <body>

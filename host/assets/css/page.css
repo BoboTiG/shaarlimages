@@ -1,0 +1,65 @@
+#images-container {
+    display: flex;
+    flex-direction: column;
+    box-sizing: content-box;
+}
+#images-container .row {
+    height: 200px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+#images-container a {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid var(--bg-color);
+}
+#images-container img {
+    display: inline-block;
+    width: 100%;
+    object-fit: cover;
+    transition: transform .5s ease-in-out;
+    opacity: 0;
+}
+#images-container img.loaded {
+    opacity: 1;
+    animation: fadein 2s;
+}
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+  }
+#images-container a:hover {
+    border-color: #ddd;
+}
+#images-container a:hover img {
+    transform: scale3d(1.2, 1.2, 1);
+    transition: transform 1s ease-in-out;
+}
+#images-container .nsfw {
+    background: transparent url('/assets/img/nsfw.png') no-repeat top right;
+}
+#images-container .nsfw img {
+    opacity: .05;
+}
+
+footer {
+    clear: both;
+    color: #eee;
+    padding: 10px;
+    margin-top: 8px;
+    text-align: center;
+    background: #45484d linear-gradient(to top, #45484d 0%,var(--bg-color) 100%);
+    text-shadow: 1px 1px 1px #000;
+}
+footer a {
+    color: #999;
+    text-decoration: none;
+}
+footer a:hover {
+    color: orange;
+}

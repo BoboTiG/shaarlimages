@@ -1,3 +1,4 @@
+% headers.append(f'<link rel="stylesheet" href="/assets/css/page.css?v={version}" />')
 %include("header")
 
 <div id="images-container"></div>
