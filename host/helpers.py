@@ -87,11 +87,11 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
         metadata["tags"] = sorted(metadata["tags"])
 
         cache[key] = metadata
+        total_new_images += 1
         new_images += 1
 
         if new_images % 10 == 0:
             functions.persist(cache_file, cache)
-            total_new_images += new_images
             new_images = 0
 
     if new_images:
