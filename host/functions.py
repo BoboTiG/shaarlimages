@@ -22,6 +22,7 @@ import feedparser
 import numpy
 import requests
 import urllib3
+from unidecode import unidecode
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -377,14 +378,24 @@ def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None
     return (metadata for _, metadata in sorted(uniq_images)[::-1])
 
 
-def safe_filename(name: str, func=re.compile(constants.SAFE_FILENAME_REGEXP).sub) -> str:
+def safe_filename(
+    name: str,
+    replace=re.compile(r"[^a-z0-9]").sub,
+    cleanup=re.compile(r"--+").sub,
+) -> str:
     r"""
     Replace forbidden characters for a given `name`.
 
-        >>> safe_filename("a/b\\c*d:e<f>g?h\"i|j%k'l#@     ")
-        'a-b-c-d-e-f-g-h-i-j-k-l-@'
+        >>> safe_filename("a/b\\c*d:e<f>g?h\"i|j%k'l#k@     ")
+        'a-b-c-d-e-f-g-h-i-j-k-l-k-'
+        >>> safe_filename("fetch.php?cache=&media=divers:img_20141120_150542")
+        'fetch-php-cache-media-divers-img-20141120-150542'
+        >>> safe_filename("普通话/普通話")
+        'pu-tong-hua-pu-tong-hua'
+        >>> safe_filename("jeux_vidéo")
+        'jeux-video'
     """
-    return func("-", name.strip())
+    return cleanup("-", replace("-", unidecode(name).strip().lower()))
 
 
 def small_hash(value: str) -> str:

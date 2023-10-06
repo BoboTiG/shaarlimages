@@ -31,7 +31,6 @@ IMAGE_EXT = (".jpeg", ".jpg", ".png")
 IMAGES_MAGIC_SIG = (b"\xff\xd8\xff", b"\x89PNG")
 NSFW = "nsfw"
 NSFW_TAGS = {"hentai", "hentaï", "nude", NSFW, "sex", "sexe", "sexy"}
-SAFE_FILENAME_REGEXP = r'\?|\*|\/|\\|"|\'|<|>|:|\||%|#'
 THUMBNAIL_MAX_SIZE = Size(width=400, height=400)
 
 # Local web server

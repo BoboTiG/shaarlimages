@@ -48,7 +48,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
         if not (link := solvers.guess_url(item.link, item.published_parsed)):
             continue
 
-        path = Path(urlparse(link).path)
+        path = Path(link)
         file = f"{functions.small_hash(link)}_{functions.safe_filename(path.stem)}{path.suffix.lower()}"
         output_file = constants.IMAGES / file
 
