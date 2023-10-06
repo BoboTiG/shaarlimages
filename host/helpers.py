@@ -38,7 +38,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
 
     feed = functions.fetch_rss_feed(url)
     total_new_images = 0
-    new_images = 0
+    count = 0
 
     for item in feed.entries:
         published = mktime(item.published_parsed)
@@ -57,12 +57,10 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
                 continue
 
             output_file.write_bytes(image)
+            total_new_images += 1
 
         if not (size := functions.get_size(output_file)) or not functions.create_thumbnail(output_file):
             output_file.unlink(missing_ok=True)
-            continue
-
-        if (key := str(published)) in cache:
             continue
 
         metadata = {
@@ -85,16 +83,14 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
             metadata["tags"].append(constants.NSFW)
 
         metadata["tags"] = sorted(metadata["tags"])
+        cache[str(published)] = metadata
 
-        cache[key] = metadata
-        total_new_images += 1
-        new_images += 1
-
-        if new_images % 10 == 0:
+        count += 1
+        if count % 10 == 0:
             functions.persist(cache_file, cache)
-            new_images = 0
+            count = 0
 
-    if new_images:
+    if count:
         functions.persist(cache_file, cache)
 
     print(f"END {index=} {host} feed={cache_key!r} (+ {total_new_images})")

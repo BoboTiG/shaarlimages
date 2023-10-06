@@ -153,13 +153,12 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
 
 def fix_images_medatadata(force: bool = False):
     errors = set()
+    images = list(constants.IMAGES.glob("*.*"))
+
     for feed in constants.CACHE_FEEDS.glob("*.json"):
         changed = False
 
-        if not (data := read(feed)):
-            continue
-
-        for k, v in data.items():
+        for k, v in (data := read(feed)).items():
             file = constants.IMAGES / v["link"]
 
             if force or "width" not in v:
