@@ -384,17 +384,21 @@ def read(file: Path) -> dict[str, Any]:
 
 def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None]:
     """Retrieve all images with no duplicates, sorted by latest first."""
+    # First, all images
+    all_images = []
+    for feed in constants.CACHE_FEEDS.glob("*.json"):
+        all_images.extend(load_metadata(feed))
+
+    # Then, keep only the first published version of an image, skipping eventual duplicates (via reshares mostly)
     know_images = set()
     uniq_images = []
+    for _, metadata in sorted(all_images, key=lambda i: i[0]):
+        if metadata.link in know_images:
+            continue
+        uniq_images.append(metadata)
+        know_images.add(metadata.link)
 
-    for feed in constants.CACHE_FEEDS.glob("*.json"):
-        for date, metadata in load_metadata(feed):
-            if metadata.link in know_images:
-                continue
-            uniq_images.append((date, metadata))
-            know_images.add(metadata.link)
-
-    return (metadata for _, metadata in sorted(uniq_images)[::-1])
+    return uniq_images[::-1]
 
 
 def safe_filename(value: str, replace=re.compile(r"[^a-z0-9]").sub, cleanup=re.compile(r"--+").sub) -> str:
