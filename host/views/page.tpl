@@ -39,7 +39,7 @@ window.onload = function () {
     let container = document.getElementById("images-container");
     const images = [
         %for metadata in images:
-        {"src": "{{ metadata.link }}", "width": {{ metadata.width }}, "height": {{ metadata.height }}, "docolav": "#{{ metadata.docolav }}"{{!', "class": "nsfw"' if "nsfw" in metadata.tags else '' }}},
+        {src: "{{ metadata.link }}", width: {{ metadata.width }}, height: {{ metadata.height }}, docolav: "#{{ metadata.docolav }}", nsfw: {{ int("nsfw" in metadata.tags) }} },
         %end 
     ];
     const rows = linearPartition(images);
@@ -59,8 +59,9 @@ window.onload = function () {
             a.style.background = image.docolav;
             img.setAttribute("data-src", "/thumbnail/" + image.src);
 
-            if (image.class) {
-                a.classList.add(image.class);
+            if (image.nsfw) {
+                a.style.background += " url(/assets/img/nsfw.png) no-repeat top right";
+                img.classList.add("nsfw");
             }
 
             a.appendChild(img);

@@ -40,7 +40,7 @@ def test_search() -> None:
     response_lowercase = app.search("robe")
     response_uppercase = app.search("ROBE")
 
-    assert '{"src":' in response_lowercase
+    assert "{src:" in response_lowercase
     assert response_lowercase == response_uppercase
 
 
@@ -48,7 +48,7 @@ def test_search_by_tag() -> None:
     response_lowercase = app.search_by_tag("robe")
     response_uppercase = app.search_by_tag("ROBE")
 
-    assert '{"src":' in response_lowercase
+    assert "{src:" in response_lowercase
     assert response_lowercase == response_uppercase
 
 

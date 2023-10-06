@@ -14,25 +14,6 @@
     overflow: hidden;
     border: 1px solid var(--bg-color);
 }
-#images-container img {
-    display: inline-block;
-    width: 100%;
-    object-fit: cover;
-    transition: transform .5s ease-in-out;
-    opacity: 0;
-}
-#images-container img.loaded {
-    opacity: 1;
-    animation: fadein 2s;
-}
-@keyframes fadein {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-  }
 #images-container a:hover {
     border-color: #ddd;
 }
@@ -40,11 +21,28 @@
     transform: scale3d(1.2, 1.2, 1);
     transition: transform 1s ease-in-out;
 }
-#images-container .nsfw {
-    background: transparent url('/assets/img/nsfw.png') no-repeat top right;
+#images-container img {
+    display: inline-block;
+    width: 100%;
+    object-fit: cover;
+    transition: transform .5s ease-in-out;
+    opacity: 0;
 }
-#images-container .nsfw img {
+#images-container img.loaded:not(.nsfw) {
+    animation: fadein 2s;
+    opacity: 1;
+}
+#images-container img.loaded.nsfw {
+    animation: fadein-nsfw 2s;
     opacity: .05;
+}
+@keyframes fadein {
+    from { opacity: 0 }
+    to { opacity: 1 }
+}
+@keyframes fadein-nsfw {
+    from { opacity: 0 }
+    to { opacity: .05 }
 }
 
 footer {
