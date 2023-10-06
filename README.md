@@ -20,6 +20,17 @@ Tasks:
 
 Check [Batteries Included](https://www.pythonanywhere.com/batteries_included/) to know what modules are already provided.
 
+### Backup
+
+Command to fully sync back the data on a local machine:
+
+```console
+# Usage:
+# rsync -avzhe ssh <USER>@ssh.pythonanywhere.com:<SHAARLIMAGES_FOLDER>/data <LOCAL_FOLDER>/
+# Example:
+$ rsync -avzhe ssh tiger222@ssh.pythonanywhere.com:/home/tiger222/shaarlimages/data /home/tiger-222/projects/shaarlimages/
+```
+
 ## Development
 
 ### Installation
