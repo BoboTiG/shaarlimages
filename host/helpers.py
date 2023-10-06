@@ -37,6 +37,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
     print(f"START {index=} {host=} feed={cache_key!r}")
 
     feed = functions.fetch_rss_feed(url)
+    total_new_images = 0
     new_images = 0
 
     for item in feed.entries:
@@ -90,13 +91,14 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
 
         if new_images % 10 == 0:
             functions.persist(cache_file, cache)
+            total_new_images += new_images
+            new_images = 0
 
     if new_images:
         functions.persist(cache_file, cache)
-        functions.invalidate_cache()
 
-    print(f"END {index=} {host} feed={cache_key!r} (+ {new_images})")
-    return {"count": new_images}
+    print(f"END {index=} {host} feed={cache_key!r} (+ {total_new_images})")
+    return {"count": total_new_images}
 
 
 def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
