@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from shutil import copyfile
 from typing import Any, Generator
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 import config
 import constants
@@ -377,15 +377,11 @@ def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None
     return (metadata for _, metadata in sorted(uniq_images)[::-1])
 
 
-def safe_filename(
-    name: str,
-    replace=re.compile(r"[^a-z0-9]").sub,
-    cleanup=re.compile(r"--+").sub,
-) -> str:
+def safe_filename(value: str, replace=re.compile(r"[^a-z0-9]").sub, cleanup=re.compile(r"--+").sub) -> str:
     r"""
-    Replace forbidden characters for a given `name`.
+    Sanitize, and control the length, of a given `value`.
 
-        >>> safe_filename("a/b\\c*d:e<f>g?h\"i|j%k'l#k@     ")
+        >>> safe_filename("   a/b\\c*d:e<f>g?h\"i|j%k'l#k@     ")
         'a-b-c-d-e-f-g-h-i-j-k-l-k-'
         >>> safe_filename("fetch.php?cache=&media=divers:img_20141120_150542")
         'fetch-php-cache-media-divers-img-20141120-150542'
@@ -393,8 +389,16 @@ def safe_filename(
         'pu-tong-hua-pu-tong-hua'
         >>> safe_filename("jeux_vidéo")
         'jeux-video'
-    """
-    return cleanup("-", replace("-", unidecode(name).strip().lower()))
+        >>> safe_filename("https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Daikokuji-Sasayama_Komus%C5%8D_Shakuhachi_%E5%A4%A7%E5%9B%BD%E5%AF%BA%EF%BC%88%E7%AF%A0%E5%B1%B1%E5%B8%82%EF%BC%89%E4%B8%B9%E6%B3%A2%E8%8C%B6%E7%A5%AD%E3%82%8A_%E8%99%9A%E7%84%A1%E5%83%A7_DSCF1443.jpg/1200px-Daikokuji-Sasayama_Komus%C5%8D_Shakuhachi_%E5%A4%A7%E5%9B%BD%E5%AF%BA%EF%BC%88%E7%AF%A0%E5%B1%B1%E5%B8%82%EF%BC%89%E4%B8%B9%E6%B3%A2%E8%8C%B6%E7%A5%AD%E3%82%8A_%E8%99%9A%E7%84%A1%E5%83%A7_DSCF1443")
+        'https-upload-wikimedia-org-wikipedia-commons-thumb-9-9d-daikoku-chi-da-guo-si-xiao-shan-shi-dan-bo-cha-ji-ri-xu-wu-seng-dscf1443'
+
+    """  # noqa[E501]
+    return shortify(cleanup("-", replace("-", unidecode(unquote(value)).strip().lower())))
+
+
+def shortify(text: str, /, *, limit: int = 128) -> str:
+    """Shorten a given `text` to fit in exactly or less `limit` characters."""
+    return f"{text[:limit // 2 - 1]}-{text[-limit // 2:]}" if len(text) > limit else text
 
 
 def small_hash(value: str) -> str:
