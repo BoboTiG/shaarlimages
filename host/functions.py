@@ -153,25 +153,42 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
 
 def fix_images_medatadata(force: bool = False):
     errors = set()
-    images = list(constants.IMAGES.glob("*.*"))
+    images = {image.name for image in constants.IMAGES.glob("*.*")}
 
     for feed in constants.CACHE_FEEDS.glob("*.json"):
         changed = False
 
         for k, v in (data := read(feed)).items():
-            file = constants.IMAGES / v["link"]
+            # Fix the filename
+            file: Path = constants.IMAGES / v["link"]
+            key = file.stem[:6]  # The small hash
+            name_original = file.stem[7:]
+            name_sanitized = safe_filename(name_original)
+            if name_original != name_sanitized:
+                new_file = file.with_stem(f"{key}_{name_sanitized}")
+                file = new_file if new_file.is_file() else file.rename(new_file)
+                data[k] |= {"link": file.name}
+                changed = True
 
+                # Recreate the thumbnail
+                (constants.THUMBNAILS / v["link"]).unlink(missing_ok=True)
+                create_thumbnail(file)
+
+            images.discard(v["link"])
+
+            # Fix the size
             if force or "width" not in v:
                 if not (size := get_size(file)):
-                    errors.add(v["link"])
+                    errors.add(file.name)
                     continue
 
                 data[k] |= {"width": size.width, "height": size.height}
                 changed = True
 
+            # Fix the dominant color average
             if force or "docolav" not in v:
                 if not (color := docolav(file)):
-                    errors.add(v["link"])
+                    errors.add(file.name)
                     continue
 
                 data[k] |= {"docolav": color}
@@ -179,6 +196,9 @@ def fix_images_medatadata(force: bool = False):
 
         if changed:
             persist(feed, data)
+
+    # Remove orphaned files
+    errors |= images
 
     if errors:
         purge(errors)
