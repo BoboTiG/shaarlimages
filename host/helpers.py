@@ -12,6 +12,7 @@ import config
 import constants
 import custom_types
 import functions
+import solvers
 import version
 from bottle import redirect, template
 
@@ -43,17 +44,10 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
         if not force and published < latest_image:
             break
 
-        # Strip URL parameters
-        link = item.link.split("?", 1)[0]
-        if not functions.is_image_link(link):
+        if not (link := solvers.guess_url(item.link, item.published_parsed)):
             continue
 
-        parts = urlparse(link)
-        file = parts.path
-        if parts.fragment and functions.is_image_link(parts.fragment):
-            # Ex: https://commons.wikimedia.org/wiki/Gustave_Dor%C3%A9#/media/File:Paradise_Lost_12.jpg
-            file += f"_{parts.fragment}"
-        path = Path(file)
+        path = Path(urlparse(link).path)
         file = f"{functions.small_hash(link)}_{functions.safe_filename(path.stem)}{path.suffix.lower()}"
         output_file = constants.IMAGES / file
 

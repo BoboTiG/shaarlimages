@@ -3,15 +3,70 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
+from time import strptime
+
 import pytest
 import responses
 
 from host import solvers
 
+DATE = strptime("2011-09-04 00:00:00", "%Y-%m-%d %H:%M:%S")
 
-def test_guess_url() -> None:
-    url = "https://example.org/favicon.png"
-    assert solvers.guess_url(url) == url
+
+@responses.activate
+@pytest.mark.parametrize("scheme", ["http", "https"])
+@pytest.mark.parametrize(
+    "rest",
+    [
+        "apod.nasa.gov/apod",
+        "apod.nasa.gov/apod/",
+        "apod.nasa.gov/apod/astropix.html",
+        "apod.nasa.gov/apod/ap110904.html",
+        "antwrp.gsfc.nasa.gov/apod/ap110904.html",
+    ],
+)
+def test_nasa_apod(scheme: str, rest: str) -> None:
+    url = f"{scheme}://{rest}"
+    url_page = "https://apod.nasa.gov/apod/ap110904.html"
+    body = """
+<center>
+<h1> Astronomy Picture of the Day </h1>
+<p>
+
+<a href="archivepix.html">Discover the cosmos!</a>
+Each day a different image or photograph of our fascinating universe is
+featured, along with a brief explanation written by a professional astronomer.
+<p>
+
+2011 September 4
+<br>
+<a href="image/0901/newrings_cassini_big.jpg">
+<IMG SRC="image/0901/newrings_cassini.jpg"
+alt="See Explanation.  Clicking on the picture will download
+ the highest resolution version available."></a>
+</center>
+"""
+
+    responses.add(method="GET", url=url_page, body=body)
+    assert solvers.guess_url(url, DATE) == "https://apod.nasa.gov/apod/image/0901/newrings_cassini_big.jpg"
+
+
+@responses.activate
+def test_nasa_apod_invalid_response() -> None:
+    url = "https://apod.nasa.gov/apod/ap110904.html"
+    body = """
+<center>
+<h1> Astronomy Picture of the Day </h1>
+<p>
+
+<a href="archivepix.html">Discover the cosmos!</a>
+Each day a different image or photograph of our fascinating universe is
+featured, along with a brief explanation written by a professional astronomer.
+<p>
+"""
+
+    responses.add(method="GET", url=url, body=body)
+    assert solvers.guess_url(url, DATE) == ""
 
 
 @responses.activate
@@ -57,7 +112,7 @@ def test_wikimedia(url: str) -> None:
     }
 
     responses.add(method="GET", url=url_files, json=body)
-    assert solvers.guess_url(url) == body["original"]["url"]
+    assert solvers.guess_url(url, None) == body["original"]["url"]
 
 
 @responses.activate
@@ -72,4 +127,4 @@ def test_wikimedia_not_found() -> None:
     }
 
     responses.add(method="GET", url=url_files, json=body)
-    assert solvers.guess_url(url) == url
+    assert solvers.guess_url(url, None) == ""

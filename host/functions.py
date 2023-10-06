@@ -129,10 +129,6 @@ def fetch_json(url: str) -> dict[str, Any]:
 
 def fetch_image(url: str) -> bytes | None:
     """Fetch an image."""
-    # Prevent a circular import error
-    import solvers
-
-    url = solvers.guess_url(url)
     try:
         req = fetch(url)
         req.raise_for_status()
@@ -241,6 +237,8 @@ def is_image_link(url: str) -> bool:
     Check whenever the given `url` points to a supported image format.
     It will also prevent downloading again images from Shaarlimages.
 
+        >>> is_image_link("")
+        False
         >>> is_image_link("ok.JPG")
         True
         >>> is_image_link("ok.jpg")
@@ -258,6 +256,8 @@ def is_image_link(url: str) -> bool:
         False
 
     """
+    if not url:
+        return False
     hostname = urlparse(url).hostname
     return url.lower().endswith(constants.IMAGE_EXT) and hostname != config.SITE["host"]
 
