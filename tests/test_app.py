@@ -6,6 +6,9 @@ Source: https://github.com/BoboTiG/shaarlimages
 from random import choice
 from unittest.mock import patch
 
+import pytest
+from bottle import HTTPResponse
+
 from host import app, custom_types, functions
 
 
@@ -34,6 +37,15 @@ def test_page_zoom() -> None:
     image = random_image()
     content = app.page_zoom(image.link)
     assert image.link in content
+
+
+def test_page_zoom_image_not_found() -> None:
+    with pytest.raises(HTTPResponse) as exc:
+        app.page_zoom("foo(does-not-exist)")
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://127.0.0.1/"
 
 
 def test_search() -> None:

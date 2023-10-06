@@ -167,7 +167,9 @@ def render_update_page() -> str:
 
 def render_zoom_page(image: custom_types.Image) -> str:
     """Render an image page."""
-    metadata = functions.get_metadata(image)
+    if not (metadata := functions.get_metadata(image)):
+        redirect("/")
+
     prev_img, next_img = functions.get_prev_next(image)
     css_class = functions.any_css_class_question()
     return render("zoom", **locals())

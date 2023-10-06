@@ -210,8 +210,8 @@ def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
     return len(all_images), all_images[(page - 1) * count : page * count]
 
 
-def get_metadata(image: str) -> custom_types.Metadata:
-    return next((metadata for metadata in retrieve_all_uniq_metadata() if metadata.link == image))
+def get_metadata(image: str) -> custom_types.Metadata | None:
+    return next((metadata for metadata in retrieve_all_uniq_metadata() if metadata.link == image), None)
 
 
 def get_prev_next(image: str) -> tuple[str, str]:

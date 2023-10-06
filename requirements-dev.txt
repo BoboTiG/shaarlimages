@@ -1,5 +1,4 @@
 black
-boddle
 bottle==0.12.25
 docopt==0.6.2
 feedparser==6.0.8
