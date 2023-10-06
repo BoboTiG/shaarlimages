@@ -16,7 +16,7 @@ Details:
 Tasks:
 - "Sync all shaarlis":
   - when: daily at 00:00
-  - command: `PYTHONPATH='/home/tiger222/shaarlimages:/home/tiger222/shaarlimages/host' python -m host sync`
+  - command: `PYTHONPATH='/home/tiger222/shaarlimages' python -m host sync`
 
 Check [Batteries Included](https://www.pythonanywhere.com/batteries_included/) to know what modules are already provided.
 
@@ -47,6 +47,12 @@ $ python -m pytest --doctest-modules host tests
 
 ```console
 $ python server.py
+```
+
+### CLI
+
+```console
+$ python -m host -h
 ```
 
 ---

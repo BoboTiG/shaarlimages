@@ -2,15 +2,18 @@
 Shaarlimages CLI • https://github.com/BoboTiG/shaarlimages
 
 Usage:
-    sync [ACTION]
-    sync ACTION --force
-    sync ACTION --index IDX
-    sync ACTION --index IDX --force
+    prog -h
+    prog fix [--force]
+    prog purge FILE
+    prog sync [--force] [--index=IDX]
+
+Arguments:
+    FILE  The image to delete.
 
 Options:
     -h --help     Show this screen.
-    --index=<idx> Feed index to sync.
-    --force       Force resync.
+    --index=IDX   Feed index to synchronize.
+    --force       Force the action.
 """
 import sys
 from pathlib import Path
@@ -25,14 +28,12 @@ if __name__ == "__main__":
     args = docopt(__doc__)
     force = args["--force"]
 
-    match args["ACTION"]:
-        case "fix":
-            functions.fix_images_medatadata(force=force)
-        case "purge":
-            if idx := args["--index"]:
-                functions.purge({idx})
-        case "sync":
-            if idx := args["--index"]:
-                helpers.sync_feed(int(idx), force=force)
-            else:
-                helpers.sync_them_all(force=force)
+    if args["fix"]:
+        functions.fix_images_medatadata(force=force)
+    elif args["purge"]:
+        functions.purge({args["FILE"]})
+    elif args["sync"]:
+        if idx := args["--index"]:
+            helpers.sync_feed(int(idx), force=force)
+        else:
+            helpers.sync_them_all(force=force)
