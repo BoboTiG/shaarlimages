@@ -159,9 +159,9 @@ def render_search(images: custom_types.Images) -> str:
 
 def render_zoom_page(image: custom_types.Image) -> str:
     """Render an image page."""
-    if not (metadata := functions.get_metadata(image)):
+    if not (result := functions.get_metadata(image)):
         redirect("/")
 
-    prev_img, next_img = functions.get_prev_next(image)
+    prev_img, metadata, next_img = result
     css_class = functions.any_css_class_question()
     return render("zoom", **locals())

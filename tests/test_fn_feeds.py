@@ -39,18 +39,11 @@ def test_get_last(setup_data) -> None:
 
 def test_get_metadata(setup_data) -> None:
     data = list(functions.retrieve_all_uniq_metadata())
-    idx = randint(0, len(data) - 1)
-    metadata = data[idx]
-
-    assert functions.get_metadata(metadata.link) == metadata
-
-
-def test_get_prev_next(setup_data) -> None:
-    data = list(functions.retrieve_all_uniq_metadata())
     idx = randint(1, len(data) - 2)
-    metadata = data[idx]
-    prev_img, next_img = functions.get_prev_next(metadata.link)
+    image = data[idx]
 
+    prev_img, metadata, next_img = functions.get_metadata(image.link)
+    assert metadata == image
     assert prev_img == data[idx - 1].link
     assert next_img == data[idx + 1].link
 

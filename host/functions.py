@@ -238,19 +238,15 @@ def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
     return len(all_images), all_images[(page - 1) * count : page * count]
 
 
-def get_metadata(image: str) -> custom_types.Metadata | None:
-    return next((metadata for metadata in retrieve_all_uniq_metadata() if metadata.link == image), None)
-
-
-def get_prev_next(image: str) -> tuple[str, str]:
+def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
     all_cache = list(retrieve_all_uniq_metadata())
     for idx, metadata in enumerate(all_cache):
-        if metadata.link != image:
-            continue
+        if metadata.link == image:
+            prev_img = all_cache[idx - 1].link if idx > 0 else ""
+            next_img = all_cache[idx + 1].link if idx < len(all_cache) - 1 else ""
+            return prev_img, metadata, next_img
 
-        prev_img = all_cache[idx - 1].link if idx > 0 else ""
-        next_img = all_cache[idx + 1].link if idx < len(all_cache) - 1 else ""
-        return prev_img, next_img
+    return None
 
 
 def get_size(file: Path) -> custom_types.Size:
