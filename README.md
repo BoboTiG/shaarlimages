@@ -66,6 +66,24 @@ $ python server.py
 $ python -m host -h
 ```
 
+#### Synchronization
+
+Sync all registered shaarlis:
+
+```console
+$ python -m host sync [--force]
+```
+
+Sync any shaarlis instance (registered or not):
+
+```console
+$ python -m host sync --url URL [--force]
+# Example:
+# python -m host sync --url 'https://shaarli.example.org/feed/atom'
+```
+
+In both cases, use `--force` to (re)sync from the beginning.
+
 ---
 
 ### Historique
@@ -74,7 +92,7 @@ Suite à [cette requête](http://sebsauvage.net/paste/?b1176a415f9bbe17#CIT+sEj+
 
 ### Ajouter un shaarli
 
-La liste des instances shaarli est récupérée depuis cette [source](host/config.py#L17).
+La liste des instances shaarli est récupérée depuis cette [source](host/constants.py#L28) (recherche `FEEDS_URL`).
 Si une meilleure source existe, n'hésitez pas à proposer une patch.
 Et si votre instance ne figure pas dans cette source, il vous suffira d'être ajouté à celle-ci site pour que vous soyez pris en compte moins de 24h plus tard.
 
