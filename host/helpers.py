@@ -22,7 +22,8 @@ from bottle import redirect, template
 
 def sync_feed(url: str, force: bool = False) -> dict[str, int]:
     """Sync a shaarli."""
-    cache_key = functions.small_hash(functions.feed_key(url))
+    feed_key = functions.feed_key(url)
+    cache_key = functions.small_hash(feed_key)
     cache_file = constants.CACHE_FEEDS / f"{cache_key}.json"
     cache: custom_types.Cache = functions.read(cache_file)
     latest_image = float(max(cache.keys(), key=float)) if cache else 0.0
@@ -31,7 +32,7 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
     if force or not cache:
         url += "&nb=all" if url.endswith("?do=rss") else "?nb=all"
 
-    print(f"START {url=} feed={cache_key!r}")
+    print(f"START {feed_key!r} {cache_key=}")
 
     feed = functions.fetch_rss_feed(url)
     total_new_images = 0
@@ -90,7 +91,7 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
     if count:
         functions.persist(cache_file, cache)
 
-    print(f"END {url=} feed={cache_key!r} (+ {total_new_images})")
+    print(f"END {feed_key!r} {cache_key=} (+ {total_new_images})")
     return {"count": total_new_images}
 
 
