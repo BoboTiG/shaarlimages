@@ -7,7 +7,6 @@ import json
 import os
 import re
 from base64 import b64encode
-from contextlib import suppress
 from datetime import datetime, timezone
 from pathlib import Path
 from shutil import copyfile
@@ -49,19 +48,11 @@ def create_thumbnail(file: Path) -> Path | None:
     if thumbnail.is_file():
         return thumbnail
 
-    if (im := cv2.imread(str(file))) is None:
-        return None
+    im = cv2.imread(str(file))
 
     height, width = im.shape[:2]
     if (height, width) <= (constants.THUMBNAIL_MAX_SIZE.height, constants.THUMBNAIL_MAX_SIZE.width):
         return copyfile(file, thumbnail)
-
-    if height > constants.THUMBNAIL_MAX_SIZE.height or width > constants.THUMBNAIL_MAX_SIZE.width:
-        # Shrinking image
-        interpolation = cv2.INTER_AREA
-    else:
-        # Stretching image
-        interpolation = cv2.INTER_CUBIC
 
     # Aspect ratio of image
     aspect = width / height
@@ -80,7 +71,7 @@ def create_thumbnail(file: Path) -> Path | None:
         new_h, new_w = constants.THUMBNAIL_MAX_SIZE.height, constants.THUMBNAIL_MAX_SIZE.width
 
     # Scale down
-    im = cv2.resize(im, (new_w, new_h), interpolation=interpolation)
+    im = cv2.resize(im, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
     cv2.imwrite(
         str(thumbnail),
@@ -107,12 +98,9 @@ def docolav(file: Path) -> str:
 
     https://stackoverflow.com/a/43112217/1117028
     """
-    if (im := cv2.imread(str(file))) is None:
-        return ""
-
+    im = cv2.imread(str(file))
     avg_color_per_row = numpy.average(im, axis=0)
     avg_color = numpy.average(avg_color_per_row, axis=0)
-
     return "".join(f"{int(n):02X}" for n in avg_color[::-1])
 
 
@@ -180,10 +168,8 @@ def fetch_image(url: str) -> bytes | None:
             print(">>> ✅", url)
             return image
         print(">>> 📛", url)
-    except requests.exceptions.RequestException:
-        print(">>> ❌", url)
     except Exception:
-        print(">>> 🛑", url)
+        print(">>> ❌", url)
     return None
 
 
@@ -266,14 +252,10 @@ def get_prev_next(image: str) -> tuple[str, str]:
         next_img = all_cache[idx + 1].link if idx < len(all_cache) - 1 else ""
         return prev_img, next_img
 
-    return "", ""
-
 
 def get_size(file: Path) -> custom_types.Size | None:
     """Retrieve the file width & height."""
-    if (im := cv2.imread(str(file))) is None:
-        return None
-
+    im = cv2.imread(str(file))
     return custom_types.Size(width=im.shape[1], height=im.shape[0])
 
 
@@ -419,9 +401,7 @@ def purge(files: set[str]) -> None:
 
 
 def read(file: Path) -> dict[str, Any]:
-    with suppress(FileNotFoundError):
-        return json.loads(file.read_text())
-    return {}
+    return json.loads(file.read_text()) if file.is_file() else {}
 
 
 def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None]:
@@ -474,7 +454,7 @@ def small_hash(value: str) -> str:
 
     Small hashes:
     - are unique (well, as unique as crc32, at last)
-    - are always 6 characters long.
+    - are always 6 characters long
     - only use the following characters: a-z A-Z 0-9 - _ @
     - are NOT cryptographically secure (they CAN be forged)
 

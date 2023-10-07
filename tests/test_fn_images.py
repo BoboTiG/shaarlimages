@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from host import functions
 from host.custom_types import Size
 
-from .constants import IMAGE_JPG, IMAGE_JPG_IS_PNG, IMAGE_PNG
+from .constants import IMAGE_JPG, IMAGE_JPG_IS_PNG, IMAGE_PNG, IMAGE_SQUARE
 
 
 def test_any_css_class_question() -> None:
@@ -30,6 +30,7 @@ def test_any_css_class_question_gray_pride() -> None:
         (IMAGE_JPG, 22548, Size(width=400, height=267)),
         (IMAGE_JPG_IS_PNG, 503, Size(width=161, height=81)),
         (IMAGE_PNG, 61283, Size(width=317, height=400)),
+        (IMAGE_SQUARE, 21519, Size(width=400, height=400)),
     ],
 )
 def test_create_thumbnail(file: Path, expected_file_size: int, expected_size: int, tmp_path: Path) -> None:

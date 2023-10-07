@@ -27,6 +27,24 @@ def test_page_home_pagination() -> None:
     assert "Petit voyeur ;)" in content
 
 
+def test_page_home_pagination_lower_than_min() -> None:
+    with pytest.raises(HTTPResponse) as exc:
+        app.page_home_pagination(0)
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://127.0.0.1/page/1"
+
+
+def test_page_home_pagination_higher_than_max() -> None:
+    with pytest.raises(HTTPResponse) as exc:
+        app.page_home_pagination(99999999999)
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"].startswith("http://127.0.0.1/page/")
+
+
 def test_page_zoom() -> None:
     image = random_image()
     content = app.page_zoom(image.link)
