@@ -21,9 +21,8 @@ from bottle import redirect, template
 #
 
 
-def sync_feed(index: int, force: bool = False) -> dict[str, int]:
-    """Sync one feed."""
-    url = functions.read(constants.SHAARLIS)["feeds"][index]
+def sync_feed(url: str, force: bool = False) -> dict[str, int]:
+    """Sync a shaarli."""
     host = urlparse(url).hostname
     cache_key = functions.small_hash(host)
     cache_file = constants.CACHE_FEEDS / f"{cache_key}.json"
@@ -34,7 +33,7 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
     if force or not cache:
         url += "&nb=all" if url.endswith("?do=rss") else "?nb=all"
 
-    print(f"START {index=} {host=} feed={cache_key!r}")
+    print(f"START {url=} feed={cache_key!r}")
 
     feed = functions.fetch_rss_feed(url)
     total_new_images = 0
@@ -93,12 +92,12 @@ def sync_feed(index: int, force: bool = False) -> dict[str, int]:
     if count:
         functions.persist(cache_file, cache)
 
-    print(f"END {index=} {host} feed={cache_key!r} (+ {total_new_images})")
+    print(f"END {url=} feed={cache_key!r} (+ {total_new_images})")
     return {"count": total_new_images}
 
 
 def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
-    """Retrieve the JSON file containing all shaarlis feed's."""
+    """Retrieve the JSON file containing all shaarlis."""
     data = {"feeds": [], "updated": functions.now()}
     file = constants.SHAARLIS
 
@@ -115,11 +114,11 @@ def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
 
 
 def sync_them_all(force: bool = False) -> None:
-    """Sync all feeds."""
+    """Sync all shaarlis."""
     sync_feeds(force=force)
 
-    for idx in range(len(functions.read(constants.SHAARLIS)["feeds"])):
-        sync_feed(idx, force=force)
+    for url in functions.read(constants.SHAARLIS)["feeds"]:
+        sync_feed(url, force=force)
 
 
 #
