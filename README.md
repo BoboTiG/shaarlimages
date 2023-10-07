@@ -98,8 +98,9 @@ Et si votre instance ne figure pas dans cette source, il vous suffira d'être aj
 
 ### Remerciements
 
-- Séb pour avoir mis au point [shaarli ;](http://sebsauvage.net/wiki/doku.php?id=php:shaarli)  
-- Bronco pour l'inspiration ([feed2array](http://www.warriordudimanche.net/article178/feed2array-obtenir-un-flux-rss-atom-sous-forme-de-tableau)) ;  
-- Jakob Holmelund pour la [base javascript](https://github.com/jakobholmelund/fitpicsjs) de la partition linéaire ;  
-- Chromatic.io pour l'[inspiration](http://www.chromatic.io/FQrLQsb) ;  
+- Séb pour avoir mis au point [shaarli](http://sebsauvage.net/wiki/doku.php?id=php:shaarli);
+- Bronco pour l'inspiration ([feed2array](http://www.warriordudimanche.net/article178/feed2array-obtenir-un-flux-rss-atom-sous-forme-de-tableau)) ;
+- Jakob Holmelund pour la [base javascript](https://github.com/jakobholmelund/fitpicsjs) de la partition linéaire ;
+- Chromatic.io pour l'[inspiration](http://www.chromatic.io/FQrLQsb) ;
+- Arthur Hoaro & Oros42 pour [l'annuaire des shaarlis](https://github.com/Oros42/shaarli-api) ;
 - Et tous les contributeurs et testeurs de l'ombre :)
