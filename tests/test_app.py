@@ -4,7 +4,6 @@ Source: https://github.com/BoboTiG/shaarlimages
 """
 
 from random import choice
-from unittest.mock import patch
 
 import pytest
 from bottle import HTTPResponse
@@ -26,11 +25,6 @@ def test_page_home() -> None:
 def test_page_home_pagination() -> None:
     content = app.page_home_pagination(1)
     assert "Petit voyeur ;)" in content
-
-
-def test_page_update() -> None:
-    content = app.page_update()
-    assert "update.css" in content
 
 
 def test_page_zoom() -> None:
@@ -94,9 +88,3 @@ def test_static_robots() -> None:
     response = app.static_robots()
     assert response.status_code == 200
     assert response.content_type == "text/plain; charset=UTF-8"
-
-
-def test_sync_one_feed() -> None:
-    with patch("helpers.sync_feed") as mocker:
-        app.sync_one_feed(42)
-        mocker.asset_called_once_with(42)

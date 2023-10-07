@@ -160,11 +160,6 @@ def render_search(images: custom_types.Images) -> str:
     return render("page", **locals())
 
 
-def render_update_page() -> str:
-    """Render the update page."""
-    return render("update", feeds=sync_feeds())
-
-
 def render_zoom_page(image: custom_types.Image) -> str:
     """Render an image page."""
     if not (metadata := functions.get_metadata(image)):

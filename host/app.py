@@ -35,12 +35,6 @@ def page_home_pagination(page: int) -> str:
     return helpers.render_home_pagination_page(page)
 
 
-@route("/update")
-def page_update() -> str:
-    """Display the update page."""
-    return helpers.render_update_page()
-
-
 @route("/zoom/<image>")
 def page_zoom(image: str) -> str:
     """Display an image."""
@@ -93,12 +87,6 @@ def static_thumbnail(image: str) -> HTTPResponse:
     response = static_file(image, root=constants.THUMBNAILS)
     response.set_header("Cache-Control", "public, max-age=31536000")
     return response
-
-
-@route("/update/<value:int>")
-def sync_one_feed(value: int) -> str:
-    """Sync one feed."""
-    return helpers.sync_feed(value)
 
 
 for folder in [
