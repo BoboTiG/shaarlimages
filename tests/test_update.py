@@ -4,16 +4,16 @@ Source: https://github.com/BoboTiG/shaarlimages
 """
 
 from pathlib import Path
-from unittest.mock import patch
 
 import responses
 
-from host import config, constants, functions, helpers
+from host import config, functions, helpers
+from host.constants import DATA, SHAARLIS
 
 
 @responses.activate
-def test_sync_feeds(tmp_path: Path) -> None:
-    file = tmp_path / constants.SHAARLIS.name
+def test_sync_feeds(tmp_path: Path, setup_data_folders) -> None:
+    file = tmp_path / DATA.name / SHAARLIS.name
     assert not file.is_file()
 
     body = [
@@ -32,32 +32,14 @@ def test_sync_feeds(tmp_path: Path) -> None:
     ]
     resp = responses.add(method="GET", url=config.SYNC["url"], json=body)
 
-    with patch("constants.SHAARLIS", file):
-        helpers.sync_feeds()
-
+    helpers.sync_feeds()
     assert resp.call_count == 1
+    assert file.is_file()
 
     stored_shaarlis = functions.read(file)
     assert stored_shaarlis["feeds"] == [body[0]["url"]]
     assert stored_shaarlis["updated"] > 0.0
 
-
-@responses.activate
-def test_sync_feeds_cache(tmp_path: Path) -> None:
-    file = tmp_path / constants.SHAARLIS.name
-    assert not file.is_file()
-
-    functions.persist(
-        file,
-        {
-            "feeds": ["https://sebsauvage.net/links/"],
-            "updated": functions.now(),
-        },
-    )
-
-    resp = responses.add(method="GET", url=config.SYNC["url"], json={})
-
-    with patch("host.constants.SHAARLIS", file):
-        helpers.sync_feeds()
-
-    assert resp.call_count == 0
+    # Ensure the cache logic is working
+    helpers.sync_feeds()
+    assert resp.call_count == 1

@@ -39,7 +39,6 @@ def main(cli_args: list[str]) -> int:
     import helpers
 
     args = create_parser().parse_args(cli_args)
-    print(args)
 
     match args.action:
         case "fix":

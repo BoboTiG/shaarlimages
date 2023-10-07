@@ -183,7 +183,7 @@ def fix_images_medatadata(force: bool = False):
     errors = set()
     images = {image.name for image in constants.IMAGES.glob("*.*")}
 
-    for feed in constants.CACHE_FEEDS.glob("*.json"):
+    for feed in constants.FEEDS.glob("*.json"):
         changed = False
 
         for k, v in (data := read(feed)).items():
@@ -253,7 +253,7 @@ def get_prev_next(image: str) -> tuple[str, str]:
         return prev_img, next_img
 
 
-def get_size(file: Path) -> custom_types.Size | None:
+def get_size(file: Path) -> custom_types.Size:
     """Retrieve the file width & height."""
     im = cv2.imread(str(file))
     return custom_types.Size(width=im.shape[1], height=im.shape[0])
@@ -348,6 +348,7 @@ def now() -> float:
 
 
 def persist(file: Path, data: dict[str, Any]) -> None:
+    file.parent.mkdir(exist_ok=True, parents=True)
     with file.open(mode="w") as fh:
         json.dump(data, fh, sort_keys=True, indent=0)
         os.fsync(fh)
@@ -384,7 +385,7 @@ def purge(files: set[str]) -> None:
     for file in files:
         print(" !! Removing non-image file", file)
 
-    for feed in constants.CACHE_FEEDS.glob("*.json"):
+    for feed in constants.FEEDS.glob("*.json"):
         changed = False
         cache = read(feed)
 
@@ -408,7 +409,7 @@ def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None
     """Retrieve all images with no duplicates, sorted by latest first."""
     # First, all images
     all_images = []
-    for feed in constants.CACHE_FEEDS.glob("*.json"):
+    for feed in constants.FEEDS.glob("*.json"):
         all_images.extend(load_metadata(feed))
 
     # Then, keep only the first published version of an image, skipping eventual duplicates (via reshares mostly)

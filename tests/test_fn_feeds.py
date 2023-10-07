@@ -6,13 +6,8 @@ Source: https://github.com/BoboTiG/shaarlimages
 from pathlib import Path
 from random import choice, randint
 
-from host import constants, custom_types, functions
-
-
-def random_feed() -> Path:
-    feed = choice(list(constants.CACHE_FEEDS.glob("*.json")))
-    print(f"Chosen {feed = }")
-    return feed
+from host import custom_types, functions
+from host.constants import DATA, FEEDS
 
 
 def check_item(item: custom_types.Metadata) -> None:
@@ -31,7 +26,7 @@ def check_item(item: custom_types.Metadata) -> None:
     assert item.width > 0
 
 
-def test_get_last() -> None:
+def test_get_last(setup_data) -> None:
     data = list(functions.retrieve_all_uniq_metadata())
     total = len(data)
 
@@ -42,7 +37,7 @@ def test_get_last() -> None:
     assert functions.get_last(2, 10) == (total, data[10:20])
 
 
-def test_get_metadata() -> None:
+def test_get_metadata(setup_data) -> None:
     data = list(functions.retrieve_all_uniq_metadata())
     idx = randint(0, len(data) - 1)
     metadata = data[idx]
@@ -50,7 +45,7 @@ def test_get_metadata() -> None:
     assert functions.get_metadata(metadata.link) == metadata
 
 
-def test_get_prev_next() -> None:
+def test_get_prev_next(setup_data) -> None:
     data = list(functions.retrieve_all_uniq_metadata())
     idx = randint(1, len(data) - 2)
     metadata = data[idx]
@@ -60,8 +55,8 @@ def test_get_prev_next() -> None:
     assert next_img == data[idx + 1].link
 
 
-def test_load_metadata() -> None:
-    feed = random_feed()
+def test_load_metadata(tmp_path: Path, setup_data) -> None:
+    feed = choice(list((tmp_path / DATA.name / FEEDS.name).glob("*.json")))
     data = functions.load_metadata(feed)
 
     assert data
@@ -72,7 +67,7 @@ def test_load_metadata() -> None:
     check_item(item)
 
 
-def test_lookup() -> None:
+def test_lookup(setup_data) -> None:
     result_lowercase = functions.lookup("robe")
 
     assert result_lowercase
@@ -84,19 +79,19 @@ def test_lookup() -> None:
     assert result_lowercase == result_uppercase
 
 
-def test_lookup_tag() -> None:
-    result_lowercase = functions.lookup_tag("robe")
+def test_lookup_tag(setup_data) -> None:
+    result_lowercase = functions.lookup_tag("sample")
 
     assert result_lowercase
     assert isinstance(result_lowercase, list)
     for item in result_lowercase:
         check_item(item)
 
-    result_uppercase = functions.lookup_tag("ROBE")
+    result_uppercase = functions.lookup_tag("SAMPLE")
     assert result_lowercase == result_uppercase
 
 
-def test_retrieve_all_uniq_metadata() -> None:
+def test_retrieve_all_uniq_metadata(setup_data) -> None:
     data = list(functions.retrieve_all_uniq_metadata())
     assert data
 

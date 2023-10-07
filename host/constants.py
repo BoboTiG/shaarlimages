@@ -12,15 +12,12 @@ ROOT = Path(__file__).parent.parent
 HOST = ROOT / "host"
 ASSETS = HOST / "assets"
 DATA = ROOT / "data"
-CACHE = DATA / "cache"
-CACHE_FEEDS = CACHE / "feeds"
-CACHE_HOME = CACHE / "home"
+FEEDS = DATA / "feeds"
 IMAGES = DATA / "images"
 THUMBNAILS = DATA / "thumbnails"
 VIEWS = HOST / "views"
 
 # Files
-CACHE_HOME_ALL = CACHE_HOME / "all.json"
 SHAARLIS = DATA / "shaarlis.json"
 
 # Sync

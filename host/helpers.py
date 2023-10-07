@@ -24,7 +24,7 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
     """Sync a shaarli."""
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
-    cache_file = constants.CACHE_FEEDS / f"{cache_key}.json"
+    cache_file = constants.FEEDS / f"{cache_key}.json"
     cache: custom_types.Cache = functions.read(cache_file)
     latest_image = float(max(cache.keys(), key=float)) if cache else 0.0
 
@@ -57,10 +57,9 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
             output_file.write_bytes(image)
             total_new_images += 1
 
-        if not (size := functions.get_size(output_file)) or not functions.create_thumbnail(output_file):
-            output_file.unlink(missing_ok=True)
-            continue
+        functions.create_thumbnail(output_file)
 
+        size = functions.get_size(output_file)
         metadata = {
             "desc": item.description,
             "docolav": functions.docolav(output_file),
@@ -84,7 +83,7 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
         cache[str(published)] = metadata
 
         count += 1
-        if count % 10 == 0:
+        if count % 10 == 0:  # pragma: nocover
             functions.persist(cache_file, cache)
             count = 0
 

@@ -89,14 +89,4 @@ def static_thumbnail(image: str) -> HTTPResponse:
     return response
 
 
-for folder in [
-    constants.CACHE,
-    constants.CACHE_FEEDS,
-    constants.CACHE_HOME,
-    constants.DATA,
-    constants.IMAGES,
-    constants.THUMBNAILS,
-]:
-    folder.mkdir(exist_ok=True, parents=True)
-
 application = default_app()
