@@ -133,6 +133,8 @@ def feed_key(url: str, version: int = 2) -> str:
         'www.example.org/pro/liens'
         >>> feed_key("https://www.example.org/rss.php?do=rss&mode=links", version=2)
         'www.example.org'
+        >>> feed_key("https://www.example.org/feed/atom?", version=2)
+        'www.example.org'
 
     """
     parts = urlparse(url)
@@ -142,7 +144,7 @@ def feed_key(url: str, version: int = 2) -> str:
         case 2:
             path = parts.path.replace("//", "/")
             if len(path) > 1:
-                path = path.removesuffix("/rss.php").removesuffix("/rss").removesuffix("/feed")
+                path = path.removesuffix("/rss.php").removesuffix("/rss").removesuffix("/atom").removesuffix("/feed")
             return f"{parts.hostname}{path.removesuffix('/')}"
 
 
