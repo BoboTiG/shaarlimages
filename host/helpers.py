@@ -6,7 +6,6 @@ Source: https://github.com/BoboTiG/shaarlimages
 import math
 from pathlib import Path
 from time import mktime
-from urllib.parse import urlparse
 
 import config
 import constants
@@ -23,8 +22,7 @@ from bottle import redirect, template
 
 def sync_feed(url: str, force: bool = False) -> dict[str, int]:
     """Sync a shaarli."""
-    host = urlparse(url).hostname
-    cache_key = functions.small_hash(host)
+    cache_key = functions.small_hash(functions.feed_key(url))
     cache_file = constants.CACHE_FEEDS / f"{cache_key}.json"
     cache: custom_types.Cache = functions.read(cache_file)
     latest_image = float(max(cache.keys(), key=float)) if cache else 0.0

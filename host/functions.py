@@ -116,6 +116,48 @@ def docolav(file: Path) -> str:
     return "".join(f"{int(n):02X}" for n in avg_color[::-1])
 
 
+def feed_key(url: str, version: int = 2) -> str:
+    """
+    Craft the feed URL key for the local storage.
+
+        >>> feed_key("https://www.example.org/links/feed/rss", version=1)
+        'www.example.org'
+
+        >>> feed_key("https://www.example.org", version=2)
+        'www.example.org'
+        >>> feed_key("https://www.example.org/", version=2)
+        'www.example.org'
+        >>> feed_key("https://shaarli.example.org/?do=rss", version=2)
+        'shaarli.example.org'
+        >>> feed_key("https://shaarli.example.org/feed/rss?do=rss", version=2)
+        'shaarli.example.org'
+        >>> feed_key("https://shaarli.example.org//feed/rss?do=rss", version=2)
+        'shaarli.example.org'
+        >>> feed_key("https://www.example.org/links?do=rss", version=2)
+        'www.example.org/links'
+        >>> feed_key("https://www.example.org/shaarli/?do=rss", version=2)
+        'www.example.org/shaarli'
+        >>> feed_key("https://www.example.org//shaarli/feed/rss?do=rss", version=2)
+        'www.example.org/shaarli'
+        >>> feed_key("https://www.example.org/shaarli/feed/rss", version=2)
+        'www.example.org/shaarli'
+        >>> feed_key("https://www.example.org/pro/liens/feed/rss?do=rss", version=2)
+        'www.example.org/pro/liens'
+        >>> feed_key("https://www.example.org/rss.php?do=rss&mode=links", version=2)
+        'www.example.org'
+
+    """
+    parts = urlparse(url)
+    match version:
+        case 1:
+            return parts.hostname
+        case 2:
+            path = parts.path.replace("//", "/")
+            if len(path) > 1:
+                path = path.removesuffix("/rss.php").removesuffix("/rss").removesuffix("/feed")
+            return f"{parts.hostname}{path.removesuffix('/')}"
+
+
 def fetch(url: str) -> requests.Response:
     """Make a HTTP call."""
     with requests.get(url, headers=constants.HTTP_REQ_HEADERS, timeout=120.0, verify=False) as req:
