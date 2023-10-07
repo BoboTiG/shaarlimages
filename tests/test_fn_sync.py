@@ -68,7 +68,7 @@ def test_sync_feed(tmp_path: Path, setup_data):
         file.unlink()
 
     # XML feed
-    responses.add(method="GET", url=f"{FEED_URL}", body=FEED_XML)
+    responses.add(method="GET", url=FEED_URL, body=FEED_XML)
 
     # Not an image link
     responses.add(method="GET", url=f"{FEED_URL}/code.txt", body="Le code, c'est le code ?")
@@ -91,3 +91,10 @@ def test_sync_feed(tmp_path: Path, setup_data):
 
     # Sync them all too
     helpers.sync_them_all()
+
+
+@responses.activate
+def test_sync_feed_error():
+    responses.add(method="GET", url=FEED_URL, body=ConnectionError("Boom"))
+
+    assert helpers.sync_feed(FEED_URL) == {"count": -1}

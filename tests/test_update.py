@@ -29,6 +29,12 @@ def test_sync_feeds(tmp_path: Path, setup_data_folders) -> None:
             "link": "https://sebsauvage.net/links/duplicate",
             "title": "Liens en vrac de sebsauvage #2",
         },
+        {
+            "id": 3,
+            "url": "",
+            "link": "https://sebsauvage.net/links/",
+            "title": "Liens en vrac de sebsauvage #3",
+        },
     ]
     resp = responses.add(method="GET", url=FEEDS_URL, json=body)
 

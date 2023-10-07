@@ -34,7 +34,12 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
 
     print(f"START {feed_key!r} {cache_key=}")
 
-    feed = functions.fetch_rss_feed(url)
+    try:
+        feed = functions.fetch_rss_feed(url)
+    except Exception:
+        print(f"END {feed_key!r} {cache_key=} (-1)")
+        return {"count": -1}
+
     total_new_images = 0
     count = 0
 
@@ -104,7 +109,7 @@ def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
         if data["updated"] - stored_data["updated"] < constants.FEEDS_TTL:
             return stored_data["feeds"]
 
-    data["feeds"] = sorted({shaarli["url"] for shaarli in functions.fetch_json(constants.FEEDS_URL)})
+    data["feeds"] = sorted({shaarli["url"] for shaarli in functions.fetch_json(constants.FEEDS_URL) if shaarli["url"]})
 
     functions.persist(file, data)
     return data["feeds"]
