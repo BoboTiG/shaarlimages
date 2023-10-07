@@ -24,6 +24,8 @@ SHAARLIS = DATA / "shaarlis.json"
 HTTP_REQ_HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0",
 }
+FEEDS_TTL = 60 * 60 * 6  # 6 hours
+FEEDS_URL = "https://www.ecirtam.net/shaarli-api/feeds?disabled=0"
 IMAGE_EXT = (".jpeg", ".jpg", ".png")
 IMAGES_MAGIC_SIG = (b"\xff\xd8\xff", b"\x89PNG")
 NSFW = "nsfw"

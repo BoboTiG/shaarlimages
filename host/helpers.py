@@ -101,11 +101,10 @@ def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
 
     if not force and file.is_file():
         stored_data = functions.read(file)
-        if data["updated"] - stored_data["updated"] < config.SYNC["ttl"]:
+        if data["updated"] - stored_data["updated"] < constants.FEEDS_TTL:
             return stored_data["feeds"]
 
-    url = str(config.SYNC["url"])
-    data["feeds"] = sorted({shaarli["url"] for shaarli in functions.fetch_json(url)})
+    data["feeds"] = sorted({shaarli["url"] for shaarli in functions.fetch_json(constants.FEEDS_URL)})
 
     functions.persist(file, data)
     return data["feeds"]
@@ -133,8 +132,8 @@ def render(tpl: str, **kwargs) -> str:
 
 def render_home_page(page: int) -> str:
     """Render the home page."""
-    total, images = functions.get_last(page, config.SITE["display_last_n_images"])
-    last = math.ceil(total / config.SITE["display_last_n_images"])
+    total, images = functions.get_last(page, config.SITE.display_last_n_images)
+    last = math.ceil(total / config.SITE.display_last_n_images)
 
     if page > last:
         redirect(f"/page/{last}")

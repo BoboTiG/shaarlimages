@@ -290,16 +290,16 @@ def is_image_link(url: str) -> bool:
         >>> is_image_link("bad.html")
         False
 
-        >>> is_image_link(f"https://{config.SITE['host']}/image/ok.jpg")
+        >>> is_image_link(f"https://{config.SITE.host}/image/ok.jpg")
         False
-        >>> is_image_link(f"{config.SITE['url']}/image/ok.png")
+        >>> is_image_link(f"{config.SITE.url}/image/ok.png")
         False
 
     """
     if not url:
         return False
     hostname = urlparse(url).hostname
-    return url.lower().endswith(constants.IMAGE_EXT) and hostname != config.SITE["host"]
+    return url.lower().endswith(constants.IMAGE_EXT) and hostname != config.SITE.host
 
 
 def load_metadata(feed: Path) -> list[tuple[float, custom_types.Metadata]]:

@@ -7,8 +7,8 @@ from pathlib import Path
 
 import responses
 
-from host import config, functions, helpers
-from host.constants import DATA, SHAARLIS
+from host import functions, helpers
+from host.constants import DATA, FEEDS_URL, SHAARLIS
 
 
 @responses.activate
@@ -30,7 +30,7 @@ def test_sync_feeds(tmp_path: Path, setup_data_folders) -> None:
             "title": "Liens en vrac de sebsauvage #2",
         },
     ]
-    resp = responses.add(method="GET", url=config.SYNC["url"], json=body)
+    resp = responses.add(method="GET", url=FEEDS_URL, json=body)
 
     helpers.sync_feeds()
     assert resp.call_count == 1
