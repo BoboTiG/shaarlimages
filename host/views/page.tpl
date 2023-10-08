@@ -1,6 +1,15 @@
 % headers.append(f'<link rel="stylesheet" href="/assets/css/page.css?v={version}" />')
 %include("header")
 
+<div id="top-bar">
+    <div class="left">
+        <input id="search" type="text" placeholder="Search" minlength="3" />
+        <input id="search-tag" type="text" placeholder="Search by tag" minlength="1" />
+        <button id="search-button">🔎</button>
+    </div>
+    <div class="right"><b>{{ total }}</b>&nbsp;images</div>
+</div>
+
 <div id="images-container"></div>
 
 %if page > 0:
@@ -19,8 +28,8 @@
 <script>
 %if page > 0:
 // Keyboard left/right
-document.onkeydown = function (e) {
-    switch (e.code) {
+document.onkeydown = (event) => {
+    switch (event.key) {
         %if page > 1:
         case "ArrowLeft":
             document.location = "/page/{{ page - 1 }}";
@@ -34,7 +43,7 @@ document.onkeydown = function (e) {
     }
 };
 %end
-window.onload = function () {
+window.onload = (event) => {
     // The gallery
     let container = document.getElementById("images-container");
     const images = [
@@ -88,6 +97,36 @@ window.onload = function () {
         threshold: 0.01,
     });
     container.querySelectorAll("img").forEach(img => imageObserver.observe(img));
+
+    // Search
+    document.getElementById("search").onkeydown = (event) => {
+        if (event.key === "Enter") {
+            const search = document.getElementById("search");
+            if (search.value && search.validity.valid) {
+                document.location = "/search/" + search.value;
+            }
+        }
+    };
+    document.getElementById("search-tag").onkeydown = (event) => {
+        if (event.key === "Enter") {
+            const search = document.getElementById("search-tag");
+            if (search.value) {
+                document.location = "/search/tag/" + search.value;
+            }
+        }
+    };
+    document.getElementById("search-button").onclick = (event) => {
+        const search_term = document.getElementById("search");
+        const search_tag = document.getElementById("search-tag");
+
+        if (search_term.value) {
+            if (search_term.validity.valid) {
+                document.location = "/search/" + search_term.value;
+            }
+        } else if (search_tag.value) {
+            document.location = "/search/tag/" + search_tag.value;
+        }
+    };
 };
 </script>
 
