@@ -8,6 +8,7 @@
 % headers.append(f'<meta property="og:url" content="{this_site.url}/zoom/{metadata.link}" />')
 % headers.append(f'<meta property="og:image:url" content="{this_site.url}/thumbnail/{metadata.link}" />')
 % headers.append(f'<meta property="og:description" content="{this_site.description}" />')
+% headers.append(f'<style>body {{ background-color: #{metadata.docolav} }}</style>')
 %include("header", site=this_site)
 
 <div class="image-container-alone-toolbar">
