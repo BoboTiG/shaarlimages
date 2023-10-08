@@ -44,6 +44,11 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
     count = 0
 
     for item in feed.entries:
+        if not hasattr(item, "published_parsed"):
+            # Shaarli is configured with HIDE_TIMESTAMPS=true
+            # https://github.com/sebsauvage/Shaarli/blob/029f75f/index.php#L23
+            item.published_parsed = functions.today().utctimetuple()
+
         published = mktime(item.published_parsed)
         if not force and published < latest_image:
             break

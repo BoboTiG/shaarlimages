@@ -3,6 +3,7 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
+import re
 from pathlib import Path
 
 from host.custom_types import Size
@@ -64,3 +65,4 @@ FEED_XML = (
     )
     + "</feed>"
 )
+FEED_XML_NO_TIMESTAMPS = re.sub(r"<published>.+</published>", "", FEED_XML)

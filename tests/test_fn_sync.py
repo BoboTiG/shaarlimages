@@ -5,12 +5,19 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 from pathlib import Path
 
+import pytest
 import responses
 
 from host import functions, helpers
 from host.constants import DATA, IMAGES
 
-from .constants import FEED_URL, FEED_XML, IMAGE_JPG, TEST_IMAGES
+from .constants import (
+    FEED_URL,
+    FEED_XML,
+    FEED_XML_NO_TIMESTAMPS,
+    IMAGE_JPG,
+    TEST_IMAGES,
+)
 
 
 @responses.activate
@@ -62,13 +69,14 @@ def test_fetch_rss() -> None:
 
 
 @responses.activate
-def test_sync_feed(tmp_path: Path, setup_data):
+@pytest.mark.parametrize("feed_data", [FEED_XML, FEED_XML_NO_TIMESTAMPS])
+def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
     # Remove several copied files in conftest.py to cover more code
     for file in (tmp_path / DATA.name / IMAGES.name).glob("*.jpg"):
         file.unlink()
 
     # XML feed
-    responses.add(method="GET", url=FEED_URL, body=FEED_XML)
+    responses.add(method="GET", url=FEED_URL, body=feed_data)
 
     # Not an image link
     responses.add(method="GET", url=f"{FEED_URL}/code.txt", body="Le code, c'est le code ?")
