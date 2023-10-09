@@ -29,10 +29,6 @@ input:invalid {
     margin-left: 10px;
 }
 
-#top-bar .left a {
-    text-decoration: none;
-}
-
 #top-bar .right {
     margin-left: auto;
     margin-right: 10px;
@@ -119,12 +115,25 @@ footer a:hover {
     color: orange;
 }
 
-@media (max-width:320px) {
-    #top-bar .left a {
+@media (max-width:640px) {
+    #top-bar {
+        flex-direction: column;
+    }
+
+    #search-button {
         display: none;
     }
 
     #top-bar>div {
-        border: 1px solid red;
+        width: 100%;
+    }
+
+    #top-bar .left>* {
+        width: 100%;
+    }
+
+    #top-bar .right {
+        margin-top: 10px;
+        justify-content: end;
     }
 }
