@@ -76,17 +76,17 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
             "guid": item.guid,
             "height": size.height,
             "link": file,
-            "tags": [tag.term.lower().strip() for tag in getattr(item, "tags", [])],
+            "tags": [functions.safe_tag(tag.term) for tag in getattr(item, "tags", [])],
             "title": item.title,
             "width": size.width,
         }
 
         # NSFW
-        if (
+        if constants.NSFW not in metadata["tags"] and (
             any(tag in constants.NSFW_TAGS for tag in metadata["tags"])
             or constants.NSFW in item.title.lower()
             or constants.NSFW in item.description.lower()
-        ) and constants.NSFW not in metadata["tags"]:
+        ):
             metadata["tags"].append(constants.NSFW)
 
         metadata["tags"] = sorted(metadata["tags"])

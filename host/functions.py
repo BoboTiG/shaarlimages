@@ -224,6 +224,12 @@ def fix_images_medatadata(force: bool = False):
                 data[k] |= {"docolav": color}
                 changed = True
 
+            # Fix tags
+            sanitized_tags = sorted(safe_tag(tag) for tag in v["tags"])
+            if v["tags"] != sanitized_tags:
+                data[k] |= {"tags": sanitized_tags}
+                changed = True
+
         if changed:
             persist(feed, data)
 
@@ -444,6 +450,17 @@ def safe_filename(value: str, replace=re.compile(r"[^a-z0-9]").sub, cleanup=re.c
 
     """  # noqa[E501]
     return shortify(cleanup("-", replace("-", unidecode(unquote(value)).strip().lower())))
+
+
+def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
+    """
+    Sanitize a tag.
+
+        >>> safe_tag("B/W_&_colors")
+        'b-w-colors'
+
+    """
+    return cleanup("-", tag.lower().strip().replace("/", "-").replace("_", "-").replace("&", "-"))
 
 
 def shortify(text: str, /, *, limit: int = 128) -> str:
