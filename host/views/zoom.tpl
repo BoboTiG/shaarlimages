@@ -1,7 +1,8 @@
 % from types import SimpleNamespace
-% this_site = SimpleNamespace(**vars(site) | {"description": metadata.desc, "title": metadata.title, "url": f"{site.url}/zoom/{metadata.link}"})
+% this_site = SimpleNamespace(**vars(site) | {"title": metadata.title, "url": f"{site.url}/zoom/{metadata.link}"})
 % headers.append(f'<link rel="stylesheet" href="/assets/css/zoom.css?v={version}" />')
 % headers.append(f'<meta property="og:image" content="{site.url}/image/{metadata.link}" />')
+% headers.append('<meta property="og:type" content="image" />')
 % headers.append(f'<style>body {{ background-color: #{metadata.docolav} }}</style>')
 %include("header", site=this_site)
 
