@@ -48,6 +48,26 @@ def test_get_metadata(setup_data) -> None:
     assert next_img == data[idx + 1].link
 
 
+def test_get_metadata_first(setup_data) -> None:
+    data = list(functions.retrieve_all_uniq_metadata())
+    image = data[0]
+
+    prev_img, metadata, next_img = functions.get_metadata(image.link)
+    assert metadata == image
+    assert prev_img == ""
+    assert next_img == data[1].link
+
+
+def test_get_metadata_last(setup_data) -> None:
+    data = list(functions.retrieve_all_uniq_metadata())
+    image = data[-1]
+
+    prev_img, metadata, next_img = functions.get_metadata(image.link)
+    assert metadata == image
+    assert prev_img == data[-2].link
+    assert next_img == ""
+
+
 def test_load_metadata(tmp_path: Path, setup_data) -> None:
     feed = choice(list((tmp_path / DATA.name / FEEDS.name).glob("*.json")))
     data = functions.load_metadata(feed)
