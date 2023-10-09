@@ -4,7 +4,12 @@
 <div id="top-bar">
     <div class="left">
         <input id="search" type="text" placeholder="Search" minlength="3" />
-        <input id="search-tag" type="text" placeholder="Search by tag" minlength="1" />
+        <input id="search-tag" list="available-tags" placeholder="Search by tag" minlength="1" />
+        <datalist id="available-tags">
+            %for tag in tags:
+            <option value="{{ tag.replace('#', '%23') }}">{{ !tag }}</option>
+            %end
+        </datalist>
         <button id="search-button">🔎</button>
     </div>
     <div class="right"><b>{{ total }}</b>&nbsp;images</div>
@@ -101,7 +106,7 @@ window.onload = (event) => {
     // Search
     document.getElementById("search").onkeydown = (event) => {
         if (event.key === "Enter") {
-            const search = document.getElementById("search");
+            const search = event.target;
             if (search.value && search.validity.valid) {
                 document.location = "/search/" + search.value;
             }
@@ -109,7 +114,7 @@ window.onload = (event) => {
     };
     document.getElementById("search-tag").onkeydown = (event) => {
         if (event.key === "Enter") {
-            const search = document.getElementById("search-tag");
+            const search = event.target;
             if (search.value) {
                 document.location = "/search/tag/" + search.value;
             }

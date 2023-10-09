@@ -257,6 +257,11 @@ def get_size(file: Path) -> custom_types.Size:
     return custom_types.Size(width=im.shape[1], height=im.shape[0])
 
 
+def get_tags() -> list[str]:
+    """Get all available tags."""
+    return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
+
+
 def is_image_data(raw: bytes) -> bool:
     r"""
     Check whenever the provided `raw` data seems like a supported image format.

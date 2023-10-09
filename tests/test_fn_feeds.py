@@ -68,6 +68,10 @@ def test_get_metadata_last(setup_data) -> None:
     assert next_img == ""
 
 
+def test_get_tags(setup_data) -> None:
+    assert functions.get_tags() == ["image", "sample", "test"]
+
+
 def test_load_metadata(tmp_path: Path, setup_data) -> None:
     feed = choice(list((tmp_path / DATA.name / FEEDS.name).glob("*.json")))
     data = functions.load_metadata(feed)

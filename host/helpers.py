@@ -148,6 +148,7 @@ def render_home_page(page: int) -> str:
     if page > last:
         redirect(f"/page/{last}")
 
+    tags = functions.get_tags()
     return render("page", **locals())
 
 
@@ -163,6 +164,7 @@ def render_search(images: custom_types.Images) -> str:
     """Render search results."""
     total = len(images)
     page = last = 0
+    tags = functions.get_tags()
     return render("page", **locals())
 
 
