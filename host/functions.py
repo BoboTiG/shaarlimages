@@ -456,11 +456,20 @@ def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
     """
     Sanitize a tag.
 
-        >>> safe_tag("B/W_&_colors")
+        >>> safe_tag("B/W_&_colors?!§")
         'b-w-colors'
 
     """
-    return cleanup("-", tag.lower().strip().replace("/", "-").replace("_", "-").replace("&", "-"))
+    return cleanup(
+        "-",
+        tag.lower()
+        .replace("/", "-")
+        .replace("_", "-")
+        .replace("&", "-")
+        .replace("?", "")
+        .replace("!", "")
+        .replace("§", ""),
+    ).strip()
 
 
 def shortify(text: str, /, *, limit: int = 128) -> str:
