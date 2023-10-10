@@ -13,12 +13,12 @@ from host import app, functions
 
 def test_page_home(setup_data) -> None:
     content = app.page_home()
-    assert "Petit voyeur ;)" in content
+    assert "Ouh !" in content
 
 
 def test_page_home_pagination(setup_data) -> None:
     content = app.page_home_pagination(1)
-    assert "Petit voyeur ;)" in content
+    assert "Ouh !" in content
 
 
 def test_page_home_pagination_lower_than_min(setup_data) -> None:
