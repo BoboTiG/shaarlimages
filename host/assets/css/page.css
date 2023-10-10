@@ -120,15 +120,15 @@ footer a:hover {
         flex-direction: column;
     }
 
-    #search-button {
-        display: none;
-    }
-
     #top-bar>div {
         width: 100%;
     }
 
-    #top-bar .left>* {
+    #search-button {
+        display: none;
+    }
+
+    #top-bar .left>*:not(button) {
         width: 100%;
     }
 

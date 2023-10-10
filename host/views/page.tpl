@@ -11,6 +11,7 @@
             %end
         </datalist>
         <button id="search-button">🔎</button>
+        <button id="random" onclick="document.location = '/random'" title="Image aléatoire">🔀</button>
     </div>
     <div class="right"><b>{{ total }}</b>&nbsp;images</div>
 </div>

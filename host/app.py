@@ -7,7 +7,7 @@ import constants
 import functions
 import helpers
 import version
-from bottle import HTTPResponse, default_app, route, static_file
+from bottle import HTTPResponse, default_app, redirect, route, static_file
 
 __version__ = version.__version__
 __author__ = "Mickaël Schoentgen"
@@ -33,6 +33,13 @@ def page_home() -> str:
 def page_home_pagination(page: int) -> str:
     """Display a pagined page."""
     return helpers.render_home_pagination_page(page)
+
+
+@route("/random")
+def page_random() -> str:
+    """Display a random image."""
+    image = functions.get_random_image()
+    redirect(f"/zoom/{image.link}")
 
 
 @route("/zoom/<image>")

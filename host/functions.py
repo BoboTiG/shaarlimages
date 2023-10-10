@@ -9,6 +9,7 @@ import re
 from base64 import b64encode
 from datetime import datetime, timezone
 from pathlib import Path
+from random import choice
 from shutil import copyfile
 from typing import Any, Generator
 from urllib.parse import unquote, urlparse
@@ -255,6 +256,12 @@ def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
             return prev_img, metadata, next_img
 
     return None
+
+
+def get_random_image() -> custom_types.Metadata:
+    """Get a random image."""
+    all_images = list(retrieve_all_uniq_metadata())
+    return choice(all_images)
 
 
 def get_size(file: Path) -> custom_types.Size:

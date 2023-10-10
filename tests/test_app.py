@@ -39,6 +39,15 @@ def test_page_home_pagination_higher_than_max(setup_data) -> None:
     assert response.headers["Location"].startswith("http://127.0.0.1/page/")
 
 
+def test_page_random(setup_data) -> None:
+    with pytest.raises(HTTPResponse) as exc:
+        app.page_random()
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"].startswith("http://127.0.0.1/zoom/")
+
+
 def test_page_zoom(setup_data) -> None:
     image = choice(list(functions.retrieve_all_uniq_metadata()))
     content = app.page_zoom(image.link)

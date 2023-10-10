@@ -72,6 +72,11 @@ def test_get_tags(setup_data) -> None:
     assert functions.get_tags() == ["image", "sample", "test"]
 
 
+def test_get_random_image(setup_data) -> None:
+    metadata = functions.get_random_image()
+    assert isinstance(metadata, custom_types.Metadata)
+
+
 def test_load_metadata(tmp_path: Path, setup_data) -> None:
     feed = choice(list((tmp_path / DATA.name / FEEDS.name).glob("*.json")))
     data = functions.load_metadata(feed)
