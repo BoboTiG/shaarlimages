@@ -8,6 +8,8 @@
 
 <div class="image-container-alone-toolbar">
     <a href="/" title="Retour à la galerie">🏠</a>
+    <a href="/random" title="Image aléatoire">🔀</a>
+    |
     <a href="/image/{{ metadata.link }}" title="Image en taille réelle" target="_blank">🖼️</a>
     %if metadata.guid.startswith("http"):
     <a href="{{ metadata.guid }}" title="Lien d'origine" target="_blank">🔗</a>
