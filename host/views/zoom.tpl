@@ -8,18 +8,18 @@
 % headers.append(f'<style>* {{ --docolav: #{metadata.docolav}; --txt-shadow: {text_shadow} }}</style>')
 %include("header", site=this_site)
 
-<div class="image-container-alone-toolbar">
+<div id="toolbar">
     <a href="/" title="Retour à la galerie">🏠</a>
     <a href="/random" title="Image aléatoire">🔀</a>
-    |
+    <span>┈</span>
     <a href="/image/{{ metadata.link }}" title="Image en taille réelle" target="_blank">🖼️</a>
     %if metadata.guid.startswith("http"):
     <a href="{{ metadata.guid }}" title="Lien d'origine" target="_blank">🔗</a>
     %end
 </div>
 
-<figure class="image-container-alone">
-    <img src="/image/{{ metadata.link }}"{{!f' class="{css_class}"' if css_class else '' }} />
+<figure>
+    <img id="image" src="/image/{{ metadata.link }}"{{!f' class="{css_class}"' if css_class else '' }} />
 </figure>
 
 %if metadata.tags:
@@ -69,7 +69,21 @@ if ("ontouchend" in document) {
     };
 }
 
-window.onload = ambilightEffect;
+window.onload = () => {
+    const adaptToolbar = () => {
+        const image = document.getElementById("image");
+        const toolbar = document.getElementById("toolbar");
+        const toolbarRect = toolbar.getBoundingClientRect();
+        const imageRect = image.getBoundingClientRect();
+
+        if (imageRect.top < toolbarRect.bottom) {
+            toolbar.classList.add("vertical");
+        }
+    };
+
+    adaptToolbar();
+    ambilightEffect();
+}
 </script>
 
 %include("footer")

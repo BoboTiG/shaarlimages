@@ -3,7 +3,7 @@ body {
     background-color: var(--docolav);
 }
 
-.image-container-alone img {
+#image {
     margin: auto;
     position: absolute;
     top: 0;
@@ -20,7 +20,7 @@ body {
         0 16px 16px hsl(0deg 0% 0% / 0.075);
 }
 
-.image-container-alone img.gay-pride {
+#image.gay-pride {
     box-shadow:
         rgb(85, 91, 255) 0px 0px 0px 3px,
         rgb(31, 193, 27) 0px 0px 0px 6px,
@@ -29,25 +29,37 @@ body {
         rgb(255, 85, 85) 0px 0px 0px 15px;
 }
 
-.image-container-alone-toolbar {
-    display: inline-block;
+#toolbar {
+    display: inline-flex;
+    align-items: center;
     background-color: var(--docolav);
     border-bottom-right-radius: 5px;
     text-shadow: 0px 0px 1px var(--txt-shadow);
-    padding: .2em .4em;
-    margin: -1px;
     opacity: .9;
     transition: .5s;
 }
 
-.image-container-alone-toolbar:hover {
+#toolbar.vertical {
+    flex-direction: column;
+}
+
+#toolbar span {
+    transform: rotate(90deg);
+}
+
+#toolbar.vertical span {
+    transform: rotate(0);
+}
+
+#toolbar:hover {
     opacity: 1;
     transition: .1s;
 }
 
-.image-container-alone-toolbar a {
+#toolbar>* {
+    display: flex;
+    margin: 0 .2em;
     outline: 0;
-    vertical-align: middle;
     text-decoration: none;
     font-size: 1.5em;
     color: #eee;
@@ -55,11 +67,11 @@ body {
     transition: .2s;
 }
 
-.image-container-alone-toolbar a:not(:last-child) {
+#toolbar a:not(:last-child) {
     margin-right: .2em;
 }
 
-.image-container-alone-toolbar a:hover {
+#toolbar a:hover {
     opacity: 1;
     transition: .1s;
 }
