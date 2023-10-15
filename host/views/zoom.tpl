@@ -3,7 +3,9 @@
 % headers.append(f'<link rel="stylesheet" href="/assets/css/zoom.css?v={version}" />')
 % headers.append(f'<meta property="og:image" content="{site.url}/image/{metadata.link}" />')
 % headers.append('<meta property="og:type" content="image" />')
-% headers.append(f'<style>body {{ background-color: #{metadata.docolav} }}</style>')
+% color_threshold = int(hex(255//2)[2:] * 3, 16)
+% text_shadow = "#000" if int(metadata.docolav, 16) < color_threshold else "#fff"
+% headers.append(f'<style>* {{ --docolav: #{metadata.docolav}; --txt-shadow: {text_shadow} }}</style>')
 %include("header", site=this_site)
 
 <div class="image-container-alone-toolbar">

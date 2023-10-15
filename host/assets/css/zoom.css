@@ -1,5 +1,6 @@
 body {
     overflow: hidden;
+    background-color: var(--docolav);
 }
 
 .image-container-alone img {
@@ -30,10 +31,9 @@ body {
 
 .image-container-alone-toolbar {
     display: inline-block;
-    background-color: #fff;
+    background-color: var(--docolav);
     border-bottom-right-radius: 5px;
-    box-shadow: 0px 0px .2em #666;
-    text-shadow: 0px 0px 1px #fff;
+    text-shadow: 0px 0px 1px var(--txt-shadow);
     padding: .2em .4em;
     margin: -1px;
     opacity: .9;
