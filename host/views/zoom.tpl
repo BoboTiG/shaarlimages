@@ -71,15 +71,19 @@ if ("ontouchend" in document) {
 
 window.onload = () => {
     const adaptToolbar = () => {
-        const image = document.getElementById("image");
+        const imageRect = document.getElementById("image").getBoundingClientRect();
         const toolbar = document.getElementById("toolbar");
-        const itemRect = toolbar.querySelector("a").getBoundingClientRect();
         const toolbarRect = toolbar.getBoundingClientRect();
-        const imageRect = image.getBoundingClientRect();
-        const fitAtTheTop = imageRect.top >= toolbarRect.bottom;
+        const itemRect = toolbar.querySelector("a").getBoundingClientRect();
+        const overlap = !(
+            imageRect.right < toolbarRect.left ||
+            imageRect.left > toolbarRect.right ||
+            imageRect.bottom < toolbarRect.top ||
+            imageRect.top > toolbarRect.bottom
+        );
         const fitOnTheLeft = imageRect.left >= itemRect.right;
 
-        if (!fitAtTheTop && fitOnTheLeft) {
+        if (overlap && fitOnTheLeft) {
             toolbar.classList.add("vertical");
         }
     };
