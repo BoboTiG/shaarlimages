@@ -73,10 +73,13 @@ window.onload = () => {
     const adaptToolbar = () => {
         const image = document.getElementById("image");
         const toolbar = document.getElementById("toolbar");
+        const itemRect = toolbar.querySelector("a").getBoundingClientRect();
         const toolbarRect = toolbar.getBoundingClientRect();
         const imageRect = image.getBoundingClientRect();
+        const fitAtTheTop = imageRect.top >= toolbarRect.bottom;
+        const fitOnTheLeft = imageRect.left >= itemRect.right;
 
-        if (imageRect.top < toolbarRect.bottom) {
+        if (!fitAtTheTop && fitOnTheLeft) {
             toolbar.classList.add("vertical");
         }
     };
