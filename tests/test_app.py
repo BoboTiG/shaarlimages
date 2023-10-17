@@ -11,6 +11,18 @@ from bottle import HTTPResponse
 from host import app, functions
 
 
+def test_cache_invalidation(setup_data) -> None:
+    content = app.page_home()
+    assert "Cached:" not in content
+
+    content = app.page_home()
+    assert "Cached:" in content
+
+    functions.invalidate_caches()
+    content = app.page_home()
+    assert "Cached:" not in content
+
+
 def test_page_home(setup_data) -> None:
     content = app.page_home()
     assert "Ouh !" in content
@@ -19,6 +31,11 @@ def test_page_home(setup_data) -> None:
 def test_page_home_pagination(setup_data) -> None:
     content = app.page_home_pagination(1)
     assert "Ouh !" in content
+
+    # Ensure the cache is working
+    assert "Cached:" not in content
+    content = app.page_home_pagination(1)
+    assert "Cached:" in content
 
 
 def test_page_home_pagination_lower_than_min(setup_data) -> None:
@@ -68,7 +85,11 @@ def test_search(setup_data) -> None:
     response_uppercase = app.search("ROBE")
 
     assert "{src:" in response_lowercase
-    assert response_lowercase == response_uppercase
+    assert response_uppercase.startswith(response_lowercase)
+
+    # Ensure the cache is working
+    assert "Cached:" not in response_lowercase
+    assert "Cached:" in response_uppercase
 
 
 def test_search_by_tag(setup_data) -> None:
@@ -76,7 +97,11 @@ def test_search_by_tag(setup_data) -> None:
     response_uppercase = app.search_by_tag("SAMPLE")
 
     assert "{src:" in response_lowercase
-    assert response_lowercase == response_uppercase
+    assert response_uppercase.startswith(response_lowercase)
+
+    # Ensure the cache is working
+    assert "Cached:" not in response_lowercase
+    assert "Cached:" in response_uppercase
 
 
 def test_static_asset() -> None:

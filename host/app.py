@@ -3,11 +3,13 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
+from functools import wraps
+
 import constants
 import functions
 import helpers
 import version
-from bottle import HTTPResponse, default_app, redirect, route, static_file
+from bottle import HTTPResponse, default_app, redirect, request, route, static_file
 
 __version__ = version.__version__
 __author__ = "Mickaël Schoentgen"
@@ -23,13 +25,29 @@ modifications, that you make.
 """
 
 
+def cache(function):
+    """Decorator used to cache HTTP responses."""
+
+    @wraps(function)
+    def wrapper(*args, **kwargs) -> str:
+        cache_key = functions.small_hash(request.path.lower())
+        if (response := functions.get_from_cache(cache_key)) is None:
+            response = function(*args, **kwargs)
+            functions.store_in_cache(cache_key, response)
+        return response
+
+    return wrapper
+
+
 @route("/")
+@cache
 def page_home() -> str:
     """Display the primary page."""
     return helpers.render_home_page(1)
 
 
 @route("/page/<page:int>")
+@cache
 def page_home_pagination(page: int) -> str:
     """Display a pagined page."""
     return helpers.render_home_pagination_page(page)
@@ -49,12 +67,14 @@ def page_zoom(image: str) -> str:
 
 
 @route("/search/<value>")
+@cache
 def search(value: str) -> str:
     """Search for images."""
     return helpers.render_search(functions.lookup(value))
 
 
 @route("/search/tag/<tag>")
+@cache
 def search_by_tag(tag: str) -> str:
     """Search for images by tag."""
     return helpers.render_search(functions.lookup_tag(tag))

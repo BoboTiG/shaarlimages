@@ -11,6 +11,7 @@ from custom_types import Size
 ROOT = Path(__file__).parent.parent
 HOST = ROOT / "host"
 ASSETS = HOST / "assets"
+CACHE = ROOT / "cache"
 DATA = ROOT / "data"
 FEEDS = DATA / "feeds"
 IMAGES = DATA / "images"

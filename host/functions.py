@@ -7,12 +7,14 @@ import json
 import os
 import re
 from base64 import b64encode
+from contextlib import suppress
 from datetime import datetime, timezone
 from pathlib import Path
 from random import choice
 from shutil import copyfile
 from typing import Any, Generator
 from urllib.parse import unquote, urlparse
+from zlib import compress, decompress
 
 import config
 import constants
@@ -183,6 +185,7 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
 
 
 def fix_images_medatadata(force: bool = False):
+    at_least_one_change = False
     errors = set()
     images = {image.name for image in constants.IMAGES.glob("*.*")}
 
@@ -200,6 +203,7 @@ def fix_images_medatadata(force: bool = False):
                 file = new_file if new_file.is_file() else file.rename(new_file)
                 data[k] |= {"link": file.name}
                 changed = True
+                at_least_one_change = True
 
                 # Recreate the thumbnail
                 (constants.THUMBNAILS / v["link"]).unlink(missing_ok=True)
@@ -215,6 +219,7 @@ def fix_images_medatadata(force: bool = False):
 
                 data[k] |= {"width": size.width, "height": size.height}
                 changed = True
+                at_least_one_change = True
 
             # Fix the dominant color average
             if force or "docolav" not in v:
@@ -224,12 +229,14 @@ def fix_images_medatadata(force: bool = False):
 
                 data[k] |= {"docolav": color}
                 changed = True
+                at_least_one_change = True
 
             # Fix tags
             sanitized_tags = sorted(safe_tag(tag) for tag in v["tags"])
             if v["tags"] != sanitized_tags:
                 data[k] |= {"tags": sanitized_tags}
                 changed = True
+                at_least_one_change = True
 
         if changed:
             persist(feed, data)
@@ -239,6 +246,17 @@ def fix_images_medatadata(force: bool = False):
 
     if errors:
         purge(errors)
+
+    if at_least_one_change:
+        invalidate_caches()
+
+
+def get_from_cache(cache_key: str) -> str | None:
+    """Retreive a compressed response from a potential cache file."""
+    file = constants.CACHE / f"{cache_key}.cache"
+    with suppress(FileNotFoundError):
+        return decompress(file.read_bytes()).decode()
+    return None
 
 
 def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
@@ -273,6 +291,12 @@ def get_size(file: Path) -> custom_types.Size:
 def get_tags() -> list[str]:
     """Get all available tags."""
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
+
+
+def invalidate_caches() -> None:
+    """Remove all cache files."""
+    for file in constants.CACHE.glob("*.cache"):
+        file.unlink()
 
 
 def is_image_data(raw: bytes) -> bool:
@@ -398,6 +422,8 @@ def php_crc32(value: str) -> str:
 
 def purge(files: set[str]) -> None:
     """Remove an image from databases."""
+    at_least_one_change = False
+
     for file in files:
         print(" !! Removing non-image file", file)
 
@@ -409,12 +435,16 @@ def purge(files: set[str]) -> None:
             if metadata["link"] in files:
                 cache.pop(date)
                 changed = True
+                at_least_one_change = True
 
         if changed:
             persist(feed, cache)
 
     for file in files:
         (constants.IMAGES / file).unlink(missing_ok=True)
+
+    if at_least_one_change:
+        invalidate_caches()
 
 
 def read(file: Path) -> dict[str, Any]:
@@ -500,6 +530,14 @@ def small_hash(value: str) -> str:
 
     """
     return b64encode(bytes.fromhex(php_crc32(value)), altchars=b"-_").rstrip(b"=").decode()
+
+
+def store_in_cache(cache_key: str, response: str) -> None:
+    """Store a HTTP response into a compressed cache file."""
+    file = constants.CACHE / f"{cache_key}.cache"
+    file.parent.mkdir(exist_ok=True)
+    response += f"\n<!-- Cached: {today()} -->\n"
+    file.write_bytes(compress(response.encode(), level=9))
 
 
 def today() -> datetime:

@@ -100,6 +100,9 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
     if count:
         functions.persist(cache_file, cache)
 
+    if total_new_images:
+        functions.invalidate_caches()
+
     print(f"END {feed_key!r} {cache_key=} (+ {total_new_images})")
     return {"count": total_new_images}
 
