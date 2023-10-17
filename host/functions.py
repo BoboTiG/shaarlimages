@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from random import choice
 from shutil import copyfile
-from typing import Any, Generator
+from typing import Any
 from urllib.parse import unquote, urlparse
 from zlib import compress, decompress
 
@@ -261,12 +261,12 @@ def get_from_cache(cache_key: str) -> str | None:
 
 def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
     """Get last N images."""
-    all_images = list(retrieve_all_uniq_metadata())
+    all_images = retrieve_all_uniq_metadata()
     return len(all_images), all_images[(page - 1) * count : page * count]
 
 
 def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
-    all_cache = list(retrieve_all_uniq_metadata())
+    all_cache = retrieve_all_uniq_metadata()
     for idx, metadata in enumerate(all_cache):
         if metadata.link == image:
             prev_img = all_cache[idx - 1].link if idx > 0 else ""
@@ -278,8 +278,7 @@ def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
 
 def get_random_image() -> custom_types.Metadata:
     """Get a random image."""
-    all_images = list(retrieve_all_uniq_metadata())
-    return choice(all_images)
+    return choice(retrieve_all_uniq_metadata())
 
 
 def get_size(file: Path) -> custom_types.Size:
@@ -451,8 +450,13 @@ def read(file: Path) -> dict[str, Any]:
     return json.loads(file.read_text()) if file.is_file() else {}
 
 
-def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None]:
+def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
     """Retrieve all images with no duplicates, sorted by latest first."""
+    cache_key = small_hash("all-in-one")
+    if cached := get_from_cache(cache_key):
+        cls = custom_types.Metadata
+        return [cls(**metadata) for metadata in json.loads(cached)]
+
     # First, all images
     all_images = []
     for feed in constants.FEEDS.glob("*.json"):
@@ -467,7 +471,9 @@ def retrieve_all_uniq_metadata() -> Generator[custom_types.Metadatas, None, None
         uniq_images.append(metadata)
         know_images.add(metadata.link)
 
-    return uniq_images[::-1]
+    res = uniq_images[::-1]
+    store_in_cache(cache_key, json.dumps(res, default=lambda s: vars(s)), info=False)
+    return res
 
 
 def safe_filename(value: str, replace=re.compile(r"[^a-z0-9]").sub, cleanup=re.compile(r"--+").sub) -> str:
@@ -532,11 +538,13 @@ def small_hash(value: str) -> str:
     return b64encode(bytes.fromhex(php_crc32(value)), altchars=b"-_").rstrip(b"=").decode()
 
 
-def store_in_cache(cache_key: str, response: str) -> None:
+def store_in_cache(cache_key: str, response: str, info: bool = True) -> None:
     """Store a HTTP response into a compressed cache file."""
+    if info:
+        response += f"\n<!-- Cached: {today()} -->\n"
+
     file = constants.CACHE / f"{cache_key}.cache"
     file.parent.mkdir(exist_ok=True)
-    response += f"\n<!-- Cached: {today()} -->\n"
     file.write_bytes(compress(response.encode(), level=9))
 
 

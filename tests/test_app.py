@@ -66,7 +66,7 @@ def test_page_random(setup_data) -> None:
 
 
 def test_page_zoom(setup_data) -> None:
-    image = choice(list(functions.retrieve_all_uniq_metadata()))
+    image = choice(functions.retrieve_all_uniq_metadata())
     content = app.page_zoom(image.link)
     assert image.link in content
 
@@ -119,7 +119,7 @@ def test_static_favicon() -> None:
 
 
 def test_static_image(setup_data) -> None:
-    image = choice(list(functions.retrieve_all_uniq_metadata()))
+    image = choice(functions.retrieve_all_uniq_metadata())
     response = app.static_image(image.link)
     response.body.close()
     assert response.status_code == 200
@@ -127,7 +127,7 @@ def test_static_image(setup_data) -> None:
 
 
 def test_static_thumbnail(setup_data) -> None:
-    image = choice(list(functions.retrieve_all_uniq_metadata()))
+    image = choice(functions.retrieve_all_uniq_metadata())
     response = app.static_thumbnail(image.link)
     response.body.close()
     assert response.status_code == 200
