@@ -108,10 +108,10 @@ function ambilightEffect() {
 
         return result;
     };
-    const create_canvas = (block_width, right) => {
+    const create_canvas = () => {
         "use strict";
 
-        let offsetX = block_width;
+        const img = document.getElementById("image");
         let canvas = document.createElement("canvas");
         let ctx = canvas.getContext("2d");
 
@@ -120,14 +120,11 @@ function ambilightEffect() {
         canvas.style.zIndex = "-2";
         canvas.style.width = "100%";
         canvas.style.height = "100%";
-        canvas.width = block_width;
+        canvas.width = 128;
         canvas.height = img.height;
-        if (right) {
-            offsetX = img.width - block_width;
-        }
         ctx.drawImage(
             img,
-            offsetX,
+            canvas.width,
             0,
             canvas.width,
             canvas.height,
@@ -137,19 +134,16 @@ function ambilightEffect() {
             canvas.height
         );
 
-        const midcolors = getMidColors(canvas, ctx, block_width);
-        let grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        const midcolors = getMidColors(canvas, ctx, canvas.width);
+        let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         for (let i = 0, il = midcolors.length; i < il; i += 1) {
-            grd.addColorStop(i / il, "rgb(" + midcolors[i] + ")");
+            gradient.addColorStop(i / il, "rgb(" + midcolors[i] + ")");
         }
 
-        ctx.fillStyle = grd;
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         return canvas;
     };
 
-    const img = document.getElementsByTagName("img")[0];
-    const allInOneCanvas = create_canvas(150, false);
-
-    document.body.appendChild(allInOneCanvas);
+    document.body.appendChild(create_canvas());
 }
