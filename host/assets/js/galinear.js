@@ -149,25 +149,7 @@ function ambilightEffect() {
     };
 
     const img = document.getElementsByTagName("img")[0];
-    const grain = document.createElement("canvas");
-    const grainCtx = grain.getContext("2d");
-    const mask = "/assets/img/mask.png";
-    const image = new Image();
-
     const allInOneCanvas = create_canvas(150, false);
+
     document.body.appendChild(allInOneCanvas);
-
-    // Grain
-    grain.style.position = "absolute";
-    grain.style.top = "0";
-    grain.style.left = "0";
-    grain.style.zIndex = "-1";
-    grain.style.width = "100%";
-    grain.style.height = "100%";
-    image.src = mask;
-    grain.width = image.width;
-    grain.height = image.height;
-    grainCtx.drawImage(image, 0, 0, grain.width, grain.height);
-
-    document.body.appendChild(grain);
 }
