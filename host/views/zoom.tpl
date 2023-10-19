@@ -4,7 +4,7 @@
 % headers.append(f'<meta property="og:image" content="{site.url}/image/{metadata.link}" />')
 % headers.append('<meta property="og:type" content="image" />')
 % color_threshold = int(hex(255//2)[2:] * 3, 16)
-% text_shadow = "#000" if int(metadata.docolav, 16) < color_threshold else "#fff"
+% text_shadow = "#000" if int(metadata.docolav, 16) < (color_threshold * 1.5) else "#fff"
 % headers.append(f'<style>* {{ --docolav: #{metadata.docolav}; --txt-shadow: {text_shadow} }}</style>')
 %include("header", site=this_site)
 
