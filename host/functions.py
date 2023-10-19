@@ -390,7 +390,8 @@ def persist(file: Path, data: dict[str, Any]) -> None:
     file.parent.mkdir(exist_ok=True, parents=True)
     with file.open(mode="w") as fh:
         json.dump(data, fh, sort_keys=True, indent=0)
-        os.fsync(fh)
+        fh.flush()
+        os.fsync(fh.fileno())
 
 
 def php_crc32(value: str) -> str:
