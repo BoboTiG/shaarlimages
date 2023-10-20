@@ -19,7 +19,7 @@
 <body>
 
 <!--
-    Ouh ! Un hackeur est parmis nous ? Ou peut-être une hackeuse ?
+    Ouh ! Un hackeur est parmi nous ? Ou peut-être une hackeuse ?
     Bref, cette galerie d'image for sympathique peut-être téléchargée et bidouillée :
         https://github.com/BoboTiG/shaarlimages
 -->
