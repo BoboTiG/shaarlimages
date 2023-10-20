@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Notes:
+# - The post-receive hook runs after the entire process is completed.
+# - We use a undocumented feature of PythonAnywhere, which is that their web workers actually
+#   watch the WSGI file for changes, so if we touch it, the web app will reload automatically.
+# - Preventing to crash if the file does not exist (like outside of PythonAnywhere).
+#
+# Installation:
+# - On PythonAnywhere, in the cloned git repository folder, copy the current file into `.git/hooks/post-receive`.
+# - Make sure the copied file is executable.
+#
+touch /var/www/www_shaarlimages_net_wsgi.py || true

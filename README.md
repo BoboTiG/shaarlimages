@@ -27,6 +27,7 @@ Command to fully sync back the data on a local machine:
 ```console
 # Usage:
 # rsync -delete -avzhe ssh <USER>@ssh.pythonanywhere.com:<SHAARLIMAGES_FOLDER>/data <LOCAL_FOLDER>/
+
 # Example:
 $ rsync -delete -avzhe ssh tiger222@ssh.pythonanywhere.com:/home/tiger222/shaarlimages/data /home/tiger-222/projects/shaarlimages/
 ```
@@ -78,6 +79,7 @@ Sync any shaarlis instance (registered or not):
 
 ```console
 $ python -m host sync --url URL [--force]
+
 # Example:
 # python -m host sync --url 'https://shaarli.example.org/feed/atom'
 ```
