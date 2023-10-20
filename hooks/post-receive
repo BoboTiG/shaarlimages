@@ -8,4 +8,5 @@
 # - On PythonAnywhere, in the cloned git repository folder, copy the current file into `.git/hooks/post-receive`.
 # - Make sure the copied file is executable.
 #
+GIT_WORK_TREE='/home/tiger222/shaarlimages' git checkout -f
 touch /var/www/www_shaarlimages_net_wsgi.py
