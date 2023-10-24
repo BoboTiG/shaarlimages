@@ -57,7 +57,13 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
             continue
 
         path = Path(link)
-        file = f"{functions.small_hash(link)}_{functions.safe_filename(path.stem)}{path.suffix.lower()}"
+
+        if not (ext := path.suffix.lower() or functions.fetch_image_type(link)):
+            # Impossible to guess the image type (either because the URL does not end with a file extension,
+            # or because we failed to fetch the image type from the Content-Type header response).
+            continue
+
+        file = f"{functions.small_hash(link)}_{functions.safe_filename(path.stem)}{ext}"
         output_file = constants.IMAGES / file
 
         if not output_file.is_file():

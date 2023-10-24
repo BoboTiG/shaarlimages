@@ -87,6 +87,19 @@ def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
     # Image link with invalid image data
     responses.add(method="GET", url=f"{FEED_URL}/{TEST_IMAGES[1][0].name}", body=b"no image")
 
+    # Not an image link but actual image data
+    responses.add(
+        method="HEAD", url="https://qph.cf2.quoracdn.net/main-qimg-xxx", headers={"Content-Type": "image/jped"}
+    )
+
+    # Not an image link and not image data
+    responses.add(
+        method="HEAD", url="https://qph.cf2.quoracdn.net/main-qimg-bad", headers={"Content-Type": "application/xml"}
+    )
+
+    # Not an image link and website is down
+    responses.add(method="HEAD", url="https://qph.cf2.quoracdn.net/main-qimg-down", status=500)
+
     # Valid images
     for file, *_ in TEST_IMAGES[2:]:
         responses.add(method="GET", url=f"{FEED_URL}/{file.name}", body=file.read_bytes())

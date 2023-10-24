@@ -70,6 +70,41 @@ featured, along with a brief explanation written by a professional astronomer.
 
 
 @responses.activate
+def test_quora() -> None:
+    url = "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3"  # noqa[W503]
+    body = """
+<title>(15) André Abrahão&#039;s answer to What is the history of Japanese jacket wrestlers (judoka) beating up founding family members of Brazilian Jiu-Jitsu (the Gracie family)? - Quora</title>
+<link rel='icon' href='https://qsf.cf2.quoracdn.net/-4-images.favicon-new.ico-26-07ecf7cd341b6919.ico' />
+<meta name="robots" content="noindex, follow" />
+<meta property='fb:app_id' content='136609459636' />
+<meta property='og:title' content='What is the history of Japanese jacket wrestlers (judoka) beating up founding family members of Brazilian Jiu-Jitsu (the Gracie family)?' />
+<meta property='og:type' content='article' />
+<meta property='og:site_name' content='Quora' />
+<meta property='og:image' content='https://qph.cf2.quoracdn.net/main-qimg-c419a1e03b967d4c9f61286a32f34613' />
+<meta property='og:url' content='https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/André-Abrahão-3' />
+<meta property='og:description' content='André Abrahão&#039;s answer: To understand this, one must know the history of Brazilian Jiu Jitsu (BJJ).
+
+BJJ is a direct “son” of the original Judo.
+
+And Judo is a “son” of the original Japanese JuJutsu, an old martial art used by the samurais in real wars, that was banned with the end of the Feudal ...' />
+<meta name='twitter:card' content='summary_large_image' />
+<meta name='twitter:site' content='@Quora' />
+<meta name='twitter:url' content='https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/André-Abrahão-3' />
+<meta name='twitter:title' content='What is the history of Japanese jacket wrestlers (judoka) beating up founding family members of Brazilian Jiu-Jitsu (the Gracie family)?' />
+<meta name='twitter:description' content='André Abrahão&#039;s answer: To understand this, one must know the history of Brazilian Jiu Jitsu (BJJ).
+
+BJJ is a direct “son” of the original Judo.
+
+And Judo is a “son” of the original Japanese JuJutsu, an old martial art used by the samurais in real wars, that was banned with the end of the Feudal ...' />
+<meta name='twitter:image' content='https://qph.cf2.quoracdn.net/main-qimg-c419a1e03b967d4c9f61286a32f34613' />
+<link rel='canonical' href='https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family' />
+"""  # noqa[W503]
+
+    responses.add(method="GET", url=url, body=body)
+    assert solvers.guess_url(url, None) == "https://qph.cf2.quoracdn.net/main-qimg-c419a1e03b967d4c9f61286a32f34613"
+
+
+@responses.activate
 @pytest.mark.parametrize(
     "url",
     [

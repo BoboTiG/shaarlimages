@@ -29,6 +29,7 @@ FEEDS_TTL = 60 * 60 * 6  # 6 hours
 FEEDS_URL = "https://www.ecirtam.net/shaarli-api/feeds?full=1"
 IMAGE_EXT = (".jpeg", ".jpg", ".png")
 IMAGES_MAGIC_SIG = (b"\xff\xd8\xff", b"\x89PNG")
+IMAGES_CONTENT_TYPE = {"image/jpeg": ".jpg", "image/png": ".png"}
 NSFW = "nsfw"
 NSFW_TAGS = {"hentai", "hentaï", "nude", NSFW, "sex", "sexe", "sexy"}
 THUMBNAIL_MAX_SIZE = Size(width=400, height=400)

@@ -35,33 +35,56 @@ FEED_XML = (
     </author>
     <id>{FEED_URL}</id>
     <generator>Shaarli</generator>
+"""
+    + f"""
     <entry>
-        <title>A link</title>
+        <title>Not an image</title>
         <link href="{FEED_URL}/code.txt" />
-        <id>{FEED_URL}/shaare/0</id>
-        <published>2023-08-10T22:41:40+02:00</published>
-        <updated>2023-08-10T22:41:40+02:00</updated>
-        <content type="html" xml:lang="en"></content>
+        <id>{FEED_URL}/shaare/1</id>
+        <published>2023-08-10T22:41:41+02:00</published>
+    </entry>
+"""
+    + f"""
+    <entry>
+        <title>Not an image link with actual image data</title>
+        <link href="https://qph.cf2.quoracdn.net/main-qimg-ok" />
+        <id>{FEED_URL}/shaare/2</id>
+        <published>2023-08-11T22:41:41+02:00</published>
+    </entry>
+"""
+    + f"""
+    <entry>
+        <title>Not an image link and not image data</title>
+        <link href="https://qph.cf2.quoracdn.net/main-qimg-bad" />
+        <id>{FEED_URL}/shaare/3</id>
+        <published>2023-08-11T22:41:41+02:00</published>
+    </entry>
+"""
+    + f"""
+    <entry>
+        <title>Not an image link and website is down</title>
+        <link href="https://qph.cf2.quoracdn.net/main-qimg-down" />
+        <id>{FEED_URL}/shaare/4</id>
+        <published>2023-08-11T22:41:41+02:00</published>
     </entry>
 """
     + "\n".join(
         f"""
     <entry>
-        <title>Image n° {idx}</title>
+        <title>Image - {file.name}</title>
         <link href="{FEED_URL}/{file.name}" />
-        <id>{FEED_URL}/shaare/{idx}</id>
-        <published>2023-08-10T22:41:4{idx}+02:00</published>
-        <updated>2023-08-10T22:41:4{idx}+02:00</updated>
+        <id>{FEED_URL}/shaare/{file.name}</id>
+        <published>2023-08-20T22:41:4{idx}+02:00</published>
         <content type="html" xml:lang="en"><![CDATA[
             Some description with the 'robe' keyword.
-            {"Lets also trigger the Not Safe For Work filter here: NSFW!" if idx == 3 else ""}
+            {"Lets also trigger the Not Safe For Work filter here: NSFW!" if file == TEST_IMAGES[-1][0] else ""}
         ]]></content>
         <category scheme="{FEED_URL}/?searchtags=" term="sample" label="sample" />
         <category scheme="{FEED_URL}/?searchtags=" term="test" label="test" />
         <category scheme="{FEED_URL}/?searchtags=" term="image" label="image" />
     </entry>
 """
-        for idx, (file, *_) in enumerate(TEST_IMAGES, 1)
+        for idx, (file, *_) in enumerate(TEST_IMAGES)
     )
     + "</feed>"
 )

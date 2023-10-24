@@ -151,9 +151,15 @@ def feed_key(url: str, version: int = 2) -> str:
             return f"{parts.hostname}{path.removesuffix('/')}"
 
 
-def fetch(url: str) -> requests.Response:
+def fetch(url: str, method: str = "get") -> requests.Response:
     """Make a HTTP call."""
-    with requests.get(url, headers=constants.HTTP_REQ_HEADERS, timeout=120.0, verify=False) as req:
+    with requests.request(
+        method=method,
+        url=url,
+        headers=constants.HTTP_REQ_HEADERS,
+        timeout=120.0,
+        verify=False,
+    ) as req:
         return req
 
 
@@ -176,6 +182,18 @@ def fetch_image(url: str) -> bytes | None:
     except Exception:
         print(">>> ❌", url)
     return None
+
+
+def fetch_image_type(url: str) -> str:
+    """Fetch an image type using HTTP headers from the HEAD response."""
+    try:
+        req = fetch(url, method="head")
+        req.raise_for_status
+    except Exception:
+        return ""
+    else:
+        content_type = req.headers["Content-Type"]
+        return constants.IMAGES_CONTENT_TYPE.get(content_type, "")
 
 
 def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:

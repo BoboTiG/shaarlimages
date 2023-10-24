@@ -73,6 +73,22 @@ def nasa_apod(url: str, date: struct_time, pattern=re.compile(rb'<a href="(image
     return urlunparse(parts)
 
 
+def quora(url: str, *_, pattern=re.compile(rb"<meta property='og:image' content='([^']+)'").search) -> str:
+    """
+    Resolve the original image URL from Quora.
+
+        >>> quora("https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46")
+        'https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46'
+
+    """
+    parts = urlparse(url)
+    if parts.path.startswith("/main-qimg-"):
+        return url
+
+    response = functions.fetch(url)
+    return "" if (image := pattern(response.content)) is None else image[1].decode()
+
+
 def wikimedia(url: str, *_) -> str:
     """
     Resolve the original image URL from Wikimedia.
@@ -115,8 +131,12 @@ def guess_url(url: str, date: struct_time) -> str:
         return ""
 
     if solver := SOLVERS.get(hostname):
-        url = solver(url, date)
-    elif hostname.endswith((".wikimedia.org", ".wikipedia.org")):
-        url = wikimedia(url)
+        return solver(url, date)
+
+    if hostname.endswith((".wikimedia.org", ".wikipedia.org")):
+        return wikimedia(url)
+
+    if hostname.endswith((".quora.com", ".quoracdn.net")):
+        return quora(url)
 
     return url if functions.is_image_link(url) else ""
