@@ -188,7 +188,7 @@ def fetch_image_type(url: str) -> str:
     """Fetch an image type using HTTP headers from the HEAD response."""
     try:
         req = fetch(url, method="head")
-        req.raise_for_status
+        req.raise_for_status()
     except Exception:
         return ""
     else:
