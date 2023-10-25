@@ -105,6 +105,31 @@ And Judo is a “son” of the original Japanese JuJutsu, an old martial art use
 
 
 @responses.activate
+def test_webbtelescope() -> None:
+    url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa[W503]
+    body = """
+    <meta property="og:url" content="https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M">
+    <meta property="og:image" content="//stsci-opo.org/STScI-01GD3HTYP68G8VQFJPNZ0RVBT9.png">
+    <meta property="og:image:type" content="image/png">
+	"""  # noqa[W503]
+
+    responses.add(method="GET", url=url, body=body)
+    assert solvers.guess_url(url, None) == "https://stsci-opo.org/STScI-01GD3HTYP68G8VQFJPNZ0RVBT9.png"
+
+
+@responses.activate
+def test_webbtelescope_nothing_found() -> None:
+    url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa[W503]
+    body = """
+    <meta property="og:url" content="https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M">
+    <meta property="og:image:type" content="image/png">
+	"""  # noqa[W503]
+
+    responses.add(method="GET", url=url, body=body)
+    assert solvers.guess_url(url, None) == ""
+
+
+@responses.activate
 @pytest.mark.parametrize(
     "url",
     [

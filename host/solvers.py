@@ -111,6 +111,17 @@ def quora(url: str, *_, pattern=re.compile(rb"<meta property='og:image' content=
     return "" if (image := pattern(response.content)) is None else image[1].decode()
 
 
+def webbtelescope(url: str, *_, pattern=re.compile(rb'<meta property="og:image" content="([^"]+)"').search) -> str:
+    """Resolve the original image URL from Webb Space Telescope."""
+    response = functions.fetch(url)
+    if not (url := "" if (image := pattern(response.content)) is None else image[1].decode()):
+        return ""
+
+    if not url.startswith("http"):
+        url = f"https:{url}"
+    return url
+
+
 def wikimedia(url: str, *_) -> str:
     """
     Resolve the original image URL from Wikimedia.
@@ -133,6 +144,7 @@ SOLVERS = {
     "antwrp.gsfc.nasa.gov": nasa_apod,
     "apod.nasa.gov": nasa_apod,
     "i.imgur.com": imgur,
+    "webbtelescope.org": webbtelescope,
 }
 
 
