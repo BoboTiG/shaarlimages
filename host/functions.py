@@ -23,6 +23,7 @@ import cv2
 import feedparser
 import numpy
 import requests
+import solvers
 import urllib3
 from unidecode import unidecode
 
@@ -318,6 +319,58 @@ def get_size(file: Path) -> custom_types.Size:
 def get_tags() -> list[str]:
     """Get all available tags."""
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
+
+
+def handle_item(item: feedparser.FeedParserDict) -> tuple[bool, dict]:
+    """Take a feed entry, and return appropriate data."""
+    new = False
+    metadata = {}
+
+    if not (link := solvers.guess_url(item.link, item.published_parsed)):
+        return new, metadata
+
+    path = Path(link)
+
+    if not (ext := fetch_image_type(link)):
+        # Impossible to guess the image type (either because the URL does not end with a file extension,
+        # or because we failed to fetch the image type from the Content-Type header response).
+        return False, metadata
+
+    file = f"{small_hash(link)}_{safe_filename(path.stem)}{ext}"
+    output_file = constants.IMAGES / file
+
+    if not output_file.is_file():
+        if not (image := fetch_image(link)):
+            return new, metadata
+
+        output_file.write_bytes(image)
+        new = True
+
+    create_thumbnail(output_file)
+
+    size = get_size(output_file)
+    metadata = {
+        "desc": item.description,
+        "docolav": docolav(output_file),
+        "guid": item.guid,
+        "height": size.height,
+        "link": file,
+        "tags": [safe_tag(tag.term) for tag in getattr(item, "tags", [])],
+        "title": item.title,
+        "width": size.width,
+    }
+
+    # NSFW
+    if constants.NSFW not in metadata["tags"] and (
+        any(tag in constants.NSFW_TAGS for tag in metadata["tags"])
+        or constants.NSFW in item.title.lower()
+        or constants.NSFW in item.description.lower()
+    ):
+        metadata["tags"].append(constants.NSFW)
+
+    metadata["tags"] = sorted(metadata["tags"])
+
+    return new, metadata
 
 
 def invalidate_caches() -> None:

@@ -4,14 +4,12 @@ Source: https://github.com/BoboTiG/shaarlimages
 """
 
 import math
-from pathlib import Path
 from time import mktime
 
 import config
 import constants
 import custom_types
 import functions
-import solvers
 import version
 from bottle import redirect, template
 
@@ -53,49 +51,14 @@ def sync_feed(url: str, force: bool = False) -> int:
         if not force and published < latest_image:
             break
 
-        if not (link := solvers.guess_url(item.link, item.published_parsed)):
-            continue
+        is_new, metadata = functions.handle_item(item)
 
-        path = Path(link)
-
-        if not (ext := functions.fetch_image_type(link)):
-            # Impossible to guess the image type (either because the URL does not end with a file extension,
-            # or because we failed to fetch the image type from the Content-Type header response).
-            continue
-
-        file = f"{functions.small_hash(link)}_{functions.safe_filename(path.stem)}{ext}"
-        output_file = constants.IMAGES / file
-
-        if not output_file.is_file():
-            if not (image := functions.fetch_image(link)):
-                continue
-
-            output_file.write_bytes(image)
+        if is_new:
             total_new_images += 1
 
-        functions.create_thumbnail(output_file)
+        if not metadata:
+            continue
 
-        size = functions.get_size(output_file)
-        metadata = {
-            "desc": item.description,
-            "docolav": functions.docolav(output_file),
-            "guid": item.guid,
-            "height": size.height,
-            "link": file,
-            "tags": [functions.safe_tag(tag.term) for tag in getattr(item, "tags", [])],
-            "title": item.title,
-            "width": size.width,
-        }
-
-        # NSFW
-        if constants.NSFW not in metadata["tags"] and (
-            any(tag in constants.NSFW_TAGS for tag in metadata["tags"])
-            or constants.NSFW in item.title.lower()
-            or constants.NSFW in item.description.lower()
-        ):
-            metadata["tags"].append(constants.NSFW)
-
-        metadata["tags"] = sorted(metadata["tags"])
         cache[str(published)] = metadata
 
         count += 1
