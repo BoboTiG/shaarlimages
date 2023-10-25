@@ -20,7 +20,7 @@ from bottle import redirect, template
 #
 
 
-def sync_feed(url: str, force: bool = False) -> dict[str, int]:
+def sync_feed(url: str, force: bool = False) -> int:
     """Sync a shaarli."""
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
@@ -38,7 +38,7 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
         feed = functions.fetch_rss_feed(url)
     except Exception:
         print(f"END {feed_key!r} {cache_key=} (-1)")
-        return {"count": -1}
+        return -1
 
     total_new_images = 0
     count = 0
@@ -110,7 +110,7 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
         functions.invalidate_caches()
 
     print(f"END {feed_key!r} {cache_key=} (+ {total_new_images})")
-    return {"count": total_new_images}
+    return total_new_images
 
 
 def sync_feeds(force: bool = False) -> custom_types.Shaarlis:

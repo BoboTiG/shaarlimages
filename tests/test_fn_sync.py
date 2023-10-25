@@ -142,11 +142,10 @@ def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
             body=file.read_bytes(),
         )
 
-    res = helpers.sync_feed(FEED_URL)
-    assert res == {"count": 3}
+    assert helpers.sync_feed(FEED_URL) == 3
 
     # Force the sync
-    helpers.sync_feed(FEED_URL, force=True)
+    assert helpers.sync_feed(FEED_URL, force=True) == 0
 
     # Sync them all too
     helpers.sync_them_all()
@@ -156,4 +155,4 @@ def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
 def test_sync_feed_error():
     responses.add(method="GET", url=FEED_URL, body=ConnectionError("Boom"))
 
-    assert helpers.sync_feed(FEED_URL) == {"count": -1}
+    assert helpers.sync_feed(FEED_URL) == -1
