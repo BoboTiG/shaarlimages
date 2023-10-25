@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from random import choice
 from shutil import copyfile
+from threading import Lock
 from typing import Any
 from urllib.parse import unquote, urlparse
 from zlib import compress, decompress
@@ -376,7 +377,7 @@ def handle_item(item: feedparser.FeedParserDict) -> tuple[bool, dict]:
 def invalidate_caches() -> None:
     """Remove all cache files."""
     for file in constants.CACHE.glob("*.cache"):
-        file.unlink()
+        file.unlink(missing_ok=True)
 
 
 def is_image_data(raw: bytes) -> bool:
@@ -467,12 +468,18 @@ def now() -> float:
     return today().timestamp()
 
 
-def persist(file: Path, data: dict[str, Any]) -> None:
+def persist(file: Path, data: dict[str, Any], lock: Lock = None) -> None:
+    if lock:
+        lock.acquire()
+
     file.parent.mkdir(exist_ok=True, parents=True)
     with file.open(mode="w") as fh:
         json.dump(data, fh, sort_keys=True, indent=0)
         fh.flush()
         os.fsync(fh.fileno())
+
+    if lock:
+        lock.release()
 
 
 def php_crc32(value: str) -> str:

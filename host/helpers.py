@@ -4,6 +4,9 @@ Source: https://github.com/BoboTiG/shaarlimages
 """
 
 import math
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from threading import Lock, get_ident
 from time import mktime
 
 import config
@@ -18,7 +21,7 @@ from bottle import redirect, template
 #
 
 
-def sync_feed(url: str, force: bool = False) -> int:
+def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
     """Sync a shaarli."""
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
@@ -30,12 +33,12 @@ def sync_feed(url: str, force: bool = False) -> int:
     if force or not cache:
         url += "&nb=all" if url.endswith("?do=rss") else "?nb=all"
 
-    print(f"START {feed_key!r} {cache_key=}", flush=True)
+    print(f"START {get_ident()} {feed_key!r} {cache_key=}", flush=True)
 
     try:
         feed = functions.fetch_rss_feed(url)
     except Exception:
-        print(f"END {feed_key!r} {cache_key=} (-1)", flush=True)
+        print(f"END {get_ident()} {feed_key!r} {cache_key=} (-1)", flush=True)
         return -1
 
     total_new_images = 0
@@ -54,7 +57,7 @@ def sync_feed(url: str, force: bool = False) -> int:
         try:
             is_new, metadata = functions.handle_item(item)
         except Exception as exc:
-            print(f"🐛 Cannot handle {item=}", flush=True)
+            print(f"🐛 {get_ident()} Cannot handle {item=}", flush=True)
             print(f"{exc}", flush=True)
 
         if is_new:
@@ -67,16 +70,16 @@ def sync_feed(url: str, force: bool = False) -> int:
 
         count += 1
         if count % 10 == 0:  # pragma: nocover
-            functions.persist(cache_file, cache)
+            functions.persist(cache_file, cache, lock=lock)
             count = 0
 
     if count:
-        functions.persist(cache_file, cache)
+        functions.persist(cache_file, cache, lock=lock)
 
     if total_new_images:
         functions.invalidate_caches()
 
-    print(f"END {feed_key!r} {cache_key=} (+ {total_new_images})", flush=True)
+    print(f"END {get_ident()} {feed_key!r} {cache_key=} (+ {total_new_images})", flush=True)
     return total_new_images
 
 
@@ -100,8 +103,10 @@ def sync_them_all(force: bool = False) -> None:
     """Sync all shaarlis."""
     sync_feeds(force=force)
 
-    for url in functions.read(constants.SHAARLIS)["feeds"]:
-        sync_feed(url, force=force)
+    all_url = functions.read(constants.SHAARLIS)["feeds"]
+    lock = Lock()
+    with ThreadPoolExecutor(4) as pool:
+        pool.map(partial(sync_feed, force=force, lock=lock), all_url)
 
 
 #
