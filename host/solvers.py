@@ -155,11 +155,18 @@ def wikimedia(url: str, *_) -> str:
     return files.get("original", {}).get("url") or ""
 
 
+def zbrushcentral(url: str, *_, pattern=re.compile(rb'<meta property="og:image" content="([^"]+)"').search) -> str:
+    """Resolve the original image URL from ZBrushCentral."""
+    response = functions.fetch(url)
+    return "" if (image := pattern(response.content)) is None else image[1].decode()
+
+
 SOLVERS = {
     "antwrp.gsfc.nasa.gov": nasa_apod,
     "apod.nasa.gov": nasa_apod,
     "i.imgur.com": imgur,
     "webbtelescope.org": webbtelescope,
+    "www.zbrushcentral.com": zbrushcentral,
 }
 
 

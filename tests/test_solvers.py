@@ -128,7 +128,7 @@ def test_webbtelescope() -> None:
     <meta property="og:url" content="https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M">
     <meta property="og:image" content="//stsci-opo.org/STScI-01GD3HTYP68G8VQFJPNZ0RVBT9.png">
     <meta property="og:image:type" content="image/png">
-	"""  # noqa[W503]
+    """  # noqa[W503]
 
     responses.add(method="GET", url=url, body=body)
     assert solvers.guess_url(url, None) == "https://stsci-opo.org/STScI-01GD3HTYP68G8VQFJPNZ0RVBT9.png"
@@ -205,3 +205,18 @@ def test_wikimedia_not_found() -> None:
 
     responses.add(method="GET", url=url_files, json=body)
     assert solvers.guess_url(url, None) == ""
+
+
+@responses.activate
+def test_zbrushcentral() -> None:
+    url = "https://www.zbrushcentral.com/t/tdk-batman/453080"
+    body = """
+<meta property="og:image" content="http://www.zbrushcentral.com/uploads/default/optimized/4X/1/a/b/1abfaaf8e1c27403c147abe77407231d79a9172c_2_1024x683.jpeg" />
+<meta property="og:url" content="http://www.zbrushcentral.com/t/tdk-batman/453080" />
+<meta name="twitter:url" content="http://www.zbrushcentral.com/t/tdk-batman/453080" />
+	"""  # noqa[W503]
+
+    responses.add(method="GET", url=url, body=body)
+
+    expected = "http://www.zbrushcentral.com/uploads/default/optimized/4X/1/a/b/1abfaaf8e1c27403c147abe77407231d79a9172c_2_1024x683.jpeg"  # noqa[W503]
+    assert solvers.guess_url(url, None) == expected
