@@ -30,12 +30,12 @@ def sync_feed(url: str, force: bool = False) -> int:
     if force or not cache:
         url += "&nb=all" if url.endswith("?do=rss") else "?nb=all"
 
-    print(f"START {feed_key!r} {cache_key=}")
+    print(f"START {feed_key!r} {cache_key=}", flush=True)
 
     try:
         feed = functions.fetch_rss_feed(url)
     except Exception:
-        print(f"END {feed_key!r} {cache_key=} (-1)")
+        print(f"END {feed_key!r} {cache_key=} (-1)", flush=True)
         return -1
 
     total_new_images = 0
@@ -51,7 +51,11 @@ def sync_feed(url: str, force: bool = False) -> int:
         if not force and published < latest_image:
             break
 
-        is_new, metadata = functions.handle_item(item)
+        try:
+            is_new, metadata = functions.handle_item(item)
+        except Exception as exc:
+            print(f"🐛 Cannot handle {item=}", flush=True)
+            print(f"{exc}", flush=True)
 
         if is_new:
             total_new_images += 1
@@ -72,7 +76,7 @@ def sync_feed(url: str, force: bool = False) -> int:
     if total_new_images:
         functions.invalidate_caches()
 
-    print(f"END {feed_key!r} {cache_key=} (+ {total_new_images})")
+    print(f"END {feed_key!r} {cache_key=} (+ {total_new_images})", flush=True)
     return total_new_images
 
 
