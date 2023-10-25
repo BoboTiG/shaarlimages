@@ -219,14 +219,14 @@ def fix_images_medatadata(force: bool = False):
                 name_has_changed = True
                 new_file = file.with_stem(f"{key}_{name_sanitized}")
             elif file.suffix not in list(constants.IMAGES_CONTENT_TYPE.values()):
-                name_has_changed = True
                 if file.suffix.startswith((".jpg", ".jpeg")):
-                    suffix = ".jpg"
+                    name_has_changed = True
+                    new_file = file.with_suffix(".jpg")
                 elif file.suffix.startswith(".png"):
-                    suffix = ".png"
+                    name_has_changed = True
+                    new_file = file.with_suffix(".png")
                 else:
-                    raise ValueError(f"Unknown {suffix=}")
-                new_file = file.with_suffix(suffix)
+                    errors.add(file.name)
 
             if name_has_changed:
                 print(f"{file.name!r} -> {new_file.name!r}")
@@ -513,7 +513,7 @@ def purge(files: set[str]) -> None:
     at_least_one_change = False
 
     for file in files:
-        print(" !! Removing non-image file", file)
+        print(" !! Removing file", file)
 
     for feed in constants.FEEDS.glob("*.json"):
         changed = False
@@ -530,6 +530,7 @@ def purge(files: set[str]) -> None:
 
     for file in files:
         (constants.IMAGES / file).unlink(missing_ok=True)
+        (constants.THUMBNAILS / file).unlink(missing_ok=True)
 
     if at_least_one_change:
         invalidate_caches()
