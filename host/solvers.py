@@ -13,6 +13,21 @@ import functions
 IMGUR_SUFFIX = tuple(f"_d{ext}" for ext in constants.IMAGE_EXT)
 
 
+def cgsociety(url: str, *_, pattern=re.compile(rb"<meta content='([^']+)' property='og:image'").search) -> str:
+    """
+    Resolve the original image URL from CG Society.
+
+        >>> cgsociety("https://cg0.cgsociety.org/uploads/images/original/oscarfb-aspidochelone-1-a6c5cb99-9ndp.png")
+        'https://cg0.cgsociety.org/uploads/images/original/oscarfb-aspidochelone-1-a6c5cb99-9ndp.png'
+
+    """
+    if functions.is_image_link(url):
+        return url
+
+    response = functions.fetch(url)
+    return "" if (image := pattern(response.content)) is None else image[1].decode().replace("/medium/", "/large/")
+
+
 def imgur(url: str, *_) -> str:
     """
     Resolve the original image URL from Imgut.
@@ -172,5 +187,8 @@ def guess_url(url: str, date: struct_time) -> str:
 
     if hostname.endswith((".quora.com", ".quoracdn.net")):
         return quora(url)
+
+    if hostname.endswith(".cgsociety.org"):
+        return cgsociety(url)
 
     return url if functions.is_image_link(url) else ""
