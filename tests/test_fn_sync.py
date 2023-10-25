@@ -3,6 +3,7 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
+from mimetypes import guess_type
 from pathlib import Path
 
 import pytest
@@ -78,34 +79,71 @@ def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
     # XML feed
     responses.add(method="GET", url=FEED_URL, body=feed_data)
 
-    # Not an image link
-    responses.add(method="GET", url=f"{FEED_URL}/code.txt", body="Le code, c'est le code ?")
-
     # Image not found
-    responses.add(method="GET", url=f"{FEED_URL}/{TEST_IMAGES[0][0].name}", status=404)
+    responses.add(
+        method="HEAD",
+        url=f"{FEED_URL}/{TEST_IMAGES[0][0].name}",
+        content_type=guess_type(TEST_IMAGES[0][0].name)[0],
+    )
+    responses.add(
+        method="GET",
+        url=f"{FEED_URL}/{TEST_IMAGES[0][0].name}",
+        status=404,
+    )
 
     # Image link with invalid image data
-    responses.add(method="GET", url=f"{FEED_URL}/{TEST_IMAGES[1][0].name}", body=b"no image")
+    responses.add(
+        method="HEAD",
+        url=f"{FEED_URL}/{TEST_IMAGES[1][0].name}",
+        content_type=guess_type(TEST_IMAGES[1][0].name)[0],
+    )
+    responses.add(
+        method="GET",
+        url=f"{FEED_URL}/{TEST_IMAGES[1][0].name}",
+        body=b"no image",
+    )
 
     # Not an image link but actual image data
     responses.add(
-        method="HEAD", url="https://qph.cf2.quoracdn.net/main-qimg-xxx", headers={"Content-Type": "image/jped"}
+        method="HEAD",
+        url="https://qph.cf2.quoracdn.net/main-qimg-ok",
+        content_type="image/jpeg",
+    )
+    responses.add(
+        method="GET",
+        url="https://qph.cf2.quoracdn.net/main-qimg-ok",
+        body=TEST_IMAGES[1][0].read_bytes(),
     )
 
     # Not an image link and not image data
     responses.add(
-        method="HEAD", url="https://qph.cf2.quoracdn.net/main-qimg-bad", headers={"Content-Type": "application/xml"}
+        method="HEAD",
+        url="https://qph.cf2.quoracdn.net/main-qimg-bad",
+        content_type="application/xml",
     )
 
     # Not an image link and website is down
-    responses.add(method="HEAD", url="https://qph.cf2.quoracdn.net/main-qimg-down", status=500)
+    responses.add(
+        method="HEAD",
+        url="https://qph.cf2.quoracdn.net/main-qimg-down",
+        status=500,
+    )
 
     # Valid images
     for file, *_ in TEST_IMAGES[2:]:
-        responses.add(method="GET", url=f"{FEED_URL}/{file.name}", body=file.read_bytes())
+        responses.add(
+            method="HEAD",
+            url=f"{FEED_URL}/{file.name}",
+            content_type=guess_type(file)[0],
+        )
+        responses.add(
+            method="GET",
+            url=f"{FEED_URL}/{file.name}",
+            body=file.read_bytes(),
+        )
 
     res = helpers.sync_feed(FEED_URL)
-    assert res == {"count": len(TEST_IMAGES) - 2}
+    assert res == {"count": 3}
 
     # Force the sync
     helpers.sync_feed(FEED_URL, force=True)

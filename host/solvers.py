@@ -19,18 +19,40 @@ def imgur(url: str, *_) -> str:
 
         >>> imgur("https://i.imgur.com/qypAs0A_d.jpg")
         'https://i.imgur.com/qypAs0A.jpg'
+        >>> imgur("https://i.imgur.com/qypAs0A_d.png?1")
+        'https://i.imgur.com/qypAs0A.png'
+        >>> imgur("https://i.imgur.com/qypAs0A_d.png#1")
+        'https://i.imgur.com/qypAs0A.png'
         >>> imgur("https://i.imgur.com/qypAs0A_d.jpeg")
         'https://i.imgur.com/qypAs0A.jpeg'
         >>> imgur("https://i.imgur.com/qypAs0A_d.png")
         'https://i.imgur.com/qypAs0A.png'
+
         >>> imgur("https://i.imgur.com/qypAs0A_dd.png")
         'https://i.imgur.com/qypAs0A_dd.png'
+        >>> imgur("https://i.imgur.com/qypAs0A_dd.png?1")
+        'https://i.imgur.com/qypAs0A_dd.png'
+        >>> imgur("https://i.imgur.com/qypAs0A_dd.png#1")
+        'https://i.imgur.com/qypAs0A_dd.png'
+
+        >>> imgur("https://i.imgur.com/qypAs0A_d.gif")
+        ''
+        >>> imgur("https://i.imgur.com/qypAs0A_d.gifv")
+        ''
+        >>> imgur("https://i.imgur.com/qypAs0A_d.mp4")
+        ''
 
     """
+    # Remove all URL parameters
+    parts = urlparse(url)
+    parts = parts._replace(fragment="", query="")
+    url = urlunparse(parts)
+
     if url.endswith(IMGUR_SUFFIX):
         for ext in constants.IMAGE_EXT:
             url = url.replace(f"_d{ext}", ext)
-    return url
+
+    return url if url.endswith(constants.IMAGE_EXT) else ""
 
 
 def nasa_apod(url: str, date: struct_time, pattern=re.compile(rb'<a href="(image/[^"]+)"').search) -> str:

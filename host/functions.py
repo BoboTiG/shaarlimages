@@ -156,7 +156,7 @@ def fetch(url: str, method: str = "get") -> requests.Response:
     with requests.request(
         method=method,
         url=url,
-        headers=constants.HTTP_REQ_HEADERS,
+        headers=constants.HTTP_HEADERS,
         timeout=120.0,
         verify=False,
     ) as req:
@@ -186,14 +186,9 @@ def fetch_image(url: str) -> bytes | None:
 
 def fetch_image_type(url: str) -> str:
     """Fetch an image type using HTTP headers from the HEAD response."""
-    try:
-        req = fetch(url, method="head")
-        req.raise_for_status()
-    except Exception:
-        return ""
-    else:
-        content_type = req.headers["Content-Type"]
-        return constants.IMAGES_CONTENT_TYPE.get(content_type, "")
+    req = fetch(url, method="head")
+    content_type = req.headers.get("content-type", "")
+    return constants.IMAGES_CONTENT_TYPE.get(content_type, "")
 
 
 def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
@@ -216,8 +211,23 @@ def fix_images_medatadata(force: bool = False):
             key = file.stem[:6]  # The small hash
             name_original = file.stem[7:]
             name_sanitized = safe_filename(name_original)
+            name_has_changed = False
+
             if name_original != name_sanitized:
+                name_has_changed = True
                 new_file = file.with_stem(f"{key}_{name_sanitized}")
+            elif file.suffix not in list(constants.IMAGES_CONTENT_TYPE.values()):
+                name_has_changed = True
+                if file.suffix.startswith((".jpg", ".jpeg")):
+                    suffix = ".jpg"
+                elif file.suffix.startswith(".png"):
+                    suffix = ".png"
+                else:
+                    raise ValueError(f"Unknown {suffix=}")
+                new_file = file.with_suffix(suffix)
+
+            if name_has_changed:
+                print(f"{file.name!r} -> {new_file.name!r}")
                 file = new_file if new_file.is_file() else file.rename(new_file)
                 data[k] |= {"link": file.name}
                 changed = True
@@ -330,7 +340,7 @@ def is_image_data(raw: bytes) -> bool:
         False
 
     """
-    return raw.startswith(constants.IMAGES_MAGIC_SIG)
+    return raw.startswith(tuple(constants.IMAGES_MAGIC_SIG.values()))
 
 
 def is_image_link(url: str) -> bool:

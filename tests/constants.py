@@ -50,6 +50,7 @@ FEED_XML = (
         <link href="https://qph.cf2.quoracdn.net/main-qimg-ok" />
         <id>{FEED_URL}/shaare/2</id>
         <published>2023-08-11T22:41:41+02:00</published>
+        <content type="html" xml:lang="en"></content>
     </entry>
 """
     + f"""
@@ -58,6 +59,7 @@ FEED_XML = (
         <link href="https://qph.cf2.quoracdn.net/main-qimg-bad" />
         <id>{FEED_URL}/shaare/3</id>
         <published>2023-08-11T22:41:41+02:00</published>
+        <content type="html" xml:lang="en"></content>
     </entry>
 """
     + f"""
@@ -66,6 +68,7 @@ FEED_XML = (
         <link href="https://qph.cf2.quoracdn.net/main-qimg-down" />
         <id>{FEED_URL}/shaare/4</id>
         <published>2023-08-11T22:41:41+02:00</published>
+        <content type="html" xml:lang="en"></content>
     </entry>
 """
     + "\n".join(

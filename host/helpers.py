@@ -58,7 +58,7 @@ def sync_feed(url: str, force: bool = False) -> dict[str, int]:
 
         path = Path(link)
 
-        if not (ext := path.suffix.lower() or functions.fetch_image_type(link)):
+        if not (ext := functions.fetch_image_type(link)):
             # Impossible to guess the image type (either because the URL does not end with a file extension,
             # or because we failed to fetch the image type from the Content-Type header response).
             continue
