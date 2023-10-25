@@ -188,7 +188,7 @@ def guess_url(url: str, date: struct_time) -> str:
     if hostname.endswith((".quora.com", ".quoracdn.net")):
         return quora(url)
 
-    if hostname.endswith(".cgsociety.org"):
+    if hostname.endswith("cgsociety.org"):
         return cgsociety(url)
 
     return url if functions.is_image_link(url) else ""
