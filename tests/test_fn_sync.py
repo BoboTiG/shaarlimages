@@ -57,6 +57,29 @@ def test_fetch_image_request_error(capsys) -> None:
 
 
 @responses.activate
+@pytest.mark.parametrize(
+    "content_type, ext",
+    [
+        # Ignored
+        ("application/xml", ""),
+        ("image/gif", ""),
+        ("image/apng", ""),
+        # Supported
+        ("image/jpeg", ".jpg"),
+        ('image/jpeg;name="BzQGBMDC;MAEnGGO.jpg:large.jpeg"', ".jpg"),
+        ("image/png", ".png"),
+        ('image/png;name="votation.PNG"', ".png"),
+        # Unhandled
+        ("image/xyz", ""),
+    ],
+)
+def test_fetch_image_type(content_type: str, ext: str) -> None:
+    url = "https://example.org/image"
+    responses.add(method="HEAD", url=url, content_type=content_type)
+    assert functions.fetch_image_type(url) == ext
+
+
+@responses.activate
 def test_fetch_rss() -> None:
     url = "https://example.org/?do=rss"
     body = "<rss><channel><title>Test</title></channel></rss>"
@@ -142,7 +165,7 @@ def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
             body=file.read_bytes(),
         )
 
-    assert helpers.sync_feed(FEED_URL) == 3
+    assert helpers.sync_feed(FEED_URL) == 4
 
     # Force the sync
     assert helpers.sync_feed(FEED_URL, force=True) == 0

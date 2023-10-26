@@ -195,7 +195,13 @@ def fetch_image(url: str) -> bytes | None:
 def fetch_image_type(url: str) -> str:
     """Fetch an image type using HTTP headers from the HEAD response."""
     req = fetch(url, method="head")
-    content_type = req.headers.get("content-type", "")
+    content_type = req.headers.get("content-type", "").replace(" ", "").split(";", 1)[0]
+    if (
+        "image/" in content_type
+        and content_type not in constants.IMAGES_CONTENT_TYPE
+        and content_type not in constants.IMAGES_CONTENT_TYPE_IGNORED
+    ):
+        print(f"🎨 Unhandled {content_type=} for {url=}", flush=True)
     return constants.IMAGES_CONTENT_TYPE.get(content_type, "")
 
 
@@ -395,11 +401,13 @@ def is_image_data(raw: bytes) -> bool:
     r"""
     Check whenever the provided `raw` data seems like a supported image format.
 
-        >>> is_image_data(b"\xff\xd8\xff\xe0\x00\x10JFIF\x00")
+        >>> is_image_data(b"\xff\xd8\xff\xe0\x00\x10JFIF\x00")  # JPG with exif data
         True
-        >>> is_image_data(b"\xff\xd8\xff\xe14\xbbExif\x00")
+        >>> is_image_data(b"\xff\xd8\xff\xe14\xbbExif\x00")  # JPG
         True
-        >>> is_image_data(b"\x89PNG\r\n\x1a")
+        >>> is_image_data(b"\x89PNG\r\n\x1a")  # PNG
+        True
+        >>> is_image_data(b"RIFFRh\x00\x00WE")  # WEBP
         True
         >>> is_image_data(b"\00")
         False
@@ -413,16 +421,28 @@ def is_image_link(url: str) -> bool:
     Check whenever the given `url` points to a supported image format.
     It will also prevent downloading again images from Shaarlimages.
 
-        >>> is_image_link("")
-        False
         >>> is_image_link("ok.JPG")
-        True
-        >>> is_image_link("ok.jpg")
         True
         >>> is_image_link("ok.jpeg")
         True
+        >>> is_image_link("ok.jpg")
+        True
+        >>> is_image_link("ok.jfif")
+        True
+        >>> is_image_link("ok.pjp")
+        True
+        >>> is_image_link("ok.pjpeg")
+        True
         >>> is_image_link("ok.png")
         True
+        >>> is_image_link("ok.webp")
+        True
+
+        >>> is_image_link("unwanted.gif")
+        False
+
+        >>> is_image_link("")
+        False
         >>> is_image_link("bad.html")
         False
 

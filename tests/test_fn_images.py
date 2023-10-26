@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from host import functions
 from host.custom_types import Size
 
-from .constants import IMAGE_JPG, IMAGE_JPG_IS_PNG, IMAGE_PNG, TEST_IMAGES
+from .constants import IMAGE_JPG, IMAGE_JPG_IS_PNG, IMAGE_PNG, IMAGE_WEBP, TEST_IMAGES
 
 
 def test_any_css_class_question() -> None:
@@ -63,6 +63,7 @@ def test_docolav(file: Path, file_size: int, size: Size, color: str, checksum: s
         (IMAGE_JPG, Size(width=2880, height=1920)),
         (IMAGE_JPG_IS_PNG, Size(width=161, height=81)),
         (IMAGE_PNG, Size(width=684, height=864)),
+        (IMAGE_WEBP, Size(width=460, height=514)),
     ],
 )
 def test_get_size(file: Path, size: Size) -> None:
