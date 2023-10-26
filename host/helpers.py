@@ -58,7 +58,7 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
 
         try:
             is_new, metadata = functions.handle_item(item)
-        except (requests.exceptions.RetryError, urllib3.exceptions.HTTPError, ConnectionError):
+        except (requests.exceptions.RetryError, urllib3.exceptions.HTTPError, urllib3.exceptions.ConnectionError):
             continue
         except Exception as exc:
             print(f"🐛 {get_ident()} {type(exc).__name__} on {item=}", flush=True)
