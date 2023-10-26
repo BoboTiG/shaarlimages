@@ -32,24 +32,6 @@ def imgur(url: str, *_) -> str:
     """
     Resolve the original image URL from Imgut.
 
-        >>> imgur("https://i.imgur.com/qypAs0A_d.jpg")
-        'https://i.imgur.com/qypAs0A.jpg'
-        >>> imgur("https://i.imgur.com/qypAs0A_d.png?1")
-        'https://i.imgur.com/qypAs0A.png'
-        >>> imgur("https://i.imgur.com/qypAs0A_d.png#1")
-        'https://i.imgur.com/qypAs0A.png'
-        >>> imgur("https://i.imgur.com/qypAs0A_d.jpeg")
-        'https://i.imgur.com/qypAs0A.jpeg'
-        >>> imgur("https://i.imgur.com/qypAs0A_d.png")
-        'https://i.imgur.com/qypAs0A.png'
-
-        >>> imgur("https://i.imgur.com/qypAs0A_dd.png")
-        'https://i.imgur.com/qypAs0A_dd.png'
-        >>> imgur("https://i.imgur.com/qypAs0A_dd.png?1")
-        'https://i.imgur.com/qypAs0A_dd.png'
-        >>> imgur("https://i.imgur.com/qypAs0A_dd.png#1")
-        'https://i.imgur.com/qypAs0A_dd.png'
-
         >>> imgur("https://i.imgur.com/qypAs0A_d.gif")
         ''
         >>> imgur("https://i.imgur.com/qypAs0A_d.gifv")
@@ -67,7 +49,15 @@ def imgur(url: str, *_) -> str:
         for ext in constants.IMAGE_EXT:
             url = url.replace(f"_d{ext}", ext)
 
-    return url if url.endswith(constants.IMAGE_EXT) else ""
+    if not url.endswith(constants.IMAGE_EXT):
+        return ""
+
+    # Ensure the image still exists
+    response = functions.fetch(url, method="head")
+    if response.url.endswith("/removed.png"):
+        return ""
+
+    return url
 
 
 def nasa_apod(url: str, date: struct_time, pattern=re.compile(rb'<a href="(image/[^"]+)"').search) -> str:

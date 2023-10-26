@@ -24,8 +24,13 @@ def test_any_css_class_question_gray_pride() -> None:
     assert functions.any_css_class_question() == "gay-pride"
 
 
-@pytest.mark.parametrize("file, file_size, size, color", TEST_IMAGES)
-def test_create_thumbnail(file: Path, file_size: int, size: Size, color: str, tmp_path: Path) -> None:
+@pytest.mark.parametrize("file, file_size, size, color, checksum", TEST_IMAGES)
+def test_checksum(file: Path, file_size: int, size: Size, color: str, checksum: str, tmp_path: Path) -> None:
+    assert functions.checksum(file) == checksum
+
+
+@pytest.mark.parametrize("file, file_size, size, color, checksum", TEST_IMAGES)
+def test_create_thumbnail(file: Path, file_size: int, size: Size, color: str, checksum: str, tmp_path: Path) -> None:
     dest_file = tmp_path / file.name
     assert not dest_file.is_file()
 
@@ -47,8 +52,8 @@ def test_create_thumbnail_already_exist(tmp_path: Path) -> None:
         assert dest_file.stat().st_size == 0
 
 
-@pytest.mark.parametrize("file, file_size, size, color", TEST_IMAGES)
-def test_docolav(file: Path, file_size: int, size: Size, color: str) -> None:
+@pytest.mark.parametrize("file, file_size, size, color, checksum", TEST_IMAGES)
+def test_docolav(file: Path, file_size: int, size: Size, color: str, checksum: str) -> None:
     assert functions.docolav(file) == color
 
 

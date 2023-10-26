@@ -31,6 +31,38 @@ def test_cgsociety() -> None:
 
 
 @responses.activate
+@pytest.mark.parametrize(
+    "url, expected",
+    [
+        ("https://i.imgur.com/qypAs0A_d.jpg", "https://i.imgur.com/qypAs0A.jpg"),
+        ("https://i.imgur.com/qypAs0A_d.jpg?1", "https://i.imgur.com/qypAs0A.jpg"),
+        ("https://i.imgur.com/qypAs0A_d.jpg#1", "https://i.imgur.com/qypAs0A.jpg"),
+        ("https://i.imgur.com/qypAs0A_d.jpeg", "https://i.imgur.com/qypAs0A.jpeg"),
+        ("https://i.imgur.com/qypAs0A_d.png", "https://i.imgur.com/qypAs0A.png"),
+        ("https://i.imgur.com/qypAs0A_dd.jpg", "https://i.imgur.com/qypAs0A_dd.jpg"),
+        ("https://i.imgur.com/qypAs0A_dd.jpg?1", "https://i.imgur.com/qypAs0A_dd.jpg"),
+        ("https://i.imgur.com/qypAs0A_dd.jpg#1", "https://i.imgur.com/qypAs0A_dd.jpg"),
+        ("https://i.imgur.com/qypAs0A_dd.jpeg", "https://i.imgur.com/qypAs0A_dd.jpeg"),
+        ("https://i.imgur.com/qypAs0A_dd.png", "https://i.imgur.com/qypAs0A_dd.png"),
+    ],
+)
+def test_imgur(url: str, expected: str) -> None:
+    responses.add(method="HEAD", url=expected, content_type="image/jpg")
+    assert solvers.guess_url(url, None) == expected
+
+
+@responses.activate
+def test_imgur_removed() -> None:
+    url0 = "https://i.imgur.com/qypAs0A_d.jpg"
+    url1 = "https://i.imgur.com/qypAs0A.jpg"
+    url2 = "https://i.imgur.com/removed.png"
+
+    responses.add(method="HEAD", url=url1, status=302, headers={"Location": url2})
+    responses.add(method="HEAD", url=url2, content_type="image/png")
+    assert solvers.guess_url(url0, None) == ""
+
+
+@responses.activate
 @pytest.mark.parametrize("scheme", ["http", "https"])
 @pytest.mark.parametrize(
     "rest",

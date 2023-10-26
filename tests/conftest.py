@@ -53,7 +53,7 @@ def setup_data(tmp_path: Path, setup_data_folders):
                 "title": "Awesome image!",
                 "width": size.width,
             }
-            for idx, (file, _, size, color) in enumerate(TEST_IMAGES, 1)
+            for idx, (file, _, size, color, *__) in enumerate(TEST_IMAGES, 1)
         },
     )
 

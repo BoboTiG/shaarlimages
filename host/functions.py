@@ -3,6 +3,7 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
+import hashlib
 import json
 import os
 import re
@@ -40,6 +41,11 @@ def any_css_class_question() -> str:
         return "gay-pride"
 
     return ""
+
+
+def checksum(file: Path, algo: str = "md5") -> str:
+    """Compute the check sum of the given `file`."""
+    return hashlib.new(algo, file.read_bytes()).hexdigest().lower()
 
 
 def create_thumbnail(file: Path) -> Path | None:
@@ -267,6 +273,11 @@ def fix_images_medatadata(force: bool = False):
                 data[k] |= {"tags": sanitized_tags}
                 changed = True
                 at_least_one_change = True
+
+            # Purge removed Imgur images
+            if checksum(file) == "d835884373f4d6c8f24742ceabe74946":
+                errors.add(file.name)
+                continue
 
         if changed:
             persist(feed, data)

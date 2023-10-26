@@ -16,10 +16,10 @@ IMAGE_PNG = DATA / "8kZBBg_1471877768-20160824.png"
 IMAGE_SQUARE = DATA / "-1hlcA_icugvpr.jpg"
 
 TEST_IMAGES = [
-    (IMAGE_JPG, 22548, Size(width=400, height=267), "585E50"),
-    (IMAGE_JPG_IS_PNG, 503, Size(width=161, height=81), "323232"),
-    (IMAGE_PNG, 61283, Size(width=317, height=400), "B19C95"),
-    (IMAGE_SQUARE, 21519, Size(width=400, height=400), "656B72"),
+    (IMAGE_JPG, 22548, Size(width=400, height=267), "585E50", "29c25875e30fe9547349057887b19682"),
+    (IMAGE_JPG_IS_PNG, 503, Size(width=161, height=81), "323232", "d835884373f4d6c8f24742ceabe74946"),
+    (IMAGE_PNG, 61283, Size(width=317, height=400), "B19C95", "2a4ab87892014129a4f1e73ba9dfe22d"),
+    (IMAGE_SQUARE, 21519, Size(width=400, height=400), "656B72", "8bdecafe89fd9e02981720ba8172dad4"),
 ]
 FEED_URL = "https://shaarli.example.org"
 FEED_XML = (
