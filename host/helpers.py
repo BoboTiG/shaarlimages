@@ -13,6 +13,8 @@ import config
 import constants
 import custom_types
 import functions
+import requests.exceptions
+import urllib3.exceptions
 import version
 from bottle import redirect, template
 
@@ -33,12 +35,12 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
     if force or not cache:
         url += "&nb=all" if url.endswith("?do=rss") else "?nb=all"
 
-    print(f"START {get_ident()} {feed_key!r} {cache_key=}", flush=True)
+    print(f"START {get_ident()} {feed_key=} {cache_key=}", flush=True)
 
     try:
         feed = functions.fetch_rss_feed(url)
     except Exception:
-        print(f"END {get_ident()} {feed_key!r} {cache_key=} (-1)", flush=True)
+        print(f"END {get_ident()} {feed_key=} {cache_key=} (-1)", flush=True)
         return -1
 
     total_new_images = 0
@@ -56,9 +58,12 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
 
         try:
             is_new, metadata = functions.handle_item(item)
+        except (requests.exceptions.RetryError, urllib3.exceptions.HTTPError):
+            continue
         except Exception as exc:
-            print(f"🐛 {get_ident()} Cannot handle {item=}", flush=True)
+            print(f"🐛 {get_ident()} {type(exc).__name__} on {item=}", flush=True)
             print(f"{exc}", flush=True)
+            continue
 
         if is_new:
             total_new_images += 1
@@ -79,7 +84,7 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
     if total_new_images:
         functions.invalidate_caches()
 
-    print(f"END {get_ident()} {feed_key!r} {cache_key=} (+ {total_new_images})", flush=True)
+    print(f"END {get_ident()} {feed_key=} {cache_key=} (+ {total_new_images})", flush=True)
     return total_new_images
 
 
