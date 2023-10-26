@@ -24,7 +24,7 @@ def cg_society(url: str, *_, pattern=re.compile(rb"<meta content='([^']+)' prope
     if functions.is_image_link(url):
         return url
 
-    response = functions.fetch(url)
+    response = functions.fetch(url, verify=True)
     return "" if (image := pattern(response.content)) is None else image[1].decode().replace("/medium/", "/large/")
 
 
@@ -32,7 +32,7 @@ def cheeseburger(url: str, *_) -> str:
     """
     Resolve the original image URL from Cheeseburger.
 
-        >>> lutim("https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/")
+        >>> cheeseburger("https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/")
         'https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/'
 
     """
@@ -64,7 +64,7 @@ def imgur(url: str, *_) -> str:
         return ""
 
     # Ensure the image still exists
-    response = functions.fetch(url, method="head")
+    response = functions.fetch(url, method="head", verify=True)
     if response.url.endswith("/removed.png"):
         return ""
 
@@ -114,7 +114,7 @@ def nasa_apod(url: str, date: struct_time, pattern=re.compile(rb'<a href="(image
     if parts.hostname != "apod.nasa.gov":
         parts = parts._replace(netloc="apod.nasa.gov")
 
-    response = functions.fetch(urlunparse(parts))
+    response = functions.fetch(urlunparse(parts), verify=True)
     if (image := pattern(response.content)) is None:
         return ""
 
@@ -134,7 +134,7 @@ def quora(url: str, *_, pattern=re.compile(rb"<meta property='og:image' content=
     if parts.path.startswith("/main-qimg-"):
         return url
 
-    response = functions.fetch(url)
+    response = functions.fetch(url, verify=True)
     return "" if (image := pattern(response.content)) is None else image[1].decode()
 
 
@@ -171,7 +171,7 @@ def twitter_img(url: str, *_) -> str:
 
 def webb_telescope(url: str, *_, pattern=re.compile(rb'<meta property="og:image" content="([^"]+)"').search) -> str:
     """Resolve the original image URL from Webb Space Telescope."""
-    response = functions.fetch(url)
+    response = functions.fetch(url, verify=True)
     if not (url := "" if (image := pattern(response.content)) is None else image[1].decode()):
         return ""
 
@@ -194,13 +194,13 @@ def wikimedia(url: str, *_) -> str:
         return url
 
     file = path.split(":", 1)[1]
-    files = functions.fetch_json(f"https://api.wikimedia.org/core/v1/commons/file/File:{file}")
+    files = functions.fetch_json(f"https://api.wikimedia.org/core/v1/commons/file/File:{file}", verify=True)
     return files.get("original", {}).get("url") or ""
 
 
 def zbrush_central(url: str, *_, pattern=re.compile(rb'<meta property="og:image" content="([^"]+)"').search) -> str:
     """Resolve the original image URL from ZBrushCentral."""
-    response = functions.fetch(url)
+    response = functions.fetch(url, verify=True)
     return "" if (image := pattern(response.content)) is None else image[1].decode()
 
 

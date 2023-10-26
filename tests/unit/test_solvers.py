@@ -14,7 +14,7 @@ DATE = strptime("2011-09-04 00:00:00", "%Y-%m-%d %H:%M:%S")
 
 
 @responses.activate
-def test_cgsociety() -> None:
+def test_cg_society() -> None:
     url = "https://oscarfb.cgsociety.org/9ndp/aspidochelone"
     body = """
 <meta content='https://cg3.cgsociety.org/uploads/images/medium/oscarfb-aspidochelone-1-a6c5cb99-9ndp.jpg' name='twitter:image'>
@@ -154,7 +154,7 @@ And Judo is a “son” of the original Japanese JuJutsu, an old martial art use
 
 
 @responses.activate
-def test_webbtelescope() -> None:
+def test_webb_telescope() -> None:
     url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa[W503]
     body = """
     <meta property="og:url" content="https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M">
@@ -167,7 +167,7 @@ def test_webbtelescope() -> None:
 
 
 @responses.activate
-def test_webbtelescope_nothing_found() -> None:
+def test_webb_telescope_nothing_found() -> None:
     url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa[W503]
     body = """
     <meta property="og:url" content="https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M">

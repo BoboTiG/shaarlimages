@@ -159,28 +159,28 @@ def feed_key(url: str, version: int = 2) -> str:
             return f"{parts.hostname}{path.removesuffix('/')}"
 
 
-def fetch(url: str, method: str = "get") -> requests.Response:
+def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Response:
     """Make a HTTP call."""
     with requests.request(
         method=method,
         url=url,
         headers=constants.HTTP_HEADERS,
         timeout=120.0,
-        verify=False,
+        verify=verify,
     ) as req:
         return req
 
 
-def fetch_json(url: str) -> dict[str, Any]:
+def fetch_json(url: str, verify: bool = False) -> dict[str, Any]:
     """Fetch a JSON file."""
     print(">>> 📑", url)
-    return fetch(url).json()
+    return fetch(url, verify=verify).json()
 
 
-def fetch_image(url: str) -> bytes | None:
+def fetch_image(url: str, verify: bool = False) -> bytes | None:
     """Fetch an image."""
     try:
-        req = fetch(url)
+        req = fetch(url, verify=verify)
         req.raise_for_status()
         image = req.content
         if is_image_data(image):

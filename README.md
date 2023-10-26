@@ -52,7 +52,10 @@ $ ./checks.sh
 ### Tests
 
 ```console
-$ python -m pytest --doctest-modules host tests
+$ python -m pytest --doctest-modules host tests/unit
+
+# To be run from time to rime to ensure solvers are still working
+$ python -m pytest tests/integration
 ```
 
 ### Local Server
