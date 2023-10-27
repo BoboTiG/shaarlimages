@@ -182,7 +182,7 @@ def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Respo
             return req
 
     print(">>> ⌛ [Wayback Machine]", url, flush=True)
-    return try_wayback_machine(url)
+    return try_wayback_machine(url, method)
 
 
 def fetch_json(url: str, verify: bool = False) -> dict[str, Any]:
@@ -704,12 +704,17 @@ def today() -> datetime:
     return datetime.now(tz=timezone.utc)
 
 
-def try_wayback_machine(url: str) -> requests.Response:
+def try_wayback_machine(url: str, method: str) -> requests.Response:
     """Try to fetch a given `url` using the great Wayback Machine."""
     url = f"http://archive.org/wayback/available?url={url}"
     with SESSION.get(url, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
         if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
             raise DisparoisseError()
 
-    with SESSION.get(snapshot, headers=constants.HTTP_HEADERS, timeout=120.0) as req_from_the_past:
+    with SESSION.request(
+        method=method,
+        url=snapshot,
+        headers=constants.HTTP_HEADERS,
+        timeout=120.0,
+    ) as req_from_the_past:
         return req_from_the_past

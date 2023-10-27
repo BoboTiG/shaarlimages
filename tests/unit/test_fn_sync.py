@@ -174,6 +174,7 @@ def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
         )
 
     assert helpers.sync_feed(FEED_URL) == 4
+    assert helpers.sync_feed(FEED_URL) == 0
 
     # Force the sync
     assert helpers.sync_feed(FEED_URL, force=True) == 0
@@ -190,7 +191,7 @@ def test_sync_feed_error():
 
 
 @responses.activate
-def test_try_wayback_machine():
+def test_try_wayback_machine_get():
     url_img = "http://web.archive.org/web/20060101064348/http://www.example.com:80/f.png"
     data = {
         "archived_snapshots": {
@@ -207,10 +208,27 @@ def test_try_wayback_machine():
 
 
 @responses.activate
+def test_try_wayback_machine_head():
+    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com:80/f.png"
+    data = {
+        "archived_snapshots": {
+            "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
+        }
+    }
+    responses.add(method="HEAD", url=FEED_URL, status=404)
+    responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
+    responses.add(method="HEAD", url=url_img, content_type="image/png")
+
+    assert functions.fetch_image_type(FEED_URL) == ".png"
+
+
+@responses.activate
 def test_try_wayback_machine_not_found():
     data = {"archived_snapshots": {}}
     responses.add(method="GET", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
 
-    with pytest.raises(DisparoisseError):
+    with pytest.raises(DisparoisseError) as exc:
         functions.fetch(FEED_URL)
+
+    assert str(exc.value) == "Cannot found the resource on internet anymore."
