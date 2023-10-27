@@ -179,6 +179,7 @@ def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Respo
             req.raise_for_status()
             return req
 
+    print(">>> ⌛ [Wayback Machine]", url)
     return try_wayback_machine(url)
 
 
