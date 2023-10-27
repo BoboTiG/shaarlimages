@@ -292,6 +292,12 @@ def fix_images_medatadata(force: bool = False):
                 errors.add(file.name)
                 continue
 
+            # Add checksum
+            if not v.get("checksum", ""):
+                data[k] |= {"checksum": checksum(file)}
+                changed = True
+                at_least_one_change = True
+
         if changed:
             persist(feed, data)
 
