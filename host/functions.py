@@ -270,6 +270,11 @@ def get_tags() -> list[str]:
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
 
 
+def get_wayback_back_data(url: str) -> tuple[str, bool]:
+    data = read(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json")
+    return data.get("snapshot", ""), data.get("is_lost", False)
+
+
 def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dict]:
     """Take a feed entry, and return appropriate data."""
     if not (link := solvers.guess_url(item.link, item.published_parsed)):
@@ -541,6 +546,10 @@ def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
     ).strip()
 
 
+def set_wayback_back_data(url: str, snapshot: str, is_lost: bool) -> None:
+    persist(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json", {"snapshot": snapshot, "is_lost": is_lost})
+
+
 def shortify(text: str, /, *, limit: int = 128) -> str:
     """Shorten a given `text` to fit in exactly or less `limit` characters."""
     return f"{text[:limit // 2 - 1]}-{text[-limit // 2:]}" if len(text) > limit else text
@@ -576,15 +585,6 @@ def store_in_cache(cache_key: str, response: str, info: bool = True) -> None:
 
 def today() -> datetime:
     return datetime.now(tz=timezone.utc)
-
-
-def get_wayback_back_data(url: str) -> tuple[str, bool]:
-    data = read(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json")
-    return data.get("snapshot", ""), data.get("is_lost", False)
-
-
-def set_wayback_back_data(url: str, snapshot: str, is_lost: bool) -> None:
-    persist(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json", {"snapshot": snapshot, "is_lost": is_lost})
 
 
 def try_wayback_machine(url: str, method: str) -> requests.Response:
