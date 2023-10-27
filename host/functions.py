@@ -368,6 +368,7 @@ def handle_item(item: feedparser.FeedParserDict) -> tuple[bool, dict]:
 
     size = get_size(output_file)
     metadata = {
+        "checksum": checksum(output_file),
         "desc": item.description,
         "docolav": docolav(output_file),
         "guid": item.guid,
@@ -375,6 +376,7 @@ def handle_item(item: feedparser.FeedParserDict) -> tuple[bool, dict]:
         "link": file,
         "tags": [safe_tag(tag.term) for tag in getattr(item, "tags", [])],
         "title": item.title,
+        "url": link,
         "width": size.width,
     }
 
@@ -485,6 +487,7 @@ def lookup(value: str) -> custom_types.Metadatas:
             or value in metadata.guid.lower()
             or value in metadata.link.lower()
             or value in metadata.tags
+            or value in metadata.url.lower()
         )
     ]
 
