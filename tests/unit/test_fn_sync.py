@@ -222,6 +222,25 @@ def test_try_wayback_machine_head():
 
     assert functions.fetch_image_type(FEED_URL) == ".png"
 
+    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
+    assert snapshot
+    assert not is_lost
+
+
+@responses.activate
+def test_try_wayback_machine_cache():
+    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
+    responses.add(method="HEAD", url=FEED_URL, status=404)
+    responses.add(method="HEAD", url=url_final, content_type="image/png")
+
+    functions.set_wayback_back_data(FEED_URL, url_final, False)
+
+    assert functions.fetch_image_type(FEED_URL) == ".png"
+
+    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
+    assert snapshot
+    assert not is_lost
+
 
 @responses.activate
 def test_try_wayback_machine_not_found():
@@ -229,7 +248,29 @@ def test_try_wayback_machine_not_found():
     responses.add(method="GET", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
 
+    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
+    assert not snapshot
+    assert not is_lost
+
     with pytest.raises(functions.Evanesco) as exc:
         functions.fetch(FEED_URL)
+
+    assert str(exc.value) == "Cannot found the resource on internet anymore."
+
+    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
+    assert not snapshot
+    assert is_lost
+
+
+@responses.activate
+def test_try_wayback_machine_resource_is_lost():
+    functions.set_wayback_back_data(FEED_URL, "", True)
+
+    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
+    assert not snapshot
+    assert is_lost
+
+    with pytest.raises(functions.Evanesco) as exc:
+        functions.try_wayback_machine(FEED_URL, "get")
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."
