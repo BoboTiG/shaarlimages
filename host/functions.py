@@ -13,7 +13,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from random import choice
 from shutil import copyfile
-from threading import Lock
 from typing import Any
 from urllib.parse import unquote, urlparse, urlunparse
 from zlib import compress, decompress
@@ -187,7 +186,6 @@ def fetch(url: str, method: str = "get", verify: bool = False, from_the_past: bo
             if not from_the_past:
                 raise
 
-    print(">>> ⌛ [Wayback Machine]", url, flush=True)
     return try_wayback_machine(url, method)
 
 
@@ -231,105 +229,6 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
     return feedparser.parse(fetch(url, from_the_past=False).text)
 
 
-def fix_images_medatadata(force: bool = False):
-    at_least_one_change = False
-    errors = set()
-    images = {image.name for image in constants.IMAGES.glob("*.*")}
-
-    for feed in constants.FEEDS.glob("*.json"):
-        changed = False
-
-        for k, v in (data := read(feed)).items():
-            # Fix the filename
-            file: Path = constants.IMAGES / v["link"]
-            key = file.stem[:6]  # The small hash
-            name_original = file.stem[7:]
-            name_sanitized = safe_filename(name_original)
-            name_has_changed = False
-
-            if name_original != name_sanitized:
-                name_has_changed = True
-                new_file = file.with_stem(f"{key}_{name_sanitized}")
-            elif file.suffix not in list(constants.IMAGES_CONTENT_TYPE.values()):
-                if file.suffix.startswith((".jpg", ".jpeg")):
-                    name_has_changed = True
-                    new_file = file.with_suffix(".jpg")
-                elif file.suffix.startswith(".png"):
-                    name_has_changed = True
-                    new_file = file.with_suffix(".png")
-                else:
-                    errors.add(file.name)
-
-            if name_has_changed:
-                print(f"{file.name!r} -> {new_file.name!r}")
-                file = new_file if new_file.is_file() else file.rename(new_file)
-                data[k] |= {"link": file.name}
-                changed = True
-                at_least_one_change = True
-
-                # Recreate the thumbnail
-                (constants.THUMBNAILS / v["link"]).unlink(missing_ok=True)
-                create_thumbnail(file)
-
-            images.discard(v["link"])
-
-            # Fix the size
-            if force or "width" not in v:
-                if not (size := get_size(file)):
-                    errors.add(file.name)
-                    continue
-
-                data[k] |= {"width": size.width, "height": size.height}
-                changed = True
-                at_least_one_change = True
-
-            # Fix the dominant color average
-            if force or "docolav" not in v:
-                if not (color := docolav(file)):
-                    errors.add(file.name)
-                    continue
-
-                data[k] |= {"docolav": color}
-                changed = True
-                at_least_one_change = True
-
-            # Fix tags
-            sanitized_tags = sorted(safe_tag(tag) for tag in v["tags"])
-            if v["tags"] != sanitized_tags:
-                data[k] |= {"tags": sanitized_tags}
-                changed = True
-                at_least_one_change = True
-
-            # Purge removed Imgur images
-            if checksum(file) == "d835884373f4d6c8f24742ceabe74946":
-                errors.add(file.name)
-                continue
-
-            # Add checksum
-            if not v.get("checksum", ""):
-                data[k] |= {"checksum": checksum(file)}
-                changed = True
-                at_least_one_change = True
-
-            # Add URL
-            if "url" not in v:
-                data[k] |= {"url": ""}
-                changed = True
-                at_least_one_change = True
-
-        if changed:
-            persist(feed, data)
-
-    # Remove orphaned files
-    errors |= images
-
-    if errors:
-        purge(errors)
-
-    if at_least_one_change:
-        invalidate_caches()
-
-
 def get_from_cache(cache_key: str) -> str | None:
     """Retreive a compressed response from a potential cache file."""
     file = constants.CACHE / f"{cache_key}.cache"
@@ -371,15 +270,15 @@ def get_tags() -> list[str]:
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
 
 
-def handle_item(item: feedparser.FeedParserDict, metadata: dict) -> bool:
+def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dict]:
     """Take a feed entry, and return appropriate data."""
     if not (link := solvers.guess_url(item.link, item.published_parsed)):
-        return False
+        return False, {}
 
     if not (ext := fetch_image_type(link)):
-        # Impossible to guess the image type (either because the URL does not end with a file extension,
+        # Cannot guess the image type (either because the URL does not end with a file extension,
         # or because we failed to fetch the image type from the Content-Type header response).
-        return False
+        return False, {}
 
     file = f"{small_hash(link)}_{safe_filename(Path(link).stem)}{ext}"
     output_file = constants.IMAGES / file
@@ -388,7 +287,7 @@ def handle_item(item: feedparser.FeedParserDict, metadata: dict) -> bool:
         is_new = False
     else:
         if not (image := fetch_image(link)):
-            return False
+            return False, {}
 
         output_file.write_bytes(image)
         is_new = True
@@ -396,7 +295,7 @@ def handle_item(item: feedparser.FeedParserDict, metadata: dict) -> bool:
     create_thumbnail(output_file)
 
     # Keep up-to-date textual information
-    metadata |= {
+    metadata = (cache or {}) | {
         "desc": item.description,
         "guid": item.guid,
         "link": file,
@@ -406,7 +305,7 @@ def handle_item(item: feedparser.FeedParserDict, metadata: dict) -> bool:
     }
 
     # It's a fresh new image
-    if "checksum" not in metadata:
+    if not cache:
         size = get_size(output_file)
         metadata |= {
             "checksum": checksum(output_file),
@@ -425,7 +324,7 @@ def handle_item(item: feedparser.FeedParserDict, metadata: dict) -> bool:
 
     metadata["tags"] = sorted(metadata["tags"])
 
-    return is_new
+    return is_new, metadata
 
 
 def invalidate_caches() -> None:
@@ -537,18 +436,12 @@ def now() -> float:
     return today().timestamp()
 
 
-def persist(file: Path, data: dict[str, Any], lock: Lock = None) -> None:
-    if lock:
-        lock.acquire()
-
+def persist(file: Path, data: dict[str, Any]) -> None:
     file.parent.mkdir(exist_ok=True, parents=True)
     with file.open(mode="w") as fh:
         json.dump(data, fh, sort_keys=True, indent=0)
         fh.flush()
         os.fsync(fh.fileno())
-
-    if lock:
-        lock.release()
 
 
 def php_crc32(value: str) -> str:
@@ -577,36 +470,8 @@ def php_crc32(value: str) -> str:
     return hex(crc)[2:].rjust(8, "0")
 
 
-def purge(files: set[str]) -> None:
-    """Remove an image from databases."""
-    at_least_one_change = False
-
-    for file in files:
-        print(" !! Removing file", file)
-
-    for feed in constants.FEEDS.glob("*.json"):
-        changed = False
-        cache = read(feed)
-
-        for date, metadata in cache.copy().items():
-            if metadata["link"] in files:
-                cache.pop(date)
-                changed = True
-                at_least_one_change = True
-
-        if changed:
-            persist(feed, cache)
-
-    for file in files:
-        (constants.IMAGES / file).unlink(missing_ok=True)
-        (constants.THUMBNAILS / file).unlink(missing_ok=True)
-
-    if at_least_one_change:
-        invalidate_caches()
-
-
 def read(file: Path) -> dict[str, Any]:
-    return json.loads(file.read_text()) if file.is_file() else {}
+    return json.loads(file.read_text() or "{}") if file.is_file() else {}
 
 
 def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
@@ -711,19 +576,42 @@ def today() -> datetime:
     return datetime.now(tz=timezone.utc)
 
 
+def get_wayback_back_data(url: str) -> tuple[str, bool]:
+    data = read(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json")
+    return data.get("snapshot", ""), data.get("is_lost", False)
+
+
+def set_wayback_back_data(url: str, snapshot: str, is_lost: bool) -> None:
+    persist(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json", {"snapshot": snapshot, "is_lost": is_lost})
+
+
 def try_wayback_machine(url: str, method: str) -> requests.Response:
     """Try to fetch a given `url` using the great Wayback Machine."""
-    url = f"https://archive.org/wayback/available?url={url}"
-    with SESSION.get(url, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
-        if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
-            raise Evanesco()
+    snapshot, is_lost = get_wayback_back_data(url)
 
-    # Use direct access to the resource
-    parts = urlparse(snapshot)
-    path = parts.path
-    parts_path = path.split("/")
-    parts_path[2] += "if_"
-    snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
+    if is_lost:
+        raise Evanesco()
+
+    if not snapshot:
+        url_archive = f"https://archive.org/wayback/available?url={url}"
+        with SESSION.get(url_archive, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
+            req.raise_for_status()
+
+            if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
+                print(">>> 💀", url, flush=True)
+                set_wayback_back_data(url, "", True)
+                raise Evanesco()
+
+        # Use direct access to the resource
+        parts = urlparse(snapshot)
+        path = parts.path
+        parts_path = path.split("/")
+        parts_path[2] += "if_"
+        snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
+
+        set_wayback_back_data(url, snapshot, False)
+
+    print(f">>> ⌛ [{method.upper()}]", url, flush=True)
 
     with SESSION.request(
         method=method,

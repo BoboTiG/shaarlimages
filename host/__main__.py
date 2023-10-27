@@ -35,16 +35,16 @@ def create_parser() -> ArgumentParser:
 
 
 def main(cli_args: list[str]) -> int:
-    import functions
+    import cli
     import helpers
 
     args = create_parser().parse_args(cli_args)
 
     match args.action:
         case "fix":
-            functions.fix_images_medatadata(force=args.force)
+            cli.fix_images_medatadata(force=args.force)
         case "purge":
-            functions.purge({args.FILE})
+            cli.purge({args.FILE})
         case "sync":
             if url := args.url:
                 helpers.sync_feed(url, force=args.force)

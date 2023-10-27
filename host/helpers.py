@@ -6,7 +6,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 import math
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from threading import Lock, get_ident
+from threading import get_ident
 from time import mktime
 
 import config
@@ -23,7 +23,7 @@ from bottle import redirect, template
 #
 
 
-def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
+def sync_feed(url: str, force: bool = False) -> int:
     """Sync a shaarli."""
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
@@ -57,7 +57,7 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
             break
 
         try:
-            is_new = functions.handle_item(item, cache.get(str(published), {}))
+            is_new, metadata = functions.handle_item(item, cache.get(str(published), {}))
         except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError, functions.Evanesco):
             continue
         except Exception as exc:
@@ -65,16 +65,17 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
             print(f"{exc}", flush=True)
             continue
 
+        cache[str(published)] = metadata
         if is_new:
             total_new_images += 1
 
         count += 1
         if count % 10 == 0:  # pragma: nocover
-            functions.persist(cache_file, cache, lock=lock)
+            functions.persist(cache_file, cache)
             count = 0
 
     if count:
-        functions.persist(cache_file, cache, lock=lock)
+        functions.persist(cache_file, cache)
 
     if total_new_images:
         functions.invalidate_caches()
@@ -104,9 +105,8 @@ def sync_them_all(force: bool = False) -> None:
     sync_feeds(force=force)
 
     all_url = functions.read(constants.SHAARLIS)["feeds"]
-    lock = Lock()
-    with ThreadPoolExecutor(4) as pool:
-        pool.map(partial(sync_feed, force=force, lock=lock), all_url)
+    with ThreadPoolExecutor() as pool:
+        pool.map(partial(sync_feed, force=force), all_url)
 
 
 #

@@ -17,6 +17,7 @@ FEEDS = DATA / "feeds"
 IMAGES = DATA / "images"
 THUMBNAILS = DATA / "thumbnails"
 VIEWS = HOST / "views"
+WAYBACK_MACHINE = DATA / "wayback-machine"
 
 # Files
 SHAARLIS = DATA / "shaarlis.json"

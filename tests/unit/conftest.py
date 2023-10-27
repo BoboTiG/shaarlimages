@@ -10,7 +10,15 @@ from unittest.mock import patch
 import pytest
 
 from host import functions
-from host.constants import CACHE, DATA, FEEDS, IMAGES, SHAARLIS, THUMBNAILS
+from host.constants import (
+    CACHE,
+    DATA,
+    FEEDS,
+    IMAGES,
+    SHAARLIS,
+    THUMBNAILS,
+    WAYBACK_MACHINE,
+)
 
 from .constants import FEED_URL, TEST_IMAGES
 
@@ -26,6 +34,7 @@ def setup_data_folders(tmp_path: Path) -> None:
         patch("constants.IMAGES", data / IMAGES.name),
         patch("constants.SHAARLIS", data / SHAARLIS.name),
         patch("constants.THUMBNAILS", data / THUMBNAILS.name),
+        patch("constants.WAYBACK_MACHINE", data / WAYBACK_MACHINE.name),
     ):
         yield
 

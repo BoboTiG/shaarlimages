@@ -11,19 +11,19 @@ from host.__main__ import main
 
 
 def test_fix():
-    with patch("functions.fix_images_medatadata") as mocker:
+    with patch("cli.fix_images_medatadata") as mocker:
         assert main(["fix"]) == 0
         mocker.assert_called_once_with(force=False)
 
 
 def test_fix_forced():
-    with patch("functions.fix_images_medatadata") as mocker:
+    with patch("cli.fix_images_medatadata") as mocker:
         assert main(["fix", "--force"]) == 0
         mocker.assert_called_once_with(force=True)
 
 
 def test_purge():
-    with patch("functions.purge") as mocker:
+    with patch("cli.purge") as mocker:
         assert main(["purge", "file.jpg"]) == 0
         mocker.assert_called_once_with({"file.jpg"})
 

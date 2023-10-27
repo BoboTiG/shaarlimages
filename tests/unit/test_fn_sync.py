@@ -224,7 +224,7 @@ def test_try_wayback_machine_head():
 
 
 @responses.activate
-def test_try_wayback_machine_not_found():
+def test_try_wayback_machine_not_found(setup_data_folders):
     data = {"archived_snapshots": {}}
     responses.add(method="GET", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
