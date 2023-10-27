@@ -27,9 +27,16 @@ import numpy
 import requests
 import solvers
 import urllib3
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from unidecode import unidecode
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+ADAPTER = HTTPAdapter(max_retries=Retry(total=0, backoff_factor=0))
+SESSION = requests.Session()
+SESSION.mount("http://", ADAPTER)
+SESSION.mount("https://", ADAPTER)
 
 
 def any_css_class_question() -> str:
@@ -161,7 +168,7 @@ def feed_key(url: str, version: int = 2) -> str:
 
 def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Response:
     """Make a HTTP call."""
-    with requests.request(
+    with SESSION.request(
         method=method,
         url=url,
         headers=constants.HTTP_HEADERS,
