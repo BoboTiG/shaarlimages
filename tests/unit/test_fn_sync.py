@@ -11,7 +11,6 @@ import responses
 
 from host import functions, helpers
 from host.constants import DATA, IMAGES
-from host.exceptions import DisparoisseError
 
 from .constants import (
     FEED_URL,
@@ -192,15 +191,15 @@ def test_sync_feed_error():
 
 @responses.activate
 def test_try_wayback_machine_get():
-    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com/f.png"
-    url_final = "http://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
+    url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
+    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
     data = {
         "archived_snapshots": {
             "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
         }
     }
     responses.add(method="GET", url=FEED_URL, status=404)
-    responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
+    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
     responses.add(method="GET", url=url_final, body=b"ok")
 
     response = functions.fetch(FEED_URL)
@@ -210,15 +209,15 @@ def test_try_wayback_machine_get():
 
 @responses.activate
 def test_try_wayback_machine_head():
-    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com/f.png"
-    url_final = "http://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
+    url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
+    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
     data = {
         "archived_snapshots": {
             "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
         }
     }
     responses.add(method="HEAD", url=FEED_URL, status=404)
-    responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
+    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
     responses.add(method="HEAD", url=url_final, content_type="image/png")
 
     assert functions.fetch_image_type(FEED_URL) == ".png"
@@ -228,9 +227,9 @@ def test_try_wayback_machine_head():
 def test_try_wayback_machine_not_found():
     data = {"archived_snapshots": {}}
     responses.add(method="GET", url=FEED_URL, status=404)
-    responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
+    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
 
-    with pytest.raises(DisparoisseError) as exc:
+    with pytest.raises(functions.Evanesco) as exc:
         functions.fetch(FEED_URL)
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."

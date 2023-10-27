@@ -31,14 +31,17 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from unidecode import unidecode
 
-from host.exceptions import DisparoisseError
-
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 ADAPTER = HTTPAdapter(max_retries=Retry(total=0, backoff_factor=0))
 SESSION = requests.Session()
 SESSION.mount("http://", ADAPTER)
 SESSION.mount("https://", ADAPTER)
+
+
+class Evanesco(Exception):
+    def __str__(self) -> str:
+        return "Cannot found the resource on internet anymore."
 
 
 def any_css_class_question() -> str:
@@ -706,10 +709,10 @@ def today() -> datetime:
 
 def try_wayback_machine(url: str, method: str) -> requests.Response:
     """Try to fetch a given `url` using the great Wayback Machine."""
-    url = f"http://archive.org/wayback/available?url={url}"
+    url = f"https://archive.org/wayback/available?url={url}"
     with SESSION.get(url, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
         if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
-            raise DisparoisseError()
+            raise Evanesco()
 
     # Use direct access to the resource
     parts = urlparse(snapshot)
