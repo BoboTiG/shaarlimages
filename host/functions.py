@@ -485,6 +485,8 @@ def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
     all_images = []
     for feed in constants.FEEDS.glob("*.json"):
         all_images.extend(load_metadata(feed))
+    if not all_images:
+        return all_images
 
     # Then, keep only the first published version of an image, skipping eventual duplicates (via reshares mostly)
     know_images = set()

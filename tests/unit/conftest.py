@@ -23,7 +23,7 @@ from host.constants import (
 from .constants import FEED_URL, TEST_IMAGES
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def setup_data_folders(tmp_path: Path) -> None:
     data = tmp_path / DATA.name
 
@@ -40,7 +40,7 @@ def setup_data_folders(tmp_path: Path) -> None:
 
 
 @pytest.fixture()
-def setup_data(tmp_path: Path, setup_data_folders):
+def setup_data(tmp_path: Path):
     # Create the shaarlis.json file
     functions.persist(
         tmp_path / DATA.name / SHAARLIS.name,

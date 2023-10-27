@@ -12,7 +12,7 @@ from host.constants import DATA, FEEDS_URL, SHAARLIS
 
 
 @responses.activate
-def test_sync_feeds(tmp_path: Path, setup_data_folders) -> None:
+def test_sync_feeds(tmp_path: Path) -> None:
     file = tmp_path / DATA.name / SHAARLIS.name
     assert not file.is_file()
 
