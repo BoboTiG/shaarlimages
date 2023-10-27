@@ -18,8 +18,14 @@ def fix_images_medatadata(force: bool = False):
 
     for feed in constants.FEEDS.glob("*.json"):
         changed = False
+        data = functions.read(feed)
 
-        for k, v in (data := functions.read(feed)).copy().items():
+        if not data:
+            print(f" ! Remove empty feed {feed}")
+            feed.unlink()
+            continue
+
+        for k, v in data.copy().items():
             if not v:
                 del data[k]
                 changed = True
