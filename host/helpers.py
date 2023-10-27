@@ -18,6 +18,8 @@ import urllib3.exceptions
 import version
 from bottle import redirect, template
 
+from host.exceptions import DisparoisseError
+
 #
 # Sync
 #
@@ -58,7 +60,7 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
 
         try:
             is_new = functions.handle_item(item, cache.get(str(published), {}))
-        except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError):
+        except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError, DisparoisseError):
             continue
         except Exception as exc:
             print(f"🐛 {get_ident()} {type(exc).__name__} on {item=}", flush=True)

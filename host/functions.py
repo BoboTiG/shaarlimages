@@ -31,6 +31,8 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from unidecode import unidecode
 
+from host.exceptions import DisparoisseError
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 ADAPTER = HTTPAdapter(max_retries=Retry(total=0, backoff_factor=0))
@@ -179,7 +181,7 @@ def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Respo
             req.raise_for_status()
             return req
 
-    print(">>> ⌛ [Wayback Machine]", url)
+    print(">>> ⌛ [Wayback Machine]", url, flush=True)
     return try_wayback_machine(url)
 
 
@@ -707,7 +709,7 @@ def try_wayback_machine(url: str) -> requests.Response:
     url = f"http://archive.org/wayback/available?url={url}"
     with SESSION.get(url, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
         if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
-            raise ValueError("Cannot found the resource on internet anymore.")
+            raise DisparoisseError()
 
     with SESSION.get(snapshot, headers=constants.HTTP_HEADERS, timeout=120.0) as req_from_the_past:
         return req_from_the_past

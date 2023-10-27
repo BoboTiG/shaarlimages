@@ -11,6 +11,7 @@ import responses
 
 from host import functions, helpers
 from host.constants import DATA, IMAGES
+from host.exceptions import DisparoisseError
 
 from .constants import (
     FEED_URL,
@@ -203,3 +204,13 @@ def test_try_wayback_machine():
     response = functions.fetch(FEED_URL)
     assert response.url == url_img
     assert response.content == b"ok"
+
+
+@responses.activate
+def test_try_wayback_machine_not_found():
+    data = {"archived_snapshots": {}}
+    responses.add(method="GET", url=FEED_URL, status=404)
+    responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
+
+    with pytest.raises(DisparoisseError):
+        functions.fetch(FEED_URL)
