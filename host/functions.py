@@ -492,10 +492,10 @@ def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
     know_images = set()
     uniq_images = []
     for _, metadata in sorted(all_images, key=lambda i: i[0]):
-        if metadata.link in know_images:
+        if metadata.checksum in know_images:
             continue
+        know_images.add(metadata.checksum)
         uniq_images.append(metadata)
-        know_images.add(metadata.link)
 
     res = uniq_images[::-1]
     store_in_cache(cache_key, json.dumps(res, default=lambda s: vars(s)), info=False)

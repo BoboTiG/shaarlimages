@@ -53,7 +53,8 @@ def setup_data(tmp_path: Path):
         tmp_path / DATA.name / FEEDS.name / f"{feed_key}.json",
         {
             str(idx): {
-                "desc": "Simple description with thr 'robe' keyword.",
+                "checksum": functions.checksum(file),
+                "desc": "Simple description with the 'robe' keyword.",
                 "docolav": color,
                 "guid": f"{FEED_URL}/shaare/{idx}",
                 "height": size.height,
@@ -61,6 +62,7 @@ def setup_data(tmp_path: Path):
                 "tags": ["sample", "test", "image"],
                 "title": "Awesome image!",
                 "width": size.width,
+                "url": f"{FEED_URL}/original/{idx}",
             }
             for idx, (file, _, size, color, *__) in enumerate(TEST_IMAGES, 1)
         },
