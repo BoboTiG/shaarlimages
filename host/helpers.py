@@ -28,7 +28,7 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
     cache_file = constants.FEEDS / f"{cache_key}.json"
-    cache: custom_types.Cache = functions.read(cache_file)
+    cache: dict[str, str] = functions.read(cache_file)
     latest_image = float(max(cache.keys(), key=float)) if cache else 0.0
 
     # First sync, starts from the begining
@@ -57,7 +57,7 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
             break
 
         try:
-            is_new, metadata = functions.handle_item(item)
+            is_new = functions.handle_item(item, cache.get(str(published), {}))
         except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError):
             continue
         except Exception as exc:
@@ -67,11 +67,6 @@ def sync_feed(url: str, force: bool = False, lock: Lock = None) -> int:
 
         if is_new:
             total_new_images += 1
-
-        if not metadata:
-            continue
-
-        cache[str(published)] = metadata
 
         count += 1
         if count % 10 == 0:  # pragma: nocover

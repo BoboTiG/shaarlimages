@@ -358,46 +358,49 @@ def get_tags() -> list[str]:
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
 
 
-def handle_item(item: feedparser.FeedParserDict) -> tuple[bool, dict]:
+def handle_item(item: feedparser.FeedParserDict, metadata: dict) -> bool:
     """Take a feed entry, and return appropriate data."""
-    new = False
-    metadata = {}
-
     if not (link := solvers.guess_url(item.link, item.published_parsed)):
-        return new, metadata
-
-    path = Path(link)
+        return False
 
     if not (ext := fetch_image_type(link)):
         # Impossible to guess the image type (either because the URL does not end with a file extension,
         # or because we failed to fetch the image type from the Content-Type header response).
-        return False, metadata
+        return False
 
-    file = f"{small_hash(link)}_{safe_filename(path.stem)}{ext}"
+    file = f"{small_hash(link)}_{safe_filename(Path(link).stem)}{ext}"
     output_file = constants.IMAGES / file
 
-    if not output_file.is_file():
+    if output_file.is_file():
+        is_new = False
+    else:
         if not (image := fetch_image(link)):
-            return new, metadata
+            return False
 
         output_file.write_bytes(image)
-        new = True
+        is_new = True
 
     create_thumbnail(output_file)
 
-    size = get_size(output_file)
-    metadata = {
-        "checksum": checksum(output_file),
+    # Keep up-to-date textual information
+    metadata |= {
         "desc": item.description,
-        "docolav": docolav(output_file),
         "guid": item.guid,
-        "height": size.height,
         "link": file,
         "tags": [safe_tag(tag.term) for tag in getattr(item, "tags", [])],
         "title": item.title,
         "url": link,
-        "width": size.width,
     }
+
+    # It's a fresh new image
+    if "checksum" not in metadata:
+        size = get_size(output_file)
+        metadata |= {
+            "checksum": checksum(output_file),
+            "docolav": docolav(output_file),
+            "height": size.height,
+            "width": size.width,
+        }
 
     # NSFW
     if constants.NSFW not in metadata["tags"] and (
@@ -409,7 +412,7 @@ def handle_item(item: feedparser.FeedParserDict) -> tuple[bool, dict]:
 
     metadata["tags"] = sorted(metadata["tags"])
 
-    return new, metadata
+    return is_new
 
 
 def invalidate_caches() -> None:
