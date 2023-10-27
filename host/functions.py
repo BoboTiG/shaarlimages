@@ -298,6 +298,12 @@ def fix_images_medatadata(force: bool = False):
                 changed = True
                 at_least_one_change = True
 
+            # Add URL
+            if "url" not in v:
+                data[k] |= {"url": ""}
+                changed = True
+                at_least_one_change = True
+
         if changed:
             persist(feed, data)
 
