@@ -13,7 +13,6 @@ MD5_EMPTY = "d835884373f4d6c8f24742ceabe74946"
 
 def fix_images_medatadata(force: bool = False):
     at_least_one_change = False
-    errors = set()
     images = {image.name for image in constants.IMAGES.glob("*.*")}
 
     for feed in constants.FEEDS.glob("*.json"):
@@ -50,7 +49,9 @@ def fix_images_medatadata(force: bool = False):
                     name_has_changed = True
                     new_file = file.with_suffix(".png")
                 else:
-                    errors.add(file.name)
+                    del data[k]
+                    changed = True
+                    at_least_one_change = True
 
             if name_has_changed:
                 print(f"{file.name!r} -> {new_file.name!r}")
@@ -68,7 +69,9 @@ def fix_images_medatadata(force: bool = False):
             # Fix the size
             if force or "width" not in v:
                 if not (size := functions.get_size(file)):
-                    errors.add(file.name)
+                    del data[k]
+                    changed = True
+                    at_least_one_change = True
                     continue
 
                 data[k] |= {"width": size.width, "height": size.height}
@@ -78,7 +81,9 @@ def fix_images_medatadata(force: bool = False):
             # Fix the dominant color average
             if force or "docolav" not in v:
                 if not (color := functions.docolav(file)):
-                    errors.add(file.name)
+                    del data[k]
+                    changed = True
+                    at_least_one_change = True
                     continue
 
                 data[k] |= {"docolav": color}
@@ -94,7 +99,9 @@ def fix_images_medatadata(force: bool = False):
 
             # Purge removed Imgur images
             if functions.checksum(file) == MD5_EMPTY:
-                errors.add(file.name)
+                del data[k]
+                changed = True
+                at_least_one_change = True
                 continue
 
             # Add checksum
@@ -111,12 +118,6 @@ def fix_images_medatadata(force: bool = False):
 
         if changed:
             functions.persist(feed, data)
-
-    # Remove orphaned files
-    errors |= images
-
-    if errors:
-        purge(errors)
 
     if at_least_one_change:
         functions.invalidate_caches()
