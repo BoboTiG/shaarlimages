@@ -621,4 +621,5 @@ def try_wayback_machine(url: str, method: str) -> requests.Response:
         headers=constants.HTTP_HEADERS,
         timeout=120.0,
     ) as req_from_the_past:
+        req_from_the_past.raise_for_status()
         return req_from_the_past
