@@ -25,7 +25,7 @@ def test_sync_feeds(tmp_path: Path) -> None:
         },
         {
             "id": 2,
-            "url": "https://sebsauvage.net/links/?do=rss",
+            "url": "https://sebsauvage.net/links?do=rss",
             "link": "https://sebsauvage.net/links/duplicate",
             "title": "Liens en vrac de sebsauvage #2",
         },
@@ -38,7 +38,8 @@ def test_sync_feeds(tmp_path: Path) -> None:
     ]
     resp = responses.add(method="GET", url=FEEDS_URL, json=body)
 
-    helpers.sync_feeds()
+    feeds = helpers.sync_feeds()
+    assert feeds == [body[0]["url"]]
     assert resp.call_count == 1
     assert file.is_file()
 
