@@ -119,6 +119,7 @@ def fix_images_medatadata(force: bool = False):
         if not data:
             print(f" ! Remove empty feed {feed}")
             feed.unlink()
+            at_least_one_change = True
         elif changed:
             functions.persist(feed, data)
 
