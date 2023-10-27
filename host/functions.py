@@ -175,7 +175,11 @@ def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Respo
         timeout=120.0,
         verify=verify,
     ) as req:
-        return req
+        with suppress(requests.exceptions.HTTPError):
+            req.raise_for_status()
+            return req
+
+    return try_wayback_machine(url)
 
 
 def fetch_json(url: str, verify: bool = False) -> dict[str, Any]:
@@ -188,7 +192,6 @@ def fetch_image(url: str, verify: bool = False) -> bytes | None:
     """Fetch an image."""
     try:
         req = fetch(url, verify=verify)
-        req.raise_for_status()
         image = req.content
         if is_image_data(image):
             print(">>> ✅", url)
@@ -696,3 +699,14 @@ def store_in_cache(cache_key: str, response: str, info: bool = True) -> None:
 
 def today() -> datetime:
     return datetime.now(tz=timezone.utc)
+
+
+def try_wayback_machine(url: str) -> requests.Response:
+    """Try to fetch a given `url` using the great Wayback Machine."""
+    url = f"http://archive.org/wayback/available?url={url}"
+    with SESSION.get(url, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
+        if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
+            raise ValueError("Cannot found the resource on internet anymore.")
+
+    with SESSION.get(snapshot, headers=constants.HTTP_HEADERS, timeout=120.0) as req_from_the_past:
+        return req_from_the_past

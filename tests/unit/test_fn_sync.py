@@ -153,6 +153,11 @@ def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
         url="https://qph.cf2.quoracdn.net/main-qimg-down",
         status=500,
     )
+    responses.add(
+        method="GET",
+        url="http://archive.org/wayback/available?url=https://qph.cf2.quoracdn.net/main-qimg-down",
+        json={"archived_snapshots": {}},
+    )
 
     # Valid images
     for file, *_ in TEST_IMAGES[2:]:
@@ -181,3 +186,20 @@ def test_sync_feed_error():
     responses.add(method="GET", url=FEED_URL, body=ConnectionError("Boom"))
 
     assert helpers.sync_feed(FEED_URL) == -1
+
+
+@responses.activate
+def test_try_wayback_machine():
+    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com:80/f.png"
+    data = {
+        "archived_snapshots": {
+            "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
+        }
+    }
+    responses.add(method="GET", url=FEED_URL, status=404)
+    responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
+    responses.add(method="GET", url=url_img, body=b"ok")
+
+    response = functions.fetch(FEED_URL)
+    assert response.url == url_img
+    assert response.content == b"ok"
