@@ -195,7 +195,7 @@ def fetch_image(url: str, verify: bool = False) -> bytes | None:
 def fetch_image_type(url: str) -> str:
     """Fetch an image type using HTTP headers from the HEAD response."""
     req = fetch(url, method="head")
-    content_type = req.headers.get("content-type", "").replace(" ", "").split(";", 1)[0]
+    content_type = req.headers.get("content-type", "").replace(" ", "").split(";", 1)[0].lower()
     if (
         "image/" in content_type
         and content_type not in constants.IMAGES_CONTENT_TYPE

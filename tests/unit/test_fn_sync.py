@@ -65,8 +65,10 @@ def test_fetch_image_request_error(capsys) -> None:
         ("image/gif", ""),
         ("image/apng", ""),
         # Supported
+        ("image/JPEG", ".jpg"),
         ("image/jpeg", ".jpg"),
         ('image/jpeg;name="BzQGBMDC;MAEnGGO.jpg:large.jpeg"', ".jpg"),
+        ("image/jpg", ".jpg"),
         ("image/png", ".png"),
         ('image/png;name="votation.PNG"', ".png"),
         # Unhandled
