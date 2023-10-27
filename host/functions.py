@@ -171,7 +171,7 @@ def feed_key(url: str, version: int = 2) -> str:
             return f"{parts.hostname}{path.removesuffix('/')}"
 
 
-def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Response:
+def fetch(url: str, method: str = "get", verify: bool = False, from_the_past: bool = True) -> requests.Response:
     """Make a HTTP call."""
     with SESSION.request(
         method=method,
@@ -180,9 +180,12 @@ def fetch(url: str, method: str = "get", verify: bool = False) -> requests.Respo
         timeout=120.0,
         verify=verify,
     ) as req:
-        with suppress(requests.exceptions.HTTPError):
+        try:
             req.raise_for_status()
             return req
+        except requests.exceptions.HTTPError:
+            if not from_the_past:
+                raise
 
     print(">>> ⌛ [Wayback Machine]", url, flush=True)
     return try_wayback_machine(url, method)
@@ -224,7 +227,8 @@ def fetch_image_type(url: str) -> str:
 def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
     """Fetch a XML RSS feed."""
     print(">>> 📜", url)
-    return feedparser.parse(fetch(url).text)
+    """Make a HTTP call."""
+    return feedparser.parse(fetch(url, from_the_past=False).text)
 
 
 def fix_images_medatadata(force: bool = False):
