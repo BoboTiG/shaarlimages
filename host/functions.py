@@ -15,7 +15,7 @@ from random import choice
 from shutil import copyfile
 from threading import Lock
 from typing import Any
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlparse, urlunparse
 from zlib import compress, decompress
 
 import config
@@ -710,6 +710,13 @@ def try_wayback_machine(url: str, method: str) -> requests.Response:
     with SESSION.get(url, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
         if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
             raise DisparoisseError()
+
+    # Use direct access to the resource
+    parts = urlparse(snapshot)
+    path = parts.path
+    parts_path = path.split("/")
+    parts_path[2] += "if_"
+    snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
 
     with SESSION.request(
         method=method,

@@ -192,7 +192,8 @@ def test_sync_feed_error():
 
 @responses.activate
 def test_try_wayback_machine_get():
-    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com:80/f.png"
+    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com/f.png"
+    url_final = "http://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
     data = {
         "archived_snapshots": {
             "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
@@ -200,16 +201,17 @@ def test_try_wayback_machine_get():
     }
     responses.add(method="GET", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
-    responses.add(method="GET", url=url_img, body=b"ok")
+    responses.add(method="GET", url=url_final, body=b"ok")
 
     response = functions.fetch(FEED_URL)
-    assert response.url == url_img
+    assert response.url == url_final
     assert response.content == b"ok"
 
 
 @responses.activate
 def test_try_wayback_machine_head():
-    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com:80/f.png"
+    url_img = "http://web.archive.org/web/20060101064348/http://www.example.com/f.png"
+    url_final = "http://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
     data = {
         "archived_snapshots": {
             "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
@@ -217,7 +219,7 @@ def test_try_wayback_machine_head():
     }
     responses.add(method="HEAD", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"http://archive.org/wayback/available?url={FEED_URL}", json=data)
-    responses.add(method="HEAD", url=url_img, content_type="image/png")
+    responses.add(method="HEAD", url=url_final, content_type="image/png")
 
     assert functions.fetch_image_type(FEED_URL) == ".png"
 
