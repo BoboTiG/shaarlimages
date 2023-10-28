@@ -65,16 +65,19 @@ def sync_feed(url: str, force: bool = False) -> int:
             print(f"{exc}", flush=True)
             continue
 
+        if not metadata:
+            continue
+
         cache[str(published)] = metadata
         if is_new:
             total_new_images += 1
 
         count += 1
-        if count % 10 == 0:  # pragma: nocover
+        if count % 10 == 0 and cache:  # pragma: nocover
             functions.persist(cache_file, cache)
             count = 0
 
-    if count:
+    if count and cache:
         functions.persist(cache_file, cache)
 
     if total_new_images:
