@@ -75,7 +75,6 @@ window.onload = (event) => {
             img.setAttribute("data-src", "/thumbnail/" + image.src);
 
             if (image.nsfw) {
-                a.style.background += " url(/assets/img/nsfw.png) no-repeat top right";
                 img.classList.add("nsfw");
             }
 

@@ -321,7 +321,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
 
     # NSFW
     if constants.NSFW not in metadata["tags"] and (
-        any(tag in constants.NSFW_TAGS for tag in metadata["tags"])
+        constants.NSFW in metadata["tags"]
         or constants.NSFW in item.title.lower()
         or constants.NSFW in item.description.lower()
     ):

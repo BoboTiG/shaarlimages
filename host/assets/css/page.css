@@ -70,14 +70,13 @@ input:invalid {
     opacity: 0;
 }
 
-#images-container img.loaded:not(.nsfw) {
+#images-container img.loaded {
     animation: fadein 2s;
     opacity: 1;
 }
 
 #images-container img.loaded.nsfw {
-    animation: fadein-nsfw 2s;
-    opacity: .05;
+    filter: blur(10px);
 }
 
 @keyframes fadein {
@@ -87,16 +86,6 @@ input:invalid {
 
     to {
         opacity: 1
-    }
-}
-
-@keyframes fadein-nsfw {
-    from {
-        opacity: 0
-    }
-
-    to {
-        opacity: .05
     }
 }
 
