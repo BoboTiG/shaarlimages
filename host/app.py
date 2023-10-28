@@ -5,6 +5,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 from functools import wraps
 
+import bottle
 import constants
 import functions
 import helpers
@@ -14,7 +15,7 @@ from bottle import HTTPResponse, default_app, redirect, request, route, static_f
 __version__ = version.__version__
 __author__ = "Mickaël Schoentgen"
 __copyright__ = """
-Copyright (c) 2013-2023, Mickaël 'Tiger-222' Schoentgen
+Copyright (c) 2013-2014,2023, Mickaël 'Tiger-222' Schoentgen
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee or royalty is hereby
@@ -30,10 +31,14 @@ def cache(function):
 
     @wraps(function)
     def wrapper(*args, **kwargs) -> str:
+        if bottle.debug:
+            return function(*args, **kwargs)
+
         cache_key = functions.small_hash(request.path.lower())
         if (response := functions.get_from_cache(cache_key)) is None:
             response = function(*args, **kwargs)
             functions.store_in_cache(cache_key, response)
+
         return response
 
     return wrapper
