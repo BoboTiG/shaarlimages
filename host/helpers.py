@@ -83,7 +83,8 @@ def sync_feed(url: str, force: bool = False) -> int:
     if total_new_images:
         functions.invalidate_caches()
 
-    print(f"END {get_ident()} {feed_key=} {cache_key=} (+ {total_new_images})", flush=True)
+    amount = f"+{total_new_images}" if total_new_images else "0"
+    print(f"END {get_ident()} {feed_key=} {cache_key=} ({amount})", flush=True)
     return total_new_images
 
 

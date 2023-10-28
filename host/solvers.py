@@ -132,7 +132,7 @@ def nasa_jpl(url: str, *_) -> str:
         'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
 
     """
-    if  url.endswith(constants.IMAGE_EXT):
+    if url.endswith(constants.IMAGE_EXT):
         return url
 
     catalog = urlparse(url).path.split("/")[-1]
