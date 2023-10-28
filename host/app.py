@@ -31,7 +31,7 @@ def cache(function):
 
     @wraps(function)
     def wrapper(*args, **kwargs) -> str:
-        if bottle.debug:
+        if bottle.DEBUG:  # pragma: nocover
             return function(*args, **kwargs)
 
         cache_key = functions.small_hash(request.path.lower())

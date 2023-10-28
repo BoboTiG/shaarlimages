@@ -14,5 +14,5 @@ if __name__ == "__main__":  # pragma:nocover
     from host.app import application
     from host.constants import HTTP_PORT
 
-    bottle.debug = True
+    bottle.debug()
     httpserver.serve(application, host="0.0.0.0", port=HTTP_PORT)
