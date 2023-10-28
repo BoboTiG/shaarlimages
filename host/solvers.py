@@ -126,10 +126,15 @@ def nasa_jpl(url: str, *_) -> str:
     """
     Resolve the original image URL from NASA's Jet Propulsion Laboratory (JPL).
 
+        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg")
+        'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
         >>> nasa_jpl("https://photojournal.jpl.nasa.gov/catalog/PIA25440")
         'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
 
     """
+    if  url.endswith(constants.IMAGE_EXT):
+        return url
+
     catalog = urlparse(url).path.split("/")[-1]
     return f"https://photojournal.jpl.nasa.gov/jpeg/{catalog}.jpg"
 
