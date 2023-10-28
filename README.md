@@ -54,7 +54,7 @@ $ ./checks.sh
 ```console
 $ python -m pytest --doctest-modules host tests/unit
 
-# To be run from time to rime to ensure solvers are still working
+# To be run from time to time to ensure solvers are still working
 $ python -m pytest tests/integration
 ```
 
@@ -78,7 +78,7 @@ Sync all registered shaarlis:
 $ python -m host sync [--force]
 ```
 
-Sync any shaarlis instance (registered or not):
+Sync any Shaarli instance (registered or not):
 
 ```console
 $ python -m host sync --url URL [--force]
@@ -98,8 +98,8 @@ Suite à [cette requête](http://sebsauvage.net/paste/?b1176a415f9bbe17#CIT+sEj+
 ### Ajouter un shaarli
 
 La liste des instances shaarli est récupérée depuis cette [source](host/constants.py#L28) (recherche `FEEDS_URL`).
-Si une meilleure source existe, n'hésitez pas à proposer une patch.
-Et si votre instance ne figure pas dans cette source, il vous suffira d'être ajouté à celle-ci site pour que vous soyez pris en compte moins de 24h plus tard.
+Si une meilleure source existe, n'hésitez pas à proposer un patch.
+Et si votre instance ne figure pas dans cette source, il vous suffira d'être ajouté à celle-ci pour que vous soyez pris en compte moins de 24h plus tard.
 
 ### Remerciements
 
