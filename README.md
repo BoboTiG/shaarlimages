@@ -32,6 +32,10 @@ Command to fully sync back the data on a local machine:
 $ rsync -delete -avzhe ssh tiger222@ssh.pythonanywhere.com:/home/tiger222/shaarlimages/data /home/tiger-222/projects/shaarlimages/
 ```
 
+### OSError: write error
+
+In the server logs, we might see lots of `OSError: write error` messages. They are not related to the current application, [more information here](https://www.pythonanywhere.com/forums/topic/13591/).
+
 ## Development
 
 ### Installation
