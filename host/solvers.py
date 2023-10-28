@@ -122,6 +122,18 @@ def nasa_apod(url: str, date: struct_time, pattern=re.compile(rb'<a href="(image
     return urlunparse(parts)
 
 
+def nasa_jpl(url: str, *_) -> str:
+    """
+    Resolve the original image URL from NASA's Jet Propulsion Laboratory (JPL).
+
+        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/catalog/PIA25440")
+        'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
+
+    """
+    catalog = urlparse(url).path.split("/")[-1]
+    return f"https://photojournal.jpl.nasa.gov/jpeg/{catalog}.jpg"
+
+
 def quora(url: str, *_, pattern=re.compile(rb"<meta property='og:image' content='([^']+)'").search) -> str:
     """
     Resolve the original image URL from Quora.
@@ -211,6 +223,7 @@ SOLVERS = {
     "i.imgur.com": imgur,
     "lut.im": lutim,
     "pbs.twimg.com": twitter_img,
+    "photojournal.jpl.nasa.gov": nasa_jpl,
     "webbtelescope.org": webb_telescope,
     "www.zbrushcentral.com": zbrush_central,
 }

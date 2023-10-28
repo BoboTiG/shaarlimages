@@ -49,6 +49,11 @@ from host import functions, solvers
             "fff00e95a3b1ce41c8860287c82a0410",
         ),
         (
+            "nasa_jpl",
+            "https://photojournal.jpl.nasa.gov/catalog/PIA25440",
+            "2b607715100fcfb9cbff305a3b84d1e9",
+        ),
+        (
             "quora",
             "https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46",
             "07a0e7a1965a0c74af2fe221e4922a0e",
