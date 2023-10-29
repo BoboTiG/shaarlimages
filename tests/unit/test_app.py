@@ -86,32 +86,75 @@ def test_page_zoom_image_not_found() -> None:
     assert response.headers["Location"] == "http://127.0.0.1/"
 
 
-def test_rss(setup_data_folders) -> None:
-    with boddle(params={}):
-        feed1 = app.rss()
-        feed2 = app.rss()
+def test_rss(setup_data) -> None:
+    feed1 = app.rss()
+    feed2 = app.rss()
 
     # Check it loads properly, extended tests can be found in a specific test file
-    feedparser.parse(feed1)
-    feedparser.parse(feed2)
+    parsed1 = feedparser.parse(feed1)
+    parsed2 = feedparser.parse(feed2)
+    assert len(parsed1.entries) == 5
+    assert len(parsed2.entries) == 5
 
     # Ensure the cache is working too
     assert "Cached:" not in feed1
     assert "Cached:" in feed2
 
 
-def test_rss_search_by_term(setup_data_folders) -> None:
-    with boddle(params={}):
-        feed = app.rss_search_by_term("robe")
+def test_rss_all(setup_data) -> None:
+    feed = app.rss_all()
 
-    feedparser.parse(feed)
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 5
 
 
-def test_rss_search_by_tag(setup_data_folders) -> None:
-    with boddle(params={}):
-        feed = app.rss_search_by_tag("sample")
+def test_rss_with_custom_items_count(setup_data) -> None:
+    feed = app.rss_with_custom_items_count(2)
 
-    feedparser.parse(feed)
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 2
+
+
+def test_rss_search_by_term(setup_data) -> None:
+    feed = app.rss_search_by_term("robe")
+
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 4
+
+
+def test_rss_search_by_term_all(setup_data) -> None:
+    feed = app.rss_search_by_term_all("robe")
+
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 4
+
+
+def test_rss_search_by_term_with_custom_items_count(setup_data) -> None:
+    feed = app.rss_search_by_term_with_custom_items_count("robe", 3)
+
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 3
+
+
+def test_rss_search_by_tag(setup_data) -> None:
+    feed = app.rss_search_by_tag("nsfw")
+
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 3
+
+
+def test_rss_search_by_tag_all(setup_data) -> None:
+    feed = app.rss_search_by_tag_all("nsfw")
+
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 3
+
+
+def test_rss_search_by_tag_with_custom_items_count(setup_data) -> None:
+    feed = app.rss_search_by_tag_with_custom_items_count("nsfw", 1)
+
+    parsed = feedparser.parse(feed)
+    assert len(parsed.entries) == 1
 
 
 def test_search_first_page_is_redirection() -> None:

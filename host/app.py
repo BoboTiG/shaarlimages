@@ -74,7 +74,21 @@ def page_zoom(image: str) -> str:
 @cache
 def rss() -> str:
     """Main RSS feed."""
-    return helpers.render_rss([])
+    return helpers.render_rss(functions.retrieve_all_uniq_metadata())
+
+
+@route("/rss/all")
+@cache
+def rss_all() -> str:
+    """Main RSS feed for all entries (do not abuse)."""
+    return helpers.render_rss(functions.retrieve_all_uniq_metadata(), count=-1)
+
+
+@route("/rss/<count:int>")
+@cache
+def rss_with_custom_items_count(count: int) -> str:
+    """Main RSS feed with custom items count."""
+    return helpers.render_rss(functions.retrieve_all_uniq_metadata(), count=count)
 
 
 @route("/rss/search/<term>")
@@ -84,11 +98,39 @@ def rss_search_by_term(term: str) -> str:
     return helpers.render_rss(functions.lookup(term))
 
 
+@route("/rss/search/<term>/all")
+@cache
+def rss_search_by_term_all(term: str) -> str:
+    """RSS feed for all searches result."""
+    return helpers.render_rss(functions.lookup(term), count=-1)
+
+
+@route("/rss/search/<term>/<count:int>")
+@cache
+def rss_search_by_term_with_custom_items_count(term: str, count: int) -> str:
+    """RSS feed for searches with custom items count."""
+    return helpers.render_rss(functions.lookup(term), count=count)
+
+
 @route("/rss/search/tag/<tag>")
 @cache
 def rss_search_by_tag(tag: str) -> str:
     """RSS feed for tag searches."""
     return helpers.render_rss(functions.lookup_tag(tag))
+
+
+@route("/rss/search/tag/<tag>/all")
+@cache
+def rss_search_by_tag_all(tag: str) -> str:
+    """RSS feed for all tag searches result."""
+    return helpers.render_rss(functions.lookup_tag(tag), count=-1)
+
+
+@route("/rss/search/tag/<tag>/<count:int>")
+@cache
+def rss_search_by_tag_with_custom_items_count(tag: str, count: int) -> str:
+    """RSS feed for tag searches with custom items count."""
+    return helpers.render_rss(functions.lookup_tag(tag), count=count)
 
 
 @route("/search/<term>")
