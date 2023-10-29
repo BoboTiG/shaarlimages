@@ -19,9 +19,9 @@ Files:
 - `/thumbnail/IMAGE`: direct link to the thumbnail `IMAGE` file;
 
 RSS feeds (a link is made accessible when clicking on "images" at the top-right on the website):
-- `/rss`: generate the global RSS feed (last 50 items);
-- `/rss/search/TERM`: generate the RSS feed of images matching `TERM` (last 50 items);
-- `/rss/search/tag/TAG`: generate the RSS feed of images having the tag `TAG` (last 50 items);
+- `/rss?nb=N|all`: generate the global RSS feed (default: last 50 items);
+- `/rss/search/TERM?nb=N|all`: generate the RSS feed of images matching `TERM` (default: last 50 items);
+- `/rss/search/tag/TAG?nb=N|all`: generate the RSS feed of images having the tag `TAG` (default: last 50 items);
 
 ## Production
 

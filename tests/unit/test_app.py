@@ -87,8 +87,9 @@ def test_page_zoom_image_not_found() -> None:
 
 
 def test_rss(setup_data_folders) -> None:
-    feed1 = app.rss()
-    feed2 = app.rss()
+    with boddle(params={}):
+        feed1 = app.rss()
+        feed2 = app.rss()
 
     # Check it loads properly, extended tests can be found in a specific test file
     feedparser.parse(feed1)
@@ -100,12 +101,16 @@ def test_rss(setup_data_folders) -> None:
 
 
 def test_rss_search_by_term(setup_data_folders) -> None:
-    feed = app.rss_search_by_term("robe")
+    with boddle(params={}):
+        feed = app.rss_search_by_term("robe")
+
     feedparser.parse(feed)
 
 
 def test_rss_search_by_tag(setup_data_folders) -> None:
-    feed = app.rss_search_by_tag("sample")
+    with boddle(params={}):
+        feed = app.rss_search_by_tag("sample")
+
     feedparser.parse(feed)
 
 

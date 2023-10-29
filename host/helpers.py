@@ -172,7 +172,12 @@ def render_home_page(page: int) -> str:
 def render_rss(images: custom_types.Metadatas) -> str:
     """Render the RSS feed."""
     images = images or functions.retrieve_all_uniq_metadata()
-    images = functions.get_a_slice(images, 1, config.SITE.images_per_page)
+
+    count = config.SITE.images_per_page
+    if custom_count := request.params.get("nb"):
+        count = -1 if "all" in custom_count else int(custom_count)
+
+    images = functions.get_a_slice(images, 1, count)
     return rss.craft_feed(images)
 
 
