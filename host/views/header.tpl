@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss" />
     <link rel="canonical" href="{{ site.url }}">
     <link rel="icon" type="image/png" href="/favicon.png?v={{ version }}">
     <link rel="stylesheet" href="/assets/css/app.css?v={{ version }}" />

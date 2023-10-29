@@ -235,7 +235,23 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
 
 
 def get_a_slice(data: list, page: int, count: int) -> list:
-    return data[(page - 1) * count : page * count]
+    """
+    Get a slice of a list.
+
+        >>> get_a_slice(list(range(10)), 1, 1)
+        [0]
+        >>> get_a_slice(list(range(10)), 1, 5)
+        [0, 1, 2, 3, 4]
+        >>> get_a_slice(list(range(10)), 2, 5)
+        [5, 6, 7, 8, 9]
+        >>> get_a_slice(list(range(10)), 3, 5)
+        []
+        >>> get_a_slice(list(range(10)), 1, -1)
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        >>> get_a_slice(list(range(10)), 2, -1)
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    """
+    return data if count == -1 else data[(page - 1) * count : page * count]
 
 
 def get_from_cache(cache_key: str) -> str | None:
@@ -305,6 +321,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
 
     # Keep up-to-date textual information
     metadata = (cache or {}) | {
+        "date": item.published,
         "desc": item.description,
         "guid": item.guid,
         "link": file,
@@ -419,7 +436,7 @@ def load_wayback_back_data(url: str) -> custom_types.Waybackdata:
     )
 
 
-def lookup(value: str) -> custom_types.Metadatas:
+def lookup(term: str) -> custom_types.Metadatas:
     """
     Search for images.
 
@@ -427,20 +444,20 @@ def lookup(value: str) -> custom_types.Metadatas:
         []
 
     """
-    if len(value) < 3:
+    if len(term) < 3:
         return []
 
-    value = value.lower()
+    term = term.lower()
     return [
         metadata
         for metadata in retrieve_all_uniq_metadata()
         if (
-            value in metadata.title.lower()
-            or value in metadata.desc.lower()
-            or value in metadata.guid.lower()
-            or value in metadata.link.lower()
-            or value in metadata.tags
-            or value in metadata.url.lower()
+            term in metadata.title.lower()
+            or term in metadata.desc.lower()
+            or term in metadata.guid.lower()
+            or term in metadata.link.lower()
+            or term in metadata.tags
+            or term in metadata.url.lower()
         )
     ]
 
@@ -594,7 +611,7 @@ def store_in_cache(cache_key: str, response: str, info: bool = True) -> None:
         response += f"\n<!-- Cached: {today()} -->\n"
 
     file = constants.CACHE / f"{cache_key}.cache"
-    file.parent.mkdir(exist_ok=True)
+    file.parent.mkdir(exist_ok=True, parents=True)
     file.write_bytes(compress(response.encode(), level=9))
 
 

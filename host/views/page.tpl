@@ -13,7 +13,7 @@
         <button id="search-button">🔎</button>
         <button id="random" onclick="document.location = '/random'" title="Image aléatoire">🔀</button>
     </div>
-    <div class="right"><b>{{ total }}</b>&nbsp;images</div>
+    <div class="right"><b>{{ total }}</b>&nbsp;<a href="{{ rss_link }}" title="RSS">images</a></div>
 </div>
 
 <div id="images-container"></div>

@@ -5,6 +5,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 import math
 from concurrent.futures import ThreadPoolExecutor
+from email.utils import formatdate
 from functools import partial
 from threading import get_ident
 from time import mktime
@@ -14,6 +15,7 @@ import constants
 import custom_types
 import functions
 import requests.exceptions
+import rss
 import urllib3.exceptions
 import version
 from bottle import redirect, request, template
@@ -48,9 +50,11 @@ def sync_feed(url: str, force: bool = False) -> int:
 
     for item in feed.entries:
         if not hasattr(item, "published_parsed"):
-            # Shaarli is configured with HIDE_TIMESTAMPS=true
+            # Sadly, Shaarli is configured with HIDE_TIMESTAMPS=true
             # https://github.com/sebsauvage/Shaarli/blob/029f75f/index.php#L23
-            item.published_parsed = functions.today().utctimetuple()
+            now = functions.today()
+            item.published = formatdate(now.timestamp(), usegmt=True)
+            item.published_parsed = now.utctimetuple()
 
         published = mktime(item.published_parsed)
         if not force and published < latest_image:
@@ -143,6 +147,7 @@ def pagination(images: custom_types.Metadatas, total: int, page: int) -> str:
         redirect(f"{path}/{last}")
 
     tags = functions.get_tags()
+    rss_link = f"/rss{path.replace('/page/', '/')}"
     return render("page", **locals())
 
 
@@ -162,6 +167,13 @@ def render_home_page(page: int) -> str:
     """Render the home page."""
     total, images = functions.get_last(page, config.SITE.images_per_page)
     return pagination(images, total, page)
+
+
+def render_rss(images: custom_types.Metadatas) -> str:
+    """Render the RSS feed."""
+    images = images or functions.retrieve_all_uniq_metadata()
+    images = functions.get_a_slice(images, 1, config.SITE.images_per_page)
+    return rss.craft_feed(images)
 
 
 def render_search(images: custom_types.Images, page: int) -> str:

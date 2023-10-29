@@ -5,6 +5,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 from random import choice
 
+import feedparser
 import pytest
 from boddle import boddle
 from bottle import HTTPResponse
@@ -83,6 +84,29 @@ def test_page_zoom_image_not_found() -> None:
     response = exc.value
     assert response.status_code == 302
     assert response.headers["Location"] == "http://127.0.0.1/"
+
+
+def test_rss(setup_data_folders) -> None:
+    feed1 = app.rss()
+    feed2 = app.rss()
+
+    # Check it loads properly, extended tests can be found in a specific test file
+    feedparser.parse(feed1)
+    feedparser.parse(feed2)
+
+    # Ensure the cache is working too
+    assert "Cached:" not in feed1
+    assert "Cached:" in feed2
+
+
+def test_rss_search_by_term(setup_data_folders) -> None:
+    feed = app.rss_search_by_term("robe")
+    feedparser.parse(feed)
+
+
+def test_rss_search_by_tag(setup_data_folders) -> None:
+    feed = app.rss_search_by_tag("sample")
+    feedparser.parse(feed)
 
 
 def test_search_first_page_is_redirection() -> None:

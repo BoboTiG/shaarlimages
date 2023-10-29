@@ -95,8 +95,10 @@ def test_fetch_rss() -> None:
 
 
 @responses.activate
-@pytest.mark.parametrize("feed_data", [FEED_XML, FEED_XML_NO_TIMESTAMPS])
-def test_sync_feed(feed_data: str, tmp_path: Path, setup_data):
+@pytest.mark.parametrize("with_timestamps", [True, False])
+def test_sync_feed(with_timestamps: bool, tmp_path: Path, setup_data):
+    feed_data = FEED_XML if with_timestamps else FEED_XML_NO_TIMESTAMPS
+
     # Remove several copied files in conftest.py to cover more code
     for file in (tmp_path / DATA.name / IMAGES.name).glob("*.jpg"):
         file.unlink()

@@ -70,17 +70,38 @@ def page_zoom(image: str) -> str:
     return helpers.render_zoom_page(image)
 
 
-@route("/search/<value>")
-def search(value: str) -> str:
-    """Search for images."""
-    redirect(f"/search/{value}/1")
-
-
-@route("/search/<value>/<page:int>")
+@route("/rss")
 @cache
-def search_pagination(value: str, page: int) -> str:
+def rss() -> str:
+    """Main RSS feed."""
+    return helpers.render_rss([])
+
+
+@route("/rss/search/<term>")
+@cache
+def rss_search_by_term(term: str) -> str:
+    """RSS feed for searches."""
+    return helpers.render_rss(functions.lookup(term))
+
+
+@route("/rss/search/tag/<tag>")
+@cache
+def rss_search_by_tag(tag: str) -> str:
+    """RSS feed for tag searches."""
+    return helpers.render_rss(functions.lookup_tag(tag))
+
+
+@route("/search/<term>")
+def search(term: str) -> str:
+    """Search for images."""
+    redirect(f"/search/{term}/1")
+
+
+@route("/search/<term>/<page:int>")
+@cache
+def search_pagination(term: str, page: int) -> str:
     """Pagined search for images."""
-    return helpers.render_search(functions.lookup(value), page)
+    return helpers.render_search(functions.lookup(term), page)
 
 
 @route("/search/tag/<tag>")
