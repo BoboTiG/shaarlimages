@@ -147,7 +147,7 @@ def pagination(images: custom_types.Metadatas, total: int, page: int) -> str:
         redirect(f"{path}/{last}")
 
     tags = functions.get_tags()
-    rss_link = f"/rss{path.replace('/page/', '/')}"
+    rss_link = f"/rss{path.replace('/page', '')}"
     return render("page", **locals())
 
 
