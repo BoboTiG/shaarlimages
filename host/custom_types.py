@@ -11,6 +11,7 @@ Metadata = SimpleNamespace
 Metadatas = list[Metadata]
 Shaarli = str
 Shaarlis = list[Shaarli]
+Waybackdata = SimpleNamespace
 
 
 class Size(NamedTuple):

@@ -209,10 +209,15 @@ def fetch_image(url: str, verify: bool = False) -> bytes | None:
     return None
 
 
+def extract_content_type(req: requests.Response) -> str:
+    """Extract the content type from the given request response."""
+    return req.headers.get("content-type", "").replace(" ", "").split(";", 1)[0].lower()
+
+
 def fetch_image_type(url: str) -> str:
     """Fetch an image type using HTTP headers from the HEAD response."""
     req = fetch(url, method="head")
-    content_type = req.headers.get("content-type", "").replace(" ", "").split(";", 1)[0].lower()
+    content_type = extract_content_type(req)
     if (
         "image/" in content_type
         and content_type not in constants.IMAGES_CONTENT_TYPE
@@ -268,11 +273,6 @@ def get_size(file: Path) -> custom_types.Size:
 def get_tags() -> list[str]:
     """Get all available tags."""
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
-
-
-def get_wayback_back_data(url: str) -> tuple[str, bool]:
-    data = read(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json")
-    return data.get("snapshot", ""), data.get("is_lost", False)
 
 
 def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dict]:
@@ -403,6 +403,16 @@ def load_metadata(feed: Path) -> list[tuple[float, custom_types.Metadata]]:
     """Load a given `feed` into more a readable object."""
     cls = custom_types.Metadata
     return [(float(date), cls(**metadata)) for date, metadata in read(feed).items()]
+
+
+def load_wayback_back_data(url: str) -> custom_types.Waybackdata:
+    """Load stored Wayback Machine data."""
+    data = read(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json")
+    return custom_types.Waybackdata(
+        content_type=data.get("content_type", ""),
+        is_lost=data.get("is_lost", False),
+        snapshot=data.get("snapshot", ""),
+    )
 
 
 def lookup(value: str) -> custom_types.Metadatas:
@@ -546,8 +556,9 @@ def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
     ).strip()
 
 
-def set_wayback_back_data(url: str, snapshot: str, is_lost: bool) -> None:
-    persist(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json", {"snapshot": snapshot, "is_lost": is_lost})
+def set_wayback_back_data(url: str, waybackdata: custom_types.Waybackdata) -> None:
+    """Store Wayback Machine data."""
+    persist(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json", vars(waybackdata))
 
 
 def shortify(text: str, /, *, limit: int = 128) -> str:
@@ -589,19 +600,20 @@ def today() -> datetime:
 
 def try_wayback_machine(url: str, method: str) -> requests.Response:
     """Try to fetch a given `url` using the great Wayback Machine."""
-    snapshot, is_lost = get_wayback_back_data(url)
+    waybackdata = load_wayback_back_data(url)
 
-    if is_lost:
+    if waybackdata.is_lost:
         raise Evanesco()
 
-    if not snapshot:
+    if not waybackdata.snapshot:
         url_archive = f"https://archive.org/wayback/available?url={url}"
         with SESSION.get(url_archive, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
             req.raise_for_status()
 
             if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
                 print(">>> 💀", url, flush=True)
-                set_wayback_back_data(url, "", True)
+                waybackdata.is_lost = True
+                set_wayback_back_data(url, waybackdata)
                 raise Evanesco()
 
         # Use direct access to the resource
@@ -609,17 +621,24 @@ def try_wayback_machine(url: str, method: str) -> requests.Response:
         path = parts.path
         parts_path = path.split("/")
         parts_path[2] += "if_"
-        snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
 
-        set_wayback_back_data(url, snapshot, False)
+        waybackdata.snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
+        set_wayback_back_data(url, waybackdata)
+
+    if method == "head" and waybackdata.content_type:
+        response = requests.Response()
+        response.headers = {"Content-Type": waybackdata.content_type}
+        response.status_code = 200
+        response.url = url
+        return response
 
     print(f">>> ⌛ [{method.upper()}]", url, flush=True)
 
-    with SESSION.request(
-        method=method,
-        url=snapshot,
-        headers=constants.HTTP_HEADERS,
-        timeout=120.0,
-    ) as req_from_the_past:
-        req_from_the_past.raise_for_status()
-        return req_from_the_past
+    with SESSION.request(method=method, url=waybackdata.snapshot, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
+        req.raise_for_status()
+
+        if method == "head":
+            waybackdata.content_type = extract_content_type(req)
+            set_wayback_back_data(url, waybackdata)
+
+        return req

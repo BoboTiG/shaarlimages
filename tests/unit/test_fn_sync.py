@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import responses
 
-from host import functions, helpers
+from host import custom_types, functions, helpers
 from host.constants import DATA, IMAGES
 
 from .constants import (
@@ -222,9 +222,26 @@ def test_try_wayback_machine_head():
 
     assert functions.fetch_image_type(FEED_URL) == ".png"
 
-    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
-    assert snapshot
-    assert not is_lost
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert waybackdata.content_type == "image/png"
+    assert not waybackdata.is_lost
+    assert waybackdata.snapshot
+
+
+@responses.activate
+def test_try_wayback_machine_head_cache():
+    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
+
+    waybackdata = custom_types.Waybackdata(content_type="image/png", snapshot=url_final)
+    functions.set_wayback_back_data(FEED_URL, waybackdata)
+
+    response = functions.try_wayback_machine(FEED_URL, "head")
+    assert response.headers == {"Content-Type": "image/png"}
+
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert waybackdata.content_type == "image/png"
+    assert not waybackdata.is_lost
+    assert waybackdata.snapshot
 
 
 @responses.activate
@@ -233,13 +250,15 @@ def test_try_wayback_machine_cache():
     responses.add(method="HEAD", url=FEED_URL, status=404)
     responses.add(method="HEAD", url=url_final, content_type="image/png")
 
-    functions.set_wayback_back_data(FEED_URL, url_final, False)
+    waybackdata = custom_types.Waybackdata(snapshot=url_final)
+    functions.set_wayback_back_data(FEED_URL, waybackdata)
 
     assert functions.fetch_image_type(FEED_URL) == ".png"
 
-    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
-    assert snapshot
-    assert not is_lost
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert waybackdata.content_type == "image/png"
+    assert not waybackdata.is_lost
+    assert waybackdata.snapshot
 
 
 @responses.activate
@@ -248,27 +267,31 @@ def test_try_wayback_machine_not_found():
     responses.add(method="GET", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
 
-    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
-    assert not snapshot
-    assert not is_lost
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert not waybackdata.content_type
+    assert not waybackdata.is_lost
+    assert not waybackdata.snapshot
 
     with pytest.raises(functions.Evanesco) as exc:
         functions.fetch(FEED_URL)
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."
 
-    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
-    assert not snapshot
-    assert is_lost
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert not waybackdata.content_type
+    assert waybackdata.is_lost
+    assert not waybackdata.snapshot
 
 
 @responses.activate
-def test_try_wayback_machine_resource_is_lost():
-    functions.set_wayback_back_data(FEED_URL, "", True)
+def test_try_wayback_machine_resource_is_lost() -> None:
+    waybackdata = custom_types.Waybackdata(is_lost=True)
+    functions.set_wayback_back_data(FEED_URL, waybackdata)
 
-    snapshot, is_lost = functions.get_wayback_back_data(FEED_URL)
-    assert not snapshot
-    assert is_lost
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert not waybackdata.content_type
+    assert waybackdata.is_lost
+    assert not waybackdata.snapshot
 
     with pytest.raises(functions.Evanesco) as exc:
         functions.try_wayback_machine(FEED_URL, "get")
