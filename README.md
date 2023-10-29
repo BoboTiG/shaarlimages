@@ -4,6 +4,25 @@ Shaarlimages, la galerie des shaarlis !
 
 URL : [www.shaarlimages.net](https://www.shaarlimages.net)
 
+## URL
+
+Galleries:
+- `/page/NUMBER`: display the page n° `NUMBER` of the gallery;
+- `/random`: display a random image;
+- `/search/TERM`: redirect to the first page of the resulting gallery of images matching `TERM` (either from the title, description, URL, or tags);
+- `/search/TERM/NUMBER`: display the page n° `NUMBER` of the resulting gallery of images matching `TERM` (either from the title, description, URL, or tags);
+- `/search/tag/TAG/NUMBER`: display the page n° `NUMBER` of the resulting gallery of images having the tag `TAG`;
+- `/zoom/IMAGE`: display the zoom page on `IMAGE`;
+
+Files:
+- `/image/IMAGE`: direct link to the original `IMAGE` file;
+- `/thumbnail/IMAGE`: direct link to the thumbnail `IMAGE` file;
+
+RSS feeds (a link is made accessible when clicking on "images" at the top-right on the website):
+- `/rss`: generate the global RSS feed (last 50 items);
+- `/rss/search/TERM`: generate the RSS feed of images matching `TERM` (last 50 items);
+- `/rss/search/tag/TAG`: generate the RSS feed of images having the tag `TAG` (last 50 items);
+
 ## Production
 
 Copy all files from the `host` folder to the [PythonAnywhere](https://www.pythonanywhere.com) hosting account.
