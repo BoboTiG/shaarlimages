@@ -45,17 +45,16 @@ def cache(function):
 
 
 @route("/")
-@cache
 def page_home() -> str:
     """Display the primary page."""
-    return helpers.render_home_page(1)
+    redirect("/page/1")
 
 
 @route("/page/<page:int>")
 @cache
 def page_home_pagination(page: int) -> str:
     """Display a pagined page."""
-    return helpers.render_home_pagination_page(page)
+    return helpers.render_home_page(page)
 
 
 @route("/random")
@@ -72,17 +71,29 @@ def page_zoom(image: str) -> str:
 
 
 @route("/search/<value>")
-@cache
 def search(value: str) -> str:
     """Search for images."""
-    return helpers.render_search(functions.lookup(value))
+    redirect(f"/search/{value}/1")
+
+
+@route("/search/<value>/<page:int>")
+@cache
+def search_pagination(value: str, page: int) -> str:
+    """Pagined search for images."""
+    return helpers.render_search(functions.lookup(value), page)
 
 
 @route("/search/tag/<tag>")
-@cache
 def search_by_tag(tag: str) -> str:
     """Search for images by tag."""
-    return helpers.render_search(functions.lookup_tag(tag))
+    redirect(f"/search/tag/{tag}/1")
+
+
+@route("/search/tag/<tag>/<page:int>")
+@cache
+def search_by_tag_pagination(tag: str, page: int) -> str:
+    """Pagined search for images by tag."""
+    return helpers.render_search(functions.lookup_tag(tag), page)
 
 
 @route("/assets/<file:path>")

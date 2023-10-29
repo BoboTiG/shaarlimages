@@ -234,6 +234,10 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
     return feedparser.parse(fetch(url, from_the_past=False).text)
 
 
+def get_a_slice(data: list, page: int, count: int) -> list:
+    return data[(page - 1) * count : page * count]
+
+
 def get_from_cache(cache_key: str) -> str | None:
     """Retreive a compressed response from a potential cache file."""
     file = constants.CACHE / f"{cache_key}.cache"
@@ -245,7 +249,7 @@ def get_from_cache(cache_key: str) -> str | None:
 def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
     """Get last N images."""
     all_images = retrieve_all_uniq_metadata()
-    return len(all_images), all_images[(page - 1) * count : page * count]
+    return len(all_images), get_a_slice(all_images, page, count)
 
 
 def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
@@ -419,7 +423,7 @@ def lookup(value: str) -> custom_types.Metadatas:
     """
     Search for images.
 
-        >>> lookup('ab')
+        >>> lookup("ab")
         []
 
     """

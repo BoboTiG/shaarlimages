@@ -21,11 +21,11 @@
 %if page > 0:
 <footer>
     %if page > 1:
-    <a href="/page/{{ page - 1 }}">⏮️</a> &nbsp;
+    <a href="{{ path }}/{{ page - 1 }}">⏮️</a> &nbsp;
     %end
     <b>{{ page }}</b> / {{ last }}
     % if page < last:
-    &nbsp; <a href="/page/{{ page + 1 }}">⏭️</a>
+    &nbsp; <a href="{{ path }}/{{ page + 1 }}">⏭️</a>
     %end
 </footer>
 %end
@@ -38,12 +38,12 @@ document.onkeydown = (event) => {
     switch (event.key) {
         %if page > 1:
         case "ArrowLeft":
-            document.location = "/page/{{ page - 1 }}";
+            document.location = "{{ path }}/{{ page - 1 }}";
             break;
         %end
         %if page < last:
         case "ArrowRight":
-            document.location = "/page/{{ page + 1 }}";
+            document.location = "{{ path }}/{{ page + 1 }}";
             break;
         %end
     }

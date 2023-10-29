@@ -6,26 +6,31 @@ Source: https://github.com/BoboTiG/shaarlimages
 from random import choice
 
 import pytest
+from boddle import boddle
 from bottle import HTTPResponse
 
 from host import app, functions
 
 
 def test_cache_invalidation(setup_data) -> None:
-    content = app.page_home()
+    content = app.page_home_pagination(1)
     assert "Cached:" not in content
 
-    content = app.page_home()
+    content = app.page_home_pagination(1)
     assert "Cached:" in content
 
     functions.invalidate_caches()
-    content = app.page_home()
+    content = app.page_home_pagination(1)
     assert "Cached:" not in content
 
 
-def test_page_home(setup_data) -> None:
-    content = app.page_home()
-    assert "Ouh !" in content
+def test_page_home_is_redirection() -> None:
+    with pytest.raises(HTTPResponse) as exc:
+        app.page_home()
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://127.0.0.1/page/1"
 
 
 def test_page_home_pagination(setup_data) -> None:
@@ -38,8 +43,8 @@ def test_page_home_pagination(setup_data) -> None:
     assert "Cached:" in content
 
 
-def test_page_home_pagination_lower_than_min(setup_data) -> None:
-    with pytest.raises(HTTPResponse) as exc:
+def test_page_home_pagination_lower_than_min() -> None:
+    with boddle(path="/page/0"), pytest.raises(HTTPResponse) as exc:
         app.page_home_pagination(0)
 
     response = exc.value
@@ -47,8 +52,8 @@ def test_page_home_pagination_lower_than_min(setup_data) -> None:
     assert response.headers["Location"] == "http://127.0.0.1/page/1"
 
 
-def test_page_home_pagination_higher_than_max(setup_data) -> None:
-    with pytest.raises(HTTPResponse) as exc:
+def test_page_home_pagination_higher_than_max() -> None:
+    with boddle(path="/page/99999999999"), pytest.raises(HTTPResponse) as exc:
         app.page_home_pagination(99999999999)
 
     response = exc.value
@@ -80,9 +85,18 @@ def test_page_zoom_image_not_found() -> None:
     assert response.headers["Location"] == "http://127.0.0.1/"
 
 
-def test_search(setup_data) -> None:
-    response_lowercase = app.search("robe")
-    response_uppercase = app.search("ROBE")
+def test_search_first_page_is_redirection() -> None:
+    with boddle(path="/search/robe"), pytest.raises(HTTPResponse) as exc:
+        app.search("robe")
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://127.0.0.1/search/robe/1"
+
+
+def test_search_case_insensitive(setup_data) -> None:
+    response_lowercase = app.search_pagination("robe", 1)
+    response_uppercase = app.search_pagination("ROBE", 1)
 
     assert "{src:" in response_lowercase
     assert response_uppercase.startswith(response_lowercase)
@@ -92,9 +106,36 @@ def test_search(setup_data) -> None:
     assert "Cached:" in response_uppercase
 
 
-def test_search_by_tag(setup_data) -> None:
-    response_lowercase = app.search_by_tag("sample")
-    response_uppercase = app.search_by_tag("SAMPLE")
+def test_search_pagination_lower_than_min() -> None:
+    with boddle(path="/search/robe/0"), pytest.raises(HTTPResponse) as exc:
+        app.search_pagination("robe", 0)
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://127.0.0.1/search/robe/1"
+
+
+def test_search_pagination_higher_than_max() -> None:
+    with boddle(path="/search/robe/99999999999"), pytest.raises(HTTPResponse) as exc:
+        app.search_pagination("robe", 99999999999)
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"].startswith("http://127.0.0.1/search/robe/")
+
+
+def test_search_by_tag_first_page_is_redirection() -> None:
+    with boddle(path="/search/tag/sample"), pytest.raises(HTTPResponse) as exc:
+        app.search_by_tag("sample")
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://127.0.0.1/search/tag/sample/1"
+
+
+def test_search_by_tag_case_insensitive(setup_data) -> None:
+    response_lowercase = app.search_by_tag_pagination("sample", 1)
+    response_uppercase = app.search_by_tag_pagination("SAMPLE", 1)
 
     assert "{src:" in response_lowercase
     assert response_uppercase.startswith(response_lowercase)
@@ -102,6 +143,24 @@ def test_search_by_tag(setup_data) -> None:
     # Ensure the cache is working
     assert "Cached:" not in response_lowercase
     assert "Cached:" in response_uppercase
+
+
+def test_search_by_tag_pagination_lower_than_min() -> None:
+    with boddle(path="/search/tag/sample/0"), pytest.raises(HTTPResponse) as exc:
+        app.search_by_tag_pagination("sample", 0)
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://127.0.0.1/search/tag/sample/1"
+
+
+def test_search_by_tag_pagination_higher_than_max() -> None:
+    with boddle(path="/search/tag/sample/99999999999"), pytest.raises(HTTPResponse) as exc:
+        app.search_by_tag_pagination("sample", 99999999999)
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"].startswith("http://127.0.0.1/search/tag/sample/")
 
 
 def test_static_asset() -> None:

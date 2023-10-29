@@ -7,8 +7,8 @@ from types import SimpleNamespace
 
 SITE = SimpleNamespace(
     description="Shaarlimages, la galerie des shaarlis !",
-    display_last_n_images=56,
     host="www.shaarlimages.net",
+    images_per_page=50,
     title="Shaarlimages",
 )
 SITE.url = f"https://{SITE.host}"

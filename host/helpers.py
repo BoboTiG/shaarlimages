@@ -16,7 +16,7 @@ import functions
 import requests.exceptions
 import urllib3.exceptions
 import version
-from bottle import redirect, template
+from bottle import redirect, request, template
 
 #
 # Sync
@@ -128,39 +128,45 @@ def sync_them_all(force: bool = False) -> None:
 #
 
 
+def pagination(images: custom_types.Metadatas, total: int, page: int) -> str:
+    """Pagined page renderer."""
+    path = request.path.removesuffix(f"/{page}")
+
+    if page < 1:
+        redirect(f"{path}/1")
+
+    last = math.ceil(total / config.SITE.images_per_page)
+
+    if page > last:
+        redirect(f"{path}/{last}")
+
+    tags = functions.get_tags()
+    return render("page", **locals())
+
+
 def render(tpl: str, **kwargs) -> str:
     """Render a template with provided keyword arguments."""
     return template(
-        tpl, **kwargs, headers=[], version=version.__version__, site=config.SITE, template_lookup=[constants.VIEWS]
+        tpl,
+        **kwargs,
+        headers=[],
+        version=version.__version__,
+        site=config.SITE,
+        template_lookup=[constants.VIEWS],
     )
 
 
 def render_home_page(page: int) -> str:
     """Render the home page."""
-    total, images = functions.get_last(page, config.SITE.display_last_n_images)
-    last = math.ceil(total / config.SITE.display_last_n_images)
-
-    if page > last:
-        redirect(f"/page/{last}")
-
-    tags = functions.get_tags()
-    return render("page", **locals())
+    total, images = functions.get_last(page, config.SITE.images_per_page)
+    return pagination(images, total, page)
 
 
-def render_home_pagination_page(page: int) -> str:
-    """Render a pagined page."""
-    if page < 1:
-        redirect("/page/1")
-
-    return render_home_page(page)
-
-
-def render_search(images: custom_types.Images) -> str:
+def render_search(images: custom_types.Images, page: int) -> str:
     """Render search results."""
     total = len(images)
-    page = last = 0
-    tags = functions.get_tags()
-    return render("page", **locals())
+    images = functions.get_a_slice(images, page, config.SITE.images_per_page)
+    return pagination(images, total, page)
 
 
 def render_zoom_page(image: custom_types.Image) -> str:
