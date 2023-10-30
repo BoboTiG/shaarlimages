@@ -336,7 +336,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
         # or because we failed to fetch the image type from the Content-Type header response).
         return False, {}
 
-    output_file = constants.IMAGES / f"{small_hash(link)}.{ext}"
+    output_file = constants.IMAGES / f"{small_hash(link)}{ext}"
     if output_file.is_file():
         is_new = False
     else:

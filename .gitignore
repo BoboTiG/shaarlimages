@@ -10,4 +10,4 @@ __pycache__/
 venv/
 
 # Keep those
-!tests/data/
+!tests/unit/data/

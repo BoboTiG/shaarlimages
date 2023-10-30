@@ -10,7 +10,7 @@ import pytest
 import responses
 
 from host import custom_types, functions, helpers
-from host.constants import DATA, IMAGES
+from host.constants import DATA, IMAGE_EXT, IMAGES
 
 from .constants import (
     FEED_URL,
@@ -182,6 +182,11 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path, setup_data):
 
     # Sync them all too
     helpers.sync_them_all()
+
+    # Check downloaded images
+    for file in (tmp_path / DATA.name / IMAGES.name).glob("*"):
+        assert len(file.stem) == 6
+        assert file.suffix in IMAGE_EXT
 
 
 @responses.activate

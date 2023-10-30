@@ -11,6 +11,8 @@ import feedparser
 from host import config, custom_types, functions
 from host.constants import DATA, FEEDS
 
+from .constants import IMAGE_WEBP
+
 
 def check_item(item: custom_types.Metadata) -> None:
     assert isinstance(item, custom_types.Metadata)
@@ -44,12 +46,12 @@ def test_craft_feed(setup_data) -> None:
 
     item = items[0]
     assert item.description == (
-        '<img src="https://www.shaarlimages.net/image/aGE2Q5Z.webp" />'
+        f'<img src="{config.SITE.url}/image/{IMAGE_WEBP.name}" />'
         "<br /><br />"
         "Simple description with the 'robe' keyword."
     )
-    assert item.id == "https://www.shaarlimages.net/zoom/aGE2Q5Z.webp"
-    assert item.link == "https://www.shaarlimages.net/zoom/aGE2Q5Z.webp"
+    assert item.id == f"{config.SITE.url}/zoom/{IMAGE_WEBP.name}"
+    assert item.link == f"{config.SITE.url}/zoom/{IMAGE_WEBP.name}"
     assert sorted(tag.term for tag in item.tags) == ["image", "nsfw", "sample", "test"]
     assert item.title == "Awesome image!"
 
