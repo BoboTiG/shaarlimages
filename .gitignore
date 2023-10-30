@@ -2,8 +2,8 @@
 .coverage
 
 # Folders
-data/
 cache/
+data/
 .mypy_cache/
 __pycache__/
 .pytest_cache/
