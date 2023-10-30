@@ -36,7 +36,7 @@ def fix_images_medatadata(force: bool = False):
                 continue
 
             # Fix date
-            if isinstance(v["date"], float):
+            if not isinstance(v["date"], float):
                 data[k] |= {"date": float(k)}
                 changed = True
                 at_least_one_change = True
