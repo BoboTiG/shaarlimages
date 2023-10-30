@@ -3,9 +3,6 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
-from contextlib import suppress
-from pathlib import Path
-
 import constants
 import functions
 
@@ -31,34 +28,12 @@ def fix_images_medatadata(force: bool = False):
                 at_least_one_change = True
                 continue
 
-            # Fix the filename
-            file: Path = constants.IMAGES / v["link"]
-            stem = file.stem
-            if len(stem) > 6:
-                name = file.name
-                new_file = file.with_stem(stem[:6])
-                print(f"{file.name!r} -> {new_file.name!r}")
-                file = new_file if new_file.is_file() else file.rename(new_file)
-                data[k] |= {"link": file.name}
-                changed = True
-                at_least_one_change = True
-
-                # Rename the thumbnail
-                thumb = constants.THUMBNAILS / name
-                with suppress(FileNotFoundError):
-                    thumb.rename(thumb.with_stem(new_file.stem))
-
             # Purge removed Imgur images
             if data[k]["checksum"] == MD5_EMPTY:
                 del data[k]
                 changed = True
                 at_least_one_change = True
                 continue
-
-            # Rename "link" to "file"
-            data[k]["file"] = data[k].pop("link")
-            changed = True
-            at_least_one_change = True
 
         if not data:
             print(f" ! Remove empty feed {feed}")
@@ -83,7 +58,7 @@ def purge(files: set[str]) -> None:
         cache = functions.read(feed)
 
         for date, metadata in cache.copy().items():
-            if metadata["link"] in files:
+            if metadata["file"] in files:
                 cache.pop(date)
                 changed = True
                 at_least_one_change = True
