@@ -69,7 +69,7 @@ def test_get_metadata_last(setup_data) -> None:
 
 
 def test_get_tags(setup_data) -> None:
-    assert functions.get_tags() == ["image", "sample", "test"]
+    assert functions.get_tags() == ["clothes", "image", "nsfw", "sample", "test"]
 
 
 def test_get_random_image(setup_data) -> None:
