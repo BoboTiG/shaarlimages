@@ -350,7 +350,6 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
 
     # Keep up-to-date textual information
     metadata = (cache or {}) | {
-        "date": item.published,
         "desc": item.description,
         "file": output_file.name,
         "guid": item.guid,

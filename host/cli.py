@@ -35,6 +35,12 @@ def fix_images_medatadata(force: bool = False):
                 at_least_one_change = True
                 continue
 
+            # Fix date
+            if isinstance(v["date"], float):
+                data[k] |= {"date": float(k)}
+                changed = True
+                at_least_one_change = True
+
         if not data:
             print(f" ! Remove empty feed {feed}")
             feed.unlink()
