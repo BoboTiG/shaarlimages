@@ -14,7 +14,7 @@ from pathlib import Path
 from random import choice
 from shutil import copyfile
 from typing import Any
-from urllib.parse import unquote, urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse
 from zlib import compress, decompress
 
 import config
@@ -29,7 +29,6 @@ import urllib3
 from feedgenerator import Atom1Feed
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
-from unidecode import unidecode
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -81,11 +80,11 @@ def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
     for image in images:
         feed.add_item(
             image.title,
-            f"{config.SITE.url}/zoom/{image.link}",
-            f'<img src="{config.SITE.url}/image/{image.link}"/><br /><br />{image.desc}',
+            f"{config.SITE.url}/zoom/{image.file}",
+            f'<img src="{config.SITE.url}/image/{image.file}"/><br /><br />{image.desc}',
             categories=image.tags,
             pubdate=datetime.fromtimestamp(image.date, tz=timezone.utc),
-            unique_id=f"{config.SITE.url}/zoom/{image.link}",
+            unique_id=f"{config.SITE.url}/zoom/{image.file}",
         )
 
     return feed.writeString("utf-8")
@@ -303,9 +302,9 @@ def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
 def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
     all_cache = retrieve_all_uniq_metadata()
     for idx, metadata in enumerate(all_cache):
-        if metadata.link == image:
-            prev_img = all_cache[idx - 1].link if idx > 0 else ""
-            next_img = all_cache[idx + 1].link if idx < len(all_cache) - 1 else ""
+        if metadata.file == image:
+            prev_img = all_cache[idx - 1].file if idx > 0 else ""
+            next_img = all_cache[idx + 1].file if idx < len(all_cache) - 1 else ""
             return prev_img, metadata, next_img
 
     return None
@@ -337,9 +336,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
         # or because we failed to fetch the image type from the Content-Type header response).
         return False, {}
 
-    file = f"{small_hash(link)}_{safe_filename(Path(link).stem)}{ext}"
-    output_file = constants.IMAGES / file
-
+    output_file = constants.IMAGES / f"{small_hash(link)}.{ext}"
     if output_file.is_file():
         is_new = False
     else:
@@ -355,8 +352,8 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
     metadata = (cache or {}) | {
         "date": item.published,
         "desc": item.description,
+        "file": output_file.name,
         "guid": item.guid,
-        "link": file,
         "tags": [safe_tag(tag.term) for tag in getattr(item, "tags", [])],
         "title": item.title,
         "url": link,
@@ -487,7 +484,7 @@ def lookup(term: str) -> custom_types.Metadatas:
             term in metadata.title.lower()
             or term in metadata.desc.lower()
             or term in metadata.guid.lower()
-            or term in metadata.link.lower()
+            or term in metadata.file.lower()
             or term in metadata.tags
             or term in metadata.url.lower()
         )
@@ -570,25 +567,6 @@ def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
     return res
 
 
-def safe_filename(value: str, replace=re.compile(r"[^a-z0-9]").sub, cleanup=re.compile(r"--+").sub) -> str:
-    r"""
-    Sanitize, and control the length, of a given `value`.
-
-        >>> safe_filename("   a/b\\c*d:e<f>g?h\"i|j%k'l#k@     ")
-        'a-b-c-d-e-f-g-h-i-j-k-l-k-'
-        >>> safe_filename("fetch.php?cache=&media=divers:img_20141120_150542")
-        'fetch-php-cache-media-divers-img-20141120-150542'
-        >>> safe_filename("普通话/普通話")
-        'pu-tong-hua-pu-tong-hua'
-        >>> safe_filename("jeux_vidéo")
-        'jeux-video'
-        >>> safe_filename("https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Daikokuji-Sasayama_Komus%C5%8D_Shakuhachi_%E5%A4%A7%E5%9B%BD%E5%AF%BA%EF%BC%88%E7%AF%A0%E5%B1%B1%E5%B8%82%EF%BC%89%E4%B8%B9%E6%B3%A2%E8%8C%B6%E7%A5%AD%E3%82%8A_%E8%99%9A%E7%84%A1%E5%83%A7_DSCF1443.jpg/1200px-Daikokuji-Sasayama_Komus%C5%8D_Shakuhachi_%E5%A4%A7%E5%9B%BD%E5%AF%BA%EF%BC%88%E7%AF%A0%E5%B1%B1%E5%B8%82%EF%BC%89%E4%B8%B9%E6%B3%A2%E8%8C%B6%E7%A5%AD%E3%82%8A_%E8%99%9A%E7%84%A1%E5%83%A7_DSCF1443")
-        'https-upload-wikimedia-org-wikipedia-commons-thumb-9-9d-daikoku-chi-da-guo-si-xiao-shan-shi-dan-bo-cha-ji-ri-xu-wu-seng-dscf1443'
-
-    """  # noqa[E501]
-    return shortify(cleanup("-", replace("-", unidecode(unquote(value)).strip().lower())))
-
-
 def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
     """
     Sanitize a tag.
@@ -612,11 +590,6 @@ def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
 def set_wayback_back_data(url: str, waybackdata: custom_types.Waybackdata) -> None:
     """Store Wayback Machine data."""
     persist(constants.WAYBACK_MACHINE / f"{small_hash(url)}.json", vars(waybackdata))
-
-
-def shortify(text: str, /, *, limit: int = 128) -> str:
-    """Shorten a given `text` to fit in exactly or less `limit` characters."""
-    return f"{text[:limit // 2 - 1]}-{text[-limit // 2:]}" if len(text) > limit else text
 
 
 def small_hash(value: str) -> str:

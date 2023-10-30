@@ -61,7 +61,7 @@ def page_home_pagination(page: int) -> str:
 def page_random() -> str:
     """Display a random image."""
     image = functions.get_random_image()
-    redirect(f"/zoom/{image.link}")
+    redirect(f"/zoom/{image.file}")
 
 
 @route("/zoom/<image>")

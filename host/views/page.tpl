@@ -54,7 +54,7 @@ window.onload = (event) => {
     let container = document.getElementById("images-container");
     const images = [
         %for metadata in images:
-        {src: "{{ metadata.link }}", width: {{ metadata.width }}, height: {{ metadata.height }}, docolav: "#{{ metadata.docolav }}", nsfw: {{ int("nsfw" in metadata.tags) }} },
+        {src: "{{ metadata.file }}", width: {{ metadata.width }}, height: {{ metadata.height }}, docolav: "#{{ metadata.docolav }}", nsfw: {{ int("nsfw" in metadata.tags) }} },
         %end 
     ];
     const rows = linearPartition(images);

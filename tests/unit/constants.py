@@ -10,11 +10,11 @@ from host.custom_types import Size
 
 HERE = Path(__file__).parent
 DATA = HERE / "data"
-IMAGE_JPG = DATA / "0_kVjw_SjIx2y8.jpg"
-IMAGE_JPG_IS_PNG = DATA / "ZKwOVg_vYAvIM0_d.jpg"
-IMAGE_PNG = DATA / "8kZBBg_1471877768-20160824.png"
-IMAGE_SQUARE = DATA / "-1hlcA_icugvpr.jpg"
-IMAGE_WEBP = DATA / "aGE2Q5Z_460swp.webp"
+IMAGE_JPG = DATA / "0_kVjw.jpg"
+IMAGE_JPG_IS_PNG = DATA / "ZKwOVg.jpg"
+IMAGE_PNG = DATA / "8kZBBg.png"
+IMAGE_SQUARE = DATA / "-1hlcA.jpg"
+IMAGE_WEBP = DATA / "aGE2Q5Z.webp"
 
 TEST_IMAGES = [
     (IMAGE_JPG, 22548, Size(width=400, height=267), "585E50", "29c25875e30fe9547349057887b19682"),

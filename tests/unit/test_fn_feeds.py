@@ -18,7 +18,7 @@ def check_item(item: custom_types.Metadata) -> None:
     assert isinstance(item.docolav, str)
     assert isinstance(item.guid, str)
     assert isinstance(item.height, int)
-    assert isinstance(item.link, str)
+    assert isinstance(item.file, str)
     assert isinstance(item.tags, list)
     assert isinstance(item.title, str)
     assert isinstance(item.width, int)
@@ -44,12 +44,12 @@ def test_craft_feed(setup_data) -> None:
 
     item = items[0]
     assert item.description == (
-        '<img src="https://www.shaarlimages.net/image/aGE2Q5Z_460swp.webp" />'
+        '<img src="https://www.shaarlimages.net/image/aGE2Q5Z.webp" />'
         "<br /><br />"
         "Simple description with the 'robe' keyword."
     )
-    assert item.id == "https://www.shaarlimages.net/zoom/aGE2Q5Z_460swp.webp"
-    assert item.link == "https://www.shaarlimages.net/zoom/aGE2Q5Z_460swp.webp"
+    assert item.id == "https://www.shaarlimages.net/zoom/aGE2Q5Z.webp"
+    assert item.link == "https://www.shaarlimages.net/zoom/aGE2Q5Z.webp"
     assert sorted(tag.term for tag in item.tags) == ["image", "nsfw", "sample", "test"]
     assert item.title == "Awesome image!"
 
@@ -70,29 +70,29 @@ def test_get_metadata(setup_data) -> None:
     idx = randint(1, len(data) - 2)
     image = data[idx]
 
-    prev_img, metadata, next_img = functions.get_metadata(image.link)
+    prev_img, metadata, next_img = functions.get_metadata(image.file)
     assert metadata == image
-    assert prev_img == data[idx - 1].link
-    assert next_img == data[idx + 1].link
+    assert prev_img == data[idx - 1].file
+    assert next_img == data[idx + 1].file
 
 
 def test_get_metadata_first(setup_data) -> None:
     data = functions.retrieve_all_uniq_metadata()
     image = data[0]
 
-    prev_img, metadata, next_img = functions.get_metadata(image.link)
+    prev_img, metadata, next_img = functions.get_metadata(image.file)
     assert metadata == image
     assert prev_img == ""
-    assert next_img == data[1].link
+    assert next_img == data[1].file
 
 
 def test_get_metadata_last(setup_data) -> None:
     data = functions.retrieve_all_uniq_metadata()
     image = data[-1]
 
-    prev_img, metadata, next_img = functions.get_metadata(image.link)
+    prev_img, metadata, next_img = functions.get_metadata(image.file)
     assert metadata == image
-    assert prev_img == data[-2].link
+    assert prev_img == data[-2].file
     assert next_img == ""
 
 

@@ -1,7 +1,7 @@
 % from types import SimpleNamespace
-% this_site = SimpleNamespace(**vars(site) | {"title": metadata.title, "url": f"{site.url}/zoom/{metadata.link}"})
+% this_site = SimpleNamespace(**vars(site) | {"title": metadata.title, "url": f"{site.url}/zoom/{metadata.file}"})
 % headers.append(f'<link rel="stylesheet" href="/assets/css/zoom.css?v={version}" />')
-% headers.append(f'<meta property="og:image" content="{site.url}/image/{metadata.link}" />')
+% headers.append(f'<meta property="og:image" content="{site.url}/image/{metadata.file}" />')
 % headers.append('<meta property="og:type" content="image" />')
 % color_threshold = int(hex(255//2)[2:] * 3, 16)
 % text_shadow = "#000" if int(metadata.docolav, 16) < (color_threshold * 1.5) else "#fff"
@@ -12,14 +12,14 @@
     <a href="/" title="Retour à la galerie">🏠</a>
     <a href="/random" title="Image aléatoire">🔀</a>
     <span>┈</span>
-    <a href="/image/{{ metadata.link }}" title="Image en taille réelle" target="_blank">🖼️</a>
+    <a href="/image/{{ metadata.file }}" title="Image en taille réelle" target="_blank">🖼️</a>
     %if metadata.guid.startswith("http"):
     <a href="{{ metadata.guid }}" title="Lien d'origine" target="_blank">🔗</a>
     %end
 </div>
 
 <figure>
-    <img id="image" src="/image/{{ metadata.link }}"{{!f' class="{css_class}"' if css_class else '' }} />
+    <img id="image" src="/image/{{ metadata.file }}"{{!f' class="{css_class}"' if css_class else '' }} />
 </figure>
 
 %if metadata.tags:

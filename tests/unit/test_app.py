@@ -73,8 +73,8 @@ def test_page_random(setup_data) -> None:
 
 def test_page_zoom(setup_data) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
-    content = app.page_zoom(image.link)
-    assert image.link in content
+    content = app.page_zoom(image.file)
+    assert image.file in content
 
 
 def test_page_zoom_image_not_found() -> None:
@@ -251,7 +251,7 @@ def test_static_favicon() -> None:
 
 def test_static_image(setup_data) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
-    response = app.static_image(image.link)
+    response = app.static_image(image.file)
     response.body.close()
     assert response.status_code == 200
     assert response.content_type.startswith("image/")
@@ -259,7 +259,7 @@ def test_static_image(setup_data) -> None:
 
 def test_static_thumbnail(setup_data) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
-    response = app.static_thumbnail(image.link)
+    response = app.static_thumbnail(image.file)
     response.body.close()
     assert response.status_code == 200
     assert response.content_type.startswith("image/")
