@@ -43,9 +43,13 @@ def test_craft_feed(setup_data) -> None:
     assert len(items) == 5
 
     item = items[0]
-    assert item.description == "Simple description with the 'robe' keyword."
+    assert item.description == (
+        '<img src="https://www.shaarlimages.net/image/aGE2Q5Z_460swp.webp" />'
+        "<br /><br />"
+        "Simple description with the 'robe' keyword."
+    )
     assert item.id == "https://www.shaarlimages.net/zoom/aGE2Q5Z_460swp.webp"
-    assert item.link == "https://www.shaarlimages.net/image/aGE2Q5Z_460swp.webp"
+    assert item.link == "https://www.shaarlimages.net/zoom/aGE2Q5Z_460swp.webp"
     assert sorted(tag.term for tag in item.tags) == ["image", "nsfw", "sample", "test"]
     assert item.title == "Awesome image!"
 

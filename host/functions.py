@@ -74,8 +74,8 @@ def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
     for image in images:
         feed.add_item(
             image.title,
-            f"{config.SITE.url}/image/{image.link}",
-            image.desc,
+            f"{config.SITE.url}/zoom/{image.link}",
+            f'<img src="{config.SITE.url}/image/{image.link}"/><br /><br />{image.desc}',
             categories=image.tags,
             pubdate=datetime.fromtimestamp(image.date, tz=timezone.utc),
             unique_id=f"{config.SITE.url}/zoom/{image.link}",
