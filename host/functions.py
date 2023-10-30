@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from random import choice
 from shutil import copyfile
+from time import mktime
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 from zlib import compress, decompress
@@ -350,6 +351,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
 
     # Keep up-to-date textual information
     metadata = (cache or {}) | {
+        "date": mktime(item.published_parsed),
         "desc": item.description,
         "file": output_file.name,
         "guid": item.guid,

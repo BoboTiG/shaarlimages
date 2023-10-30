@@ -10,7 +10,7 @@ import pytest
 import responses
 
 from host import custom_types, functions, helpers
-from host.constants import DATA, IMAGE_EXT, IMAGES
+from host.constants import DATA, FEEDS, IMAGE_EXT, IMAGES
 
 from .constants import (
     FEED_URL,
@@ -187,6 +187,23 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path, setup_data):
     for file in (tmp_path / DATA.name / IMAGES.name).glob("*"):
         assert len(file.stem) == 6
         assert file.suffix in IMAGE_EXT
+
+    # Check item metadata
+    file = tmp_path / DATA.name / FEEDS.name / f"{functions.small_hash(functions.feed_key(FEED_URL))}.json"
+    when, data = functions.load_metadata(file)[0]
+    assert isinstance(when, float)
+    assert when == 1.0
+    assert data.checksum == "29c25875e30fe9547349057887b19682"
+    assert isinstance(data.date, float)
+    assert data.date > 0
+    assert data.desc == "Simple description with the 'nsfw' keyword."
+    assert data.docolav == "585E50"
+    assert data.file == "0_kVjw.jpg"
+    assert data.height == 267
+    assert data.tags == ["sample", "test", "image", "nsfw"]
+    assert data.title == "Awesome image!"
+    assert data.url == f"{FEED_URL}/original/1"
+    assert data.width == 400
 
 
 @responses.activate

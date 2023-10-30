@@ -70,7 +70,6 @@ def sync_feed(url: str, force: bool = False) -> int:
         if not metadata:
             continue
 
-        metadata["date"] = published
         cache[str(published)] = metadata
 
         if is_new:
