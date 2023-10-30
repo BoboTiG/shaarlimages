@@ -39,6 +39,21 @@ def cheeseburger(url: str, *_) -> str:
     return url
 
 
+def developpez(url: str, *_) -> str:
+    """
+    Resolve the original image URL from Developpez.net.
+
+        >>> developpez("https://www.developpez.net/forums/attachments/p627433d1/a/a/a")
+        'https://www.developpez.net/forums/attachments/p627433d1/a/a/a'
+        >>> developpez("https://www.developpez.com/images/logos/forum.png")
+        'https://www.developpez.com/images/logos/forum.png'
+        >>> developpez("https://www.developpez.net/forums/d1526370/")
+        ''
+
+    """
+    return url if url.endswith(constants.IMAGE_EXT) or "/forums/attachments/" in url else ""
+
+
 def imgur(url: str, *_) -> str:
     """
     Resolve the original image URL from Imgut.
@@ -230,6 +245,7 @@ SOLVERS = {
     "pbs.twimg.com": twitter_img,
     "photojournal.jpl.nasa.gov": nasa_jpl,
     "webbtelescope.org": webb_telescope,
+    "www.developpez.net": developpez,
     "www.zbrushcentral.com": zbrush_central,
 }
 

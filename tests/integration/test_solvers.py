@@ -24,6 +24,11 @@ from host import functions, solvers
             "b303c658fe124f27a60c161ea021e1fc",
         ),
         (
+            "developpez",
+            "https://www.developpez.net/forums/attachments/p627433d1/a/a/a",
+            "9e33f526d924caee437e9705e887a31d",
+        ),
+        (
             "imgur",
             "https://i.imgur.com/y06MsKG.jpg",  # Removed
             "d41d8cd98f00b204e9800998ecf8427e",
