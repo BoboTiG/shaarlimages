@@ -62,8 +62,15 @@ def checksum(file: Path, algo: str = "md5") -> str:
 
 def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
     """RSS feed creator."""
+
+    title = config.SITE.title
+    if "/search/tag/" in rss_link:
+        title += f" 🏷️ {rss_link.split('/')[-1]}"
+    elif "/search/" in rss_link:
+        title += f" 🔎 {rss_link.split('/')[-1]}"
+
     feed = Atom1Feed(
-        config.SITE.title,
+        title,
         f"{config.SITE.url}{rss_link}",
         config.SITE.description,
         author_name=config.SITE.title,
