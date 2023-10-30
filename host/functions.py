@@ -26,6 +26,7 @@ import numpy
 import requests
 import solvers
 import urllib3
+from feedgenerator import Atom1Feed
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from unidecode import unidecode
@@ -57,6 +58,30 @@ def any_css_class_question() -> str:
 def checksum(file: Path, algo: str = "md5") -> str:
     """Compute the check sum of the given `file`."""
     return hashlib.new(algo, file.read_bytes()).hexdigest().lower()
+
+
+def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
+    """RSS feed creator."""
+    feed = Atom1Feed(
+        config.SITE.title,
+        f"{config.SITE.url}{rss_link}",
+        config.SITE.description,
+        author_name=config.SITE.title,
+        categories=["Shaarli", "gallery", "image"],
+        image=f"{config.SITE.url}/favicon.png",
+    )
+
+    for image in images:
+        feed.add_item(
+            image.title,
+            f"{config.SITE.url}/image/{image.link}",
+            image.desc,
+            categories=image.tags,
+            pubdate=datetime.fromtimestamp(image.date, tz=timezone.utc),
+            unique_id=f"{config.SITE.url}/zoom/{image.link}",
+        )
+
+    return feed.writeString("utf-8")
 
 
 def create_thumbnail(file: Path) -> Path | None:
@@ -232,17 +257,6 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
     print(">>> 📜", url)
     """Make a HTTP call."""
     return feedparser.parse(fetch(url, from_the_past=False).text)
-
-
-def format_date(timestamp: float) -> str:
-    """
-    Return the given `timestamp` as a RFC-3339/ISO-8601 compliant string.
-
-        >>> format_date(1698654777.0)
-        '2023-10-30T09:32:57Z'
-
-    """
-    return datetime.fromtimestamp(timestamp).isoformat(sep="T") + "Z"
 
 
 def get_a_slice(data: list, page: int, count: int) -> list:

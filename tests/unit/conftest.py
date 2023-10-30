@@ -54,7 +54,7 @@ def setup_data(tmp_path: Path):
         {
             str(idx): {
                 "checksum": functions.checksum(file),
-                "date": functions.format_date(functions.now()),
+                "date": functions.now(),
                 "desc": f"Simple description with the '{'nsfw' if idx == 1 else 'robe'}' keyword.",
                 "docolav": color,
                 "guid": f"{FEED_URL}/shaare/{idx}",

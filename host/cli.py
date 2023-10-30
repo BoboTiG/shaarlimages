@@ -117,8 +117,8 @@ def fix_images_medatadata(force: bool = False):
                 at_least_one_change = True
 
             # Add date
-            if "date" not in v or not v["date"][0].isdigit():
-                data[k] |= {"date": functions.format_date(float(k))}
+            if "date" not in v or not isinstance(v["date"], float):
+                data[k] |= {"date": float(k)}
                 changed = True
                 at_least_one_change = True
 

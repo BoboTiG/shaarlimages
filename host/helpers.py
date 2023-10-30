@@ -14,7 +14,6 @@ import constants
 import custom_types
 import functions
 import requests.exceptions
-import rss
 import urllib3.exceptions
 import version
 from bottle import redirect, request, response, template
@@ -52,7 +51,7 @@ def sync_feed(url: str, force: bool = False) -> int:
             # Sadly, Shaarli is configured with HIDE_TIMESTAMPS=true
             # https://github.com/sebsauvage/Shaarli/blob/029f75f/index.php#L23
             now = functions.today()
-            item.published = functions.format_date(now.timestamp())
+            item.published = now.isoformat("T")
             item.published_parsed = now.utctimetuple()
 
         published = mktime(item.published_parsed)
@@ -172,7 +171,7 @@ def render_rss(images: custom_types.Metadatas, count: int = config.SITE.images_p
     """Render the RSS feed."""
     images = functions.get_a_slice(images, 1, count)
     response.content_type = "application/rss+xml"
-    return rss.craft_feed(images, request.path)
+    return functions.craft_feed(images, request.path)
 
 
 def render_search(images: custom_types.Images, page: int) -> str:

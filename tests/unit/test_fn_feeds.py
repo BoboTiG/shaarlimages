@@ -6,7 +6,9 @@ Source: https://github.com/BoboTiG/shaarlimages
 from pathlib import Path
 from random import choice, randint
 
-from host import custom_types, functions
+import feedparser
+
+from host import config, custom_types, functions
 from host.constants import DATA, FEEDS
 
 
@@ -24,6 +26,28 @@ def check_item(item: custom_types.Metadata) -> None:
     assert len(item.docolav) == 6
     assert item.height > 0
     assert item.width > 0
+
+
+def test_craft_feed(setup_data) -> None:
+    images = functions.retrieve_all_uniq_metadata()
+    parsed = feedparser.parse(functions.craft_feed(images, "/rss"))
+
+    feed = parsed.feed
+    assert feed.author == config.SITE.title
+    assert feed.description == config.SITE.description
+    assert feed.link == f"{config.SITE.url}/rss"
+    assert sorted(tag.term for tag in feed.tags) == ["Shaarli", "gallery", "image"]
+    assert feed.title == config.SITE.title
+
+    items = parsed.entries
+    assert len(items) == 5
+
+    item = items[0]
+    assert item.description == "Simple description with the 'robe' keyword."
+    assert item.id == "https://www.shaarlimages.net/zoom/aGE2Q5Z_460swp.webp"
+    assert item.link == "https://www.shaarlimages.net/image/aGE2Q5Z_460swp.webp"
+    assert sorted(tag.term for tag in item.tags) == ["image", "nsfw", "sample", "test"]
+    assert item.title == "Awesome image!"
 
 
 def test_get_last(setup_data) -> None:
