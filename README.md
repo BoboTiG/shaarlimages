@@ -45,10 +45,10 @@ Command to fully sync back the data on a local machine:
 
 ```console
 # Usage:
-# rsync -delete -avzhe ssh <USER>@ssh.pythonanywhere.com:<SHAARLIMAGES_FOLDER>/data <LOCAL_FOLDER>/
+# rsync -avzhe ssh <USER>@ssh.pythonanywhere.com:<SHAARLIMAGES_FOLDER>/data <LOCAL_FOLDER>/
 
 # Example:
-$ rsync -delete -avzhe ssh tiger222@ssh.pythonanywhere.com:/home/tiger222/shaarlimages/data /home/tiger-222/projects/shaarlimages/
+$ rsync -avzhe ssh tiger222@ssh.pythonanywhere.com:/home/tiger222/shaarlimages/data /home/tiger-222/projects/shaarlimages/
 ```
 
 ### OSError: write error
