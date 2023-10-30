@@ -112,21 +112,21 @@ def rss_search_by_term_with_custom_items_count(term: str, count: int) -> str:
     return helpers.render_rss(functions.lookup(term), count=count)
 
 
-@route("/rss/search/tag/<tag>")
+@route("/rss/tag/<tag>")
 @cache
 def rss_search_by_tag(tag: str) -> str:
     """RSS feed for tag searches."""
     return helpers.render_rss(functions.lookup_tag(tag))
 
 
-@route("/rss/search/tag/<tag>/all")
+@route("/rss/tag/<tag>/all")
 @cache
 def rss_search_by_tag_all(tag: str) -> str:
     """RSS feed for all tag searches result."""
     return helpers.render_rss(functions.lookup_tag(tag), count=-1)
 
 
-@route("/rss/search/tag/<tag>/<count:int>")
+@route("/rss/tag/<tag>/<count:int>")
 @cache
 def rss_search_by_tag_with_custom_items_count(tag: str, count: int) -> str:
     """RSS feed for tag searches with custom items count."""
@@ -146,13 +146,13 @@ def search_pagination(term: str, page: int) -> str:
     return helpers.render_search(functions.lookup(term), page)
 
 
-@route("/search/tag/<tag>")
+@route("/tag/<tag>")
 def search_by_tag(tag: str) -> str:
     """Search for images by tag."""
-    redirect(f"/search/tag/{tag}/1")
+    redirect(f"/tag/{tag}/1")
 
 
-@route("/search/tag/<tag>/<page:int>")
+@route("/tag/<tag>/<page:int>")
 @cache
 def search_by_tag_pagination(tag: str, page: int) -> str:
     """Pagined search for images by tag."""

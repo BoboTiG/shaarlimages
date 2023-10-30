@@ -63,10 +63,10 @@ def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
     """RSS feed creator."""
 
     title = config.SITE.title
-    if "/search/tag/" in rss_link:
-        title += f" 🏷️ {rss_link.split('/')[-1]}"
-    elif "/search/" in rss_link:
+    if "/search/" in rss_link:
         title += f" 🔎 {rss_link.split('/')[-1]}"
+    elif "/tag/" in rss_link:
+        title += f" 🏷️ {rss_link.split('/')[-1]}"
 
     feed = Atom1Feed(
         title,

@@ -4,24 +4,23 @@ Shaarlimages, la galerie des shaarlis !
 
 URL : [www.shaarlimages.net](https://www.shaarlimages.net)
 
-## URL
+## API
 
 Galleries:
-- `/page/NUMBER`: display the page n° `NUMBER` of the gallery;
-- `/random`: display a random image;
-- `/search/TERM`: redirect to the first page of the resulting gallery of images matching `TERM` (either from the title, description, URL, or tags);
-- `/search/TERM/NUMBER`: display the page n° `NUMBER` of the resulting gallery of images matching `TERM` (either from the title, description, URL, or tags);
-- `/search/tag/TAG/NUMBER`: display the page n° `NUMBER` of the resulting gallery of images having the tag `TAG`;
-- `/zoom/IMAGE`: display the zoom page on `IMAGE`;
+- [/page/NUMBER](https://www.shaarlimages.net/page/42): display the page n° `NUMBER`;
+- [/random](https://www.shaarlimages.net/random): display a random image;
+- [/search/TERM](https://www.shaarlimages.net/search/animaux), and [/search/TERM/NUMBER](https://www.shaarlimages.net/search/animaux/42): search by term;
+- [/tag/TAG](https://www.shaarlimages.net/tag/animaux), and [/tag/TAG/NUMBER](https://www.shaarlimages.net/tag/animaux)/42: search by tag;
+- [/zoom/IMAGE](https://www.shaarlimages.net/zoom/urIokw.jpg): display the `IMAGE`;
 
 Files:
-- `/image/IMAGE`: direct link to the original `IMAGE` file;
-- `/thumbnail/IMAGE`: direct link to the thumbnail `IMAGE` file;
+- [/image/IMAGE](https://www.shaarlimages.net/image/urIokw.jpg): direct link to the original `IMAGE` file;
+- [/thumbnail/IMAGE](https://www.shaarlimages.net/thumbnail/urIokw.jpg): direct link to the thumbnail `IMAGE` file;
 
 RSS feeds (a link is made accessible when clicking on "images" at the top-right on the website):
-- `/rss`, `/rss/NUMBER`, and `/rss/all`: generate the global RSS feed (default: last 50 items);
-- `/rss/search/TERM`, `/rss/search/TERM/NUMBER`, and `/rss/search/TERM/all`: generate the RSS feed of images matching `TERM` (default: last 50 items);
-- `/rss/search/tag/TAG`, `/rss/search/tag/TAG/NUMBER`, and `/rss/search/tag/TAG/all`: generate the RSS feed of images having the tag `TAG` (default: last 50 items);
+- [/rss](https://www.shaarlimages.net/rss), [/rss/NUMBER](https://www.shaarlimages.net/rss/42), and [/rss/all](https://www.shaarlimages.net/rss/all): global RSS feed (default: last 50 items);
+- [/rss/search/TERM](https://www.shaarlimages.net/rss/search/animaux), [/rss/search/TERM/NUMBER](https://www.shaarlimages.net/rss/search/animaux/42), and [/rss/search/TERM/all](https://www.shaarlimages.net/rss/search/animaux/all): RSS feed of the result of the search by term (default: last 50 items);
+- [/rss/tag/TAG](https://www.shaarlimages.net/rss/tag/animaux), [/rss/tag/TAG/NUMBER](https://www.shaarlimages.net/rss/tag/animaux/42), and [/rss/tag/TAG/all](https://www.shaarlimages.net/rss/tag/animaux/all): RSS feed of the result of the search by tag (default: last 50 items);
 
 ## Production
 

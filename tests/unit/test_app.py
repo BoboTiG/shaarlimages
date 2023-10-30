@@ -197,12 +197,12 @@ def test_search_pagination_higher_than_max() -> None:
 
 
 def test_search_by_tag_first_page_is_redirection() -> None:
-    with boddle(path="/search/tag/sample"), pytest.raises(HTTPResponse) as exc:
+    with boddle(path="/tag/sample"), pytest.raises(HTTPResponse) as exc:
         app.search_by_tag("sample")
 
     response = exc.value
     assert response.status_code == 302
-    assert response.headers["Location"] == "http://127.0.0.1/search/tag/sample/1"
+    assert response.headers["Location"] == "http://127.0.0.1/tag/sample/1"
 
 
 def test_search_by_tag_case_insensitive(setup_data) -> None:
@@ -218,21 +218,21 @@ def test_search_by_tag_case_insensitive(setup_data) -> None:
 
 
 def test_search_by_tag_pagination_lower_than_min() -> None:
-    with boddle(path="/search/tag/sample/0"), pytest.raises(HTTPResponse) as exc:
+    with boddle(path="/tag/sample/0"), pytest.raises(HTTPResponse) as exc:
         app.search_by_tag_pagination("sample", 0)
 
     response = exc.value
     assert response.status_code == 302
-    assert response.headers["Location"] == "http://127.0.0.1/search/tag/sample/1"
+    assert response.headers["Location"] == "http://127.0.0.1/tag/sample/1"
 
 
 def test_search_by_tag_pagination_higher_than_max() -> None:
-    with boddle(path="/search/tag/sample/99999999999"), pytest.raises(HTTPResponse) as exc:
+    with boddle(path="/tag/sample/99999999999"), pytest.raises(HTTPResponse) as exc:
         app.search_by_tag_pagination("sample", 99999999999)
 
     response = exc.value
     assert response.status_code == 302
-    assert response.headers["Location"] == "http://127.0.0.1/search/tag/sample/1"
+    assert response.headers["Location"] == "http://127.0.0.1/tag/sample/1"
 
 
 def test_static_asset() -> None:

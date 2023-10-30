@@ -116,7 +116,7 @@ window.onload = (event) => {
         if (event.key === "Enter") {
             const search = event.target;
             if (search.value) {
-                document.location = "/search/tag/" + search.value + "/1";
+                document.location = "/tag/" + search.value + "/1";
             }
         }
     };
@@ -129,7 +129,7 @@ window.onload = (event) => {
                 document.location = "/search/" + search_term.value + "/1";
             }
         } else if (search_tag.value) {
-            document.location = "/search/tag/" + search_tag.value + "/1";
+            document.location = "/tag/" + search_tag.value + "/1";
         }
     };
 };

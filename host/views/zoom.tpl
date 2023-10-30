@@ -25,7 +25,7 @@
 %if metadata.tags:
 <div id="tags">
     %for tag in metadata.tags:
-    <a onclick='document.location = "/search/tag/{{ tag }}"'>{{ !tag }}</a>
+    <a onclick='document.location = "/tag/{{ tag }}"'>{{ !tag }}</a>
     %end
 </div>
 %end
