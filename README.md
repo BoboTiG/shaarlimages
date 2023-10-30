@@ -21,7 +21,7 @@ Files:
 RSS feeds (a link is made accessible when clicking on "images" at the top-right on the website):
 - `/rss`, `/rss/NUMBER`, and `/rss/all`: generate the global RSS feed (default: last 50 items);
 - `/rss/search/TERM`, `/rss/search/TERM/NUMBER`, and `/rss/search/TERM/all`: generate the RSS feed of images matching `TERM` (default: last 50 items);
-- `/rss/search/tag/TAG`, `/rss/search/tag/TAGM/NUMBER`, and `/rss/search/tag/TAGM/all`: generate the RSS feed of images having the tag `TAG` (default: last 50 items);
+- `/rss/search/tag/TAG`, `/rss/search/tag/TAG/NUMBER`, and `/rss/search/tag/TAG/all`: generate the RSS feed of images having the tag `TAG` (default: last 50 items);
 
 ## Production
 

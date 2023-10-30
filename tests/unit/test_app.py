@@ -59,7 +59,7 @@ def test_page_home_pagination_higher_than_max() -> None:
 
     response = exc.value
     assert response.status_code == 302
-    assert response.headers["Location"].startswith("http://127.0.0.1/page/")
+    assert response.headers["Location"] == "http://127.0.0.1/page/1"
 
 
 def test_page_random(setup_data) -> None:
@@ -193,7 +193,7 @@ def test_search_pagination_higher_than_max() -> None:
 
     response = exc.value
     assert response.status_code == 302
-    assert response.headers["Location"].startswith("http://127.0.0.1/search/robe/")
+    assert response.headers["Location"] == "http://127.0.0.1/search/robe/1"
 
 
 def test_search_by_tag_first_page_is_redirection() -> None:
@@ -232,7 +232,7 @@ def test_search_by_tag_pagination_higher_than_max() -> None:
 
     response = exc.value
     assert response.status_code == 302
-    assert response.headers["Location"].startswith("http://127.0.0.1/search/tag/sample/")
+    assert response.headers["Location"] == "http://127.0.0.1/search/tag/sample/1"
 
 
 def test_static_asset() -> None:

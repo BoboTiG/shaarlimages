@@ -139,7 +139,7 @@ def pagination(images: custom_types.Metadatas, total: int, page: int) -> str:
     if page < 1:
         redirect(f"{path}/1")
 
-    last = math.ceil(total / config.SITE.images_per_page)
+    last = math.ceil(total / config.SITE.images_per_page) or 1
 
     if page > last:
         redirect(f"{path}/{last}")

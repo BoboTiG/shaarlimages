@@ -108,7 +108,7 @@ window.onload = (event) => {
         if (event.key === "Enter") {
             const search = event.target;
             if (search.value && search.validity.valid) {
-                document.location = "/search/" + search.value;
+                document.location = "/search/" + search.value + "/1";
             }
         }
     };
@@ -116,7 +116,7 @@ window.onload = (event) => {
         if (event.key === "Enter") {
             const search = event.target;
             if (search.value) {
-                document.location = "/search/tag/" + search.value;
+                document.location = "/search/tag/" + search.value + "/1";
             }
         }
     };
@@ -126,10 +126,10 @@ window.onload = (event) => {
 
         if (search_term.value) {
             if (search_term.validity.valid) {
-                document.location = "/search/" + search_term.value;
+                document.location = "/search/" + search_term.value + "/1";
             }
         } else if (search_tag.value) {
-            document.location = "/search/tag/" + search_tag.value;
+            document.location = "/search/tag/" + search_tag.value + "/1";
         }
     };
 };
