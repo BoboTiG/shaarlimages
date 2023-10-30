@@ -10,35 +10,27 @@ import custom_types
 import functions
 
 FEED = f"""\
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0">
-    <channel>
-        <description>{config.SITE.description}</description>
-        <category>gallery</category>
-        <category>images</category>
-        <category>Shaarli</category>
-        <generator>{config.SITE.title}</generator>
-        <image>
-            <link>{config.SITE.url}</link>
-            <title>{config.SITE.title}</title>
-            <url>{config.SITE.url}/favicon.png</url>
-        </image>
-        <link>{config.SITE.url}</link>
-        <pubDate>{{date}}</pubDate>
-        <title>{config.SITE.title}</title>
+<?xml version="1.0" encoding="UTF-8" ?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>{config.SITE.title}</title>
+    <subtitle>{config.SITE.description}</subtitle>
+    <published>{{date}}</published>
+    <updated>{{date}}</updated>
+    <id>{config.SITE.url}</id>
+    <generator>{config.SITE.title}</generator>
+    <logo>{config.SITE.url}/favicon.png</logo>
 {{items}}
-    </channel>
-</rss>
+</feed>
 """
 ITEM = """\
-        <item>
-            <description><![CDATA[{description}]]></description>
+    <entry>
+        <title>{title}</title>
+        <link href="{link}" />
+        <id>{guid}</id>
+        <published>{date}</published>
+        <content type="html" xml:lang="en"><![CDATA[{description}]]></content>
 {categories}
-            <guid>{guid}</guid>
-            <link>{link}</link>
-            <pubDate>{date}</pubDate>
-            <title>{title}</title>
-        </item>\
+    </entry>\
 """
 
 
@@ -52,7 +44,10 @@ def craft_feed(images: custom_types.Metadatas) -> str:
 
 def craft_item(image: custom_types.Metadata) -> str:
     return ITEM.format(
-        categories="\n".join(f"{' ' * 12}<category>{tag}</category>" for tag in image.tags),
+        categories="\n".join(
+            f'{" " * 8}<category scheme="{config.SITE.url}/search/tag/{tag}" term="{tag}" label="{tag}"/>'
+            for tag in image.tags
+        ),
         date=image.date,
         description=image.desc,
         guid=f"{config.SITE.url}/zoom/{image.link}",
