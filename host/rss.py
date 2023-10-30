@@ -3,8 +3,6 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
-from email.utils import formatdate
-
 import config
 import custom_types
 import functions
@@ -12,33 +10,33 @@ import functions
 FEED = f"""\
 <?xml version="1.0" encoding="UTF-8" ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>{config.SITE.title}</title>
-    <subtitle>{config.SITE.description}</subtitle>
-    <published>{{date}}</published>
-    <updated>{{date}}</updated>
-    <id>{config.SITE.url}</id>
+    <atom:link href="{config.SITE.url}{{rss_link}}" rel="self" type="application/rss+xml" />
     <generator>{config.SITE.title}</generator>
     <logo>{config.SITE.url}/favicon.png</logo>
+    <subtitle>{config.SITE.description}</subtitle>
+    <title>{config.SITE.title}</title>
+    <updated>{{date}}</updated>
 {{items}}
 </feed>
 """
 ITEM = """\
     <entry>
-        <title>{title}</title>
-        <link href="{link}" />
-        <id>{guid}</id>
-        <published>{date}</published>
         <content type="html" xml:lang="en"><![CDATA[{description}]]></content>
 {categories}
+        <id>{guid}</id>
+        <link href="{link}" />
+        <published>{date}</published>
+        <title>{title}</title>
     </entry>\
 """
 
 
-def craft_feed(images: custom_types.Metadatas) -> str:
+def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
     """RSS feed creator."""
     return FEED.format(
-        date=formatdate(timeval=functions.now(), usegmt=True),
+        date=functions.format_date(functions.now()),
         items="\n".join(craft_item(image) for image in images),
+        rss_link=rss_link,
     )
 
 

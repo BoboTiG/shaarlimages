@@ -3,7 +3,6 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
-from email.utils import formatdate
 from pathlib import Path
 
 import constants
@@ -118,8 +117,8 @@ def fix_images_medatadata(force: bool = False):
                 at_least_one_change = True
 
             # Add date
-            if "date" not in v:
-                data[k] |= {"date": formatdate(timeval=float(k), usegmt=True)}
+            if "date" not in v or not v["date"][0].isdigit():
+                data[k] |= {"date": functions.format_date(float(k))}
                 changed = True
                 at_least_one_change = True
 

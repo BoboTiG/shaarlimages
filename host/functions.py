@@ -234,6 +234,17 @@ def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
     return feedparser.parse(fetch(url, from_the_past=False).text)
 
 
+def format_date(timestamp: float) -> str:
+    """
+    Return the given `timestamp` as a RFC-3339/ISO-8601 compliant string.
+
+        >>> format_date(1698654777.0)
+        '2023-10-30T09:32:57Z'
+
+    """
+    return datetime.fromtimestamp(timestamp).isoformat(sep="T") + "Z"
+
+
 def get_a_slice(data: list, page: int, count: int) -> list:
     """
     Get a slice of a list.

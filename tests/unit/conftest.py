@@ -3,7 +3,6 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
-from email.utils import formatdate
 from pathlib import Path
 from shutil import copyfile
 from unittest.mock import patch
@@ -55,7 +54,7 @@ def setup_data(tmp_path: Path):
         {
             str(idx): {
                 "checksum": functions.checksum(file),
-                "date": formatdate(usegmt=True),
+                "date": functions.format_date(functions.now()),
                 "desc": f"Simple description with the '{'nsfw' if idx == 1 else 'robe'}' keyword.",
                 "docolav": color,
                 "guid": f"{FEED_URL}/shaare/{idx}",

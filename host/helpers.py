@@ -5,7 +5,6 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 import math
 from concurrent.futures import ThreadPoolExecutor
-from email.utils import formatdate
 from functools import partial
 from threading import get_ident
 from time import mktime
@@ -18,7 +17,7 @@ import requests.exceptions
 import rss
 import urllib3.exceptions
 import version
-from bottle import redirect, request, template
+from bottle import redirect, request, response, template
 
 #
 # Sync
@@ -53,7 +52,7 @@ def sync_feed(url: str, force: bool = False) -> int:
             # Sadly, Shaarli is configured with HIDE_TIMESTAMPS=true
             # https://github.com/sebsauvage/Shaarli/blob/029f75f/index.php#L23
             now = functions.today()
-            item.published = formatdate(now.timestamp(), usegmt=True)
+            item.published = functions.format_date(now.timestamp())
             item.published_parsed = now.utctimetuple()
 
         published = mktime(item.published_parsed)
@@ -172,7 +171,8 @@ def render_home_page(page: int) -> str:
 def render_rss(images: custom_types.Metadatas, count: int = config.SITE.images_per_page) -> str:
     """Render the RSS feed."""
     images = functions.get_a_slice(images, 1, count)
-    return rss.craft_feed(images)
+    response.content_type = "application/rss+xml"
+    return rss.craft_feed(images, request.path)
 
 
 def render_search(images: custom_types.Images, page: int) -> str:
