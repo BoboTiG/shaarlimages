@@ -16,9 +16,10 @@ def test_fix():
         mocker.assert_called_once_with(force=False)
 
 
-def test_fix_forced():
+@pytest.mark.parametrize("arg_force", ["--force", "-f"])
+def test_fix_forced(arg_force: str):
     with patch("cli.fix_images_medatadata") as mocker:
-        assert main(["fix", "--force"]) == 0
+        assert main(["fix", arg_force]) == 0
         mocker.assert_called_once_with(force=True)
 
 
@@ -39,21 +40,25 @@ def test_sync():
         mocker.assert_called_once_with(force=False)
 
 
-def test_sync_forced():
+@pytest.mark.parametrize("arg_force", ["--force", "-f"])
+def test_sync_forced(arg_force: str):
     with patch("helpers.sync_them_all") as mocker:
-        assert main(["sync", "--force"]) == 0
+        assert main(["sync", arg_force]) == 0
         mocker.assert_called_once_with(force=True)
 
 
-def test_sync_specific():
+@pytest.mark.parametrize("arg_url", ["--url", "-u"])
+def test_sync_specific(arg_url: str):
     url = "https://example.org/links/"
     with patch("helpers.sync_feed") as mocker:
-        assert main(["sync", "--url", url]) == 0
+        assert main(["sync", arg_url, url]) == 0
         mocker.assert_called_once_with(url, force=False)
 
 
-def test_sync_specific_forced():
+@pytest.mark.parametrize("arg_force", ["--force", "-f"])
+@pytest.mark.parametrize("arg_url", ["--url", "-u"])
+def test_sync_specific_forced(arg_url: str, arg_force: str):
     url = "https://example.org/links/"
     with patch("helpers.sync_feed") as mocker:
-        assert main(["sync", "--url", url, "--force"]) == 0
+        assert main(["sync", arg_url, url, arg_force]) == 0
         mocker.assert_called_once_with(url, force=True)

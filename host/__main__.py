@@ -14,13 +14,12 @@ def create_parser() -> ArgumentParser:
     parser = ArgumentParser(
         prog="python -m host",
         description="Shaarlimages CLI • https://github.com/BoboTiG/shaarlimages",
-        allow_abbrev=False,
     )
     subparsers = parser.add_subparsers(dest="action")
 
     # fix
     parser_fix = subparsers.add_parser("fix", help="several fix actions on images")
-    parser_fix.add_argument("--force", action="store_true", help="force full recheck")
+    parser_fix.add_argument("--force", "-f", action="store_true", help="force full recheck")
 
     # purge
     parser_purge = subparsers.add_parser("purge", help="remove an image")
@@ -28,8 +27,8 @@ def create_parser() -> ArgumentParser:
 
     # sync
     parser_sync = subparsers.add_parser("sync", help="synchronize all shaarlis, or only a specific one")
-    parser_sync.add_argument("--url", help="specific shaarli URL")
-    parser_sync.add_argument("--force", action="store_true", help="force full resync")
+    parser_sync.add_argument("--url", "-u", help="specific shaarli URL")
+    parser_sync.add_argument("--force", "-f", action="store_true", help="force full resync")
 
     return parser
 
