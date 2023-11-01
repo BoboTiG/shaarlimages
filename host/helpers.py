@@ -33,7 +33,7 @@ def sync_feed(url: str, force: bool = False) -> int:
 
     # First sync, starts from the begining
     if force or not cache:
-        url += "&nb=all" if url.endswith("?do=rss") else "?nb=all"
+        url += "&nb=all" if url.endswith(("?do=rss", "?do=atom")) else "?nb=all"
 
     print(f"START {get_ident()} {feed_key=} {cache_key=}", flush=True)
 
