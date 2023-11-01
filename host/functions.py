@@ -241,6 +241,25 @@ def fetch_image(url: str, verify: bool = False) -> bytes | None:
     return None
 
 
+def fix_url(url: str) -> str:
+    """
+    Fix common URL issues.
+
+        >>> fix_url("https://example.org/")
+        'https://example.org/'
+        >>> fix_url("https://example.org?do=rss")
+        'https://example.org?do=rss'
+        >>> fix_url("https://example.org/?do=rss")
+        'https://example.org/?do=rss'
+        >>> fix_url("https://example.org//shaarli/feed/rss?do=rss")
+        'https://example.org/shaarli/feed/rss?do=rss'
+
+    """
+    parts = urlparse(url)
+    parts = parts._replace(path=parts.path.replace("//", "/"))
+    return urlunparse(parts)
+
+
 def extract_content_type(req: requests.Response) -> str:
     """Extract the content type from the given request response."""
     return req.headers.get("content-type", "").replace(" ", "").split(";", 1)[0].lower()

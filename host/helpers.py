@@ -31,6 +31,8 @@ def sync_feed(url: str, force: bool = False) -> int:
     cache: dict[str, str] = functions.read(cache_file)
     latest_image = float(max(cache.keys(), key=float)) if cache else 0.0
 
+    url = functions.fix_url(url)
+
     # First sync, starts from the begining
     if force or not cache:
         url += "&nb=all" if url.endswith(("?do=rss", "?do=atom")) else "?nb=all"
