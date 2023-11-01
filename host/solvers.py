@@ -51,7 +51,7 @@ def developpez(url: str, *_) -> str:
         ''
 
     """
-    return url if url.endswith(constants.IMAGE_EXT) or "/forums/attachments/" in url else ""
+    return url if functions.is_image_link(url) or "/forums/attachments/" in url else ""
 
 
 def imgur(url: str, *_) -> str:
@@ -75,7 +75,7 @@ def imgur(url: str, *_) -> str:
         for ext in constants.IMAGE_EXT:
             url = url.replace(f"_d{ext}", ext)
 
-    if not url.endswith(constants.IMAGE_EXT):
+    if not functions.is_image_link(url):
         return ""
 
     # Ensure the image still exists
@@ -143,11 +143,13 @@ def nasa_jpl(url: str, *_) -> str:
 
         >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg")
         'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
+        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.JPG")
+        'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.JPG'
         >>> nasa_jpl("https://photojournal.jpl.nasa.gov/catalog/PIA25440")
         'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
 
     """
-    if url.endswith(constants.IMAGE_EXT):
+    if functions.is_image_link(url):
         return url
 
     catalog = urlparse(url).path.split("/")[-1]
@@ -176,6 +178,8 @@ def twitter_img(url: str, *_) -> str:
 
         >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg")
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
+        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.JPG")
+        'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.JPG'
         >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:small")
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
         >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:medium")
@@ -192,7 +196,7 @@ def twitter_img(url: str, *_) -> str:
     if ":" in parts.path:
         parts = parts._replace(path=parts.path.split(":", 1)[0])
 
-    if not parts.path.endswith(constants.IMAGE_EXT) and "format" in parts.query:
+    if not functions.is_image_link(parts.path) and "format" in parts.query:
         query = parse_qs(parts.query)
         ext = query["format"][0].lower()
         parts = parts._replace(path=f"{parts.path}.{ext}", query="")
@@ -218,6 +222,8 @@ def wikimedia(url: str, *_) -> str:
 
         >>> wikimedia("http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg")
         'http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg'
+        >>> wikimedia("https://en.wikipedia.org/wiki/File:Douglas-Peucker_animated.gif")
+        ''
 
     """
     parts = urlparse(url)
@@ -226,6 +232,9 @@ def wikimedia(url: str, *_) -> str:
         return url
 
     file = path.split(":", 1)[1]
+    if not functions.is_image_link(file):
+        return ""
+
     files = functions.fetch_json(f"https://api.wikimedia.org/core/v1/commons/file/File:{file}", verify=True)
     return files.get("original", {}).get("url") or ""
 
