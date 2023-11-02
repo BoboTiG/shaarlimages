@@ -7,7 +7,7 @@ from pathlib import Path
 
 import responses
 
-from host import constants, functions, helpers
+from host import functions, helpers
 from host.constants import DATA, FEEDS_URL, SHAARLIS
 
 
@@ -17,32 +17,17 @@ def test_sync_feeds(tmp_path: Path) -> None:
     assert not file.is_file()
 
     body = [
-        {
-            "id": 1,
-            "url": "https://example.shaarli.net/links/?do=rss",
-            "link": "https://example.shaarli.net/links/",
-            "title": "Liens en vrac de X",
-        },
-        {
-            "id": 2,
-            "url": "https://example.shaarli.net/links?do=rss",
-            "link": "https://example.shaarli.net/links/duplicate",
-            "title": "Liens en vrac de XX",
-        },
-        {
-            "id": 3,
-            "url": "",
-            "link": "https://example.shaarli.net/links/",
-            "title": "Liens en vrac de XXX",
-        },
+        "https://example.shaarli.net/links/?do=rss",
+        "https://example.shaarli.net/links?do=rss",
+        "",
     ]
     resp = responses.add(method="GET", url=FEEDS_URL, json=body)
 
     feeds = helpers.sync_feeds()
-    assert body[0]["url"] in feeds
-    assert body[1]["url"] not in feeds
-    assert body[2]["url"] not in feeds
-    assert len(feeds) == len(constants.MORE_SHAARLIS) + 1
+    assert body[0] in feeds
+    assert body[1] not in feeds
+    assert body[2] not in feeds
+    assert len(feeds) == 1
     assert resp.call_count == 1
     assert file.is_file()
 

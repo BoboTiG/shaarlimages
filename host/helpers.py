@@ -107,8 +107,7 @@ def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
     # Remove duplicates
     uniq_feeds = []
     known_feeds = set()
-    for shaarli in functions.fetch_json(constants.FEEDS_URL) + constants.MORE_SHAARLIS:
-        url = shaarli["url"]
+    for url in functions.fetch_json(constants.FEEDS_URL, verify=True):
         key = functions.feed_key(url)
         if url and key not in known_feeds:
             known_feeds.add(key)

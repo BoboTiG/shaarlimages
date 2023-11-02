@@ -119,9 +119,7 @@ Suite à [cette requête](http://sebsauvage.net/paste/?b1176a415f9bbe17#CIT+sEj+
 
 ### Ajouter un shaarli
 
-La liste des instances shaarli est récupérée depuis cette [source](host/constants.py#L28) (recherche `FEEDS_URL`).
-Si une meilleure source existe, n'hésitez pas à proposer un patch.
-Et si votre instance ne figure pas dans cette source, il vous suffira d'être ajouté à celle-ci pour que vous soyez pris en compte moins de 24h plus tard.
+La liste des instances shaarli est récupérée depuis [BoboTiG/shaarlis](https://github.com/BoboTiG/shaarlis). N'hésitez pas à proposer un patch pour ajouter d'autres liens.
 
 ### Remerciements
 
