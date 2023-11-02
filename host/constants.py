@@ -30,7 +30,12 @@ FEEDS_URL = "https://www.ecirtam.net/shaarli-api/feeds?full=1"
 IMAGE_EXT = (".jfif", ".jpeg", ".jpg", ".pjp", ".pjpeg", ".png", ".webp")
 IMAGES_MAGIC_SIG = {".jpg": b"\xff\xd8\xff", ".png": b"\x89PNG", ".webp": b"RIFF"}
 IMAGES_CONTENT_TYPE = {"image/jpeg": ".jpg", "image/jpg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
-IMAGES_CONTENT_TYPE_IGNORED = {"image/apng", "image/gif", "image/svg+xml"}
+# Unsupported image types
+# image/apng: animation would make the gallery weird, issues with thumbnails & dominant color
+# image/gif: animation would make the gallery weird, issues with thumbnails & dominant color
+# image/svg+xml: issues with color average
+# image/tiff: files are too big
+IMAGES_CONTENT_TYPE_IGNORED = {"image/apng", "image/gif", "image/svg+xml", "image/tiff"}
 NSFW = "nsfw"
 THUMBNAIL_MAX_SIZE = Size(width=400, height=400)
 

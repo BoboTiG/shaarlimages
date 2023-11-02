@@ -449,7 +449,15 @@ def is_image_link(url: str) -> bool:
         >>> is_image_link("ok.webp")
         True
 
+        >>> is_image_link("unwanted.apng")
+        False
         >>> is_image_link("unwanted.gif")
+        False
+        >>> is_image_link("unwanted.gifv")
+        False
+        >>> is_image_link("unwanted.svg")
+        False
+        >>> is_image_link("unwanted.tif")
         False
 
         >>> is_image_link("")
