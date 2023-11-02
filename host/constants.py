@@ -36,3 +36,42 @@ THUMBNAIL_MAX_SIZE = Size(width=400, height=400)
 
 # Local web server
 HTTP_PORT = 8080
+
+# Additional shaarlis
+MORE_SHAARLIS = [
+    {"url": "http://140.238.202.186:8080/feed/atom"},
+    {"url": "http://abrochier.org/sha//feed/rss"},
+    {"url": "http://lwuibr.free.fr/shaarli/?do=rss"},
+    {"url": "http://shaarli.sam7.blog/?do=atom"},
+    {"url": "http://shaarli.speakerine.fr/?do=atom"},
+    {"url": "http://wwwcdorg.hd.free.fr/shaarli/feed/atom"},
+    {"url": "https://arthur.lutz.im/shaarli/feed/atom"},
+    {"url": "https://bm.raphaelbastide.com/feed/atom"},
+    {"url": "https://brouillon.zici.fr/liens/feed/atom"},
+    {"url": "https://dmeloni.fr/shaarli/?do=rss"},
+    {"url": "https://foxicorn.red/shaarli/feed/atom"},
+    {"url": "https://gregoire.surrel.org/links/?do=atom"},
+    {"url": "https://l.wentao.org//feed/atom"},
+    {"url": "https://liens.ordinator.fr/?do=atom"},
+    {"url": "https://links.nixdevil.com/feed/atom"},
+    {"url": "https://news.restez-curieux.ovh/feed/atom"},
+    {"url": "https://romainmarula.fr/Shaarli/feed/atom"},
+    {"url": "https://shaarli.4nton.dk/feed/atom"},
+    {"url": "https://shaarli.antredugreg.be/?do=rss"},
+    {"url": "https://shaarli.demapage.fr/feed/atom"},
+    {"url": "https://shaarli.dreads-unlock.fr/feed/atom"},
+    {"url": "https://shaarli.gardes.fr/feed/atom"},
+    {"url": "https://shaarli.grimbox.be/feed/atom"},
+    {"url": "https://shaarli.iooner.io/feed/atom"},
+    {"url": "https://shaarli.kazhnuz.space/feed/atom"},
+    {"url": "https://shaarli.kcaran.com/feed/atom"},
+    {"url": "https://shaarli.lyc-lecastel.fr/feed/atom"},
+    {"url": "https://shaarli.nailyk.fr/feed/atom"},
+    {"url": "https://shaarli.rosenberg-watt.com/feed/atom"},
+    {"url": "https://shaarli.underworld.fr/fouine/?do=atom"},
+    {"url": "https://top7box.com/shaarli/feed/atom"},
+    {"url": "https://www.funksys.net/feed/atom"},
+    {"url": "https://www.joelmariteau.fr/shaarli/?do=atom"},
+    {"url": "https://www.musee-gourmandise.be/shaarli/index.php?do=rss"},
+    {"url": "https://www.orpheomundi.fr/shaarli/?do=rss"},
+]
