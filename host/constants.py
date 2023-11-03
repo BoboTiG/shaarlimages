@@ -37,6 +37,7 @@ IMAGES_CONTENT_TYPE = {"image/jpeg": ".jpg", "image/jpg": ".jpg", "image/png": "
 # image/tiff: files are too big
 IMAGES_CONTENT_TYPE_IGNORED = {"image/apng", "image/gif", "image/svg+xml", "image/tiff"}
 NSFW = "nsfw"
+NSFW_TAGS = {NSFW, "sexy"}
 THUMBNAIL_MAX_SIZE = Size(width=400, height=400)
 
 # Local web server
