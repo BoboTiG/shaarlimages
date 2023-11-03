@@ -390,11 +390,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
         }
 
     # NSFW
-    if constants.NSFW not in metadata["tags"] and (
-        any(tag in constants.NSFW_TAGS for tag in metadata["tags"])
-        or constants.NSFW in item.title.lower()
-        or constants.NSFW in item.description.lower()
-    ):
+    if constants.NSFW not in metadata["tags"] and is_nsfw(item):
         metadata["tags"].append(constants.NSFW)
 
     metadata["tags"] = sorted(metadata["tags"])
@@ -475,6 +471,34 @@ def is_image_link(url: str) -> bool:
         return False
     hostname = urlparse(url).hostname
     return url.lower().endswith(constants.IMAGE_EXT) and hostname != config.SITE.host
+
+
+def is_nsfw(item: feedparser.FeedParserDict) -> bool:
+    """
+    Return True when the given `item` seems Not Safe For Work.
+
+        >>> is_nsfw({"tags": [{"term": "NSFW"}]})
+        True
+        >>> is_nsfw({"tags": [{"term": "sexy"}]})
+        True
+        >>> is_nsfw({"title": "NSFW Warning!"})
+        True
+        >>> is_nsfw({"title": "noop", "description": "NSFW Warning!"})
+        True
+
+        >>> is_nsfw({"title": "Sexy picture!", "description": "Sexy picture! (maybe SFW)"})
+        False
+        >>> is_nsfw({"title": "noop", "description": "noop"})
+        False
+        >>> is_nsfw({"tags": [{"term": "foo"}], "title": "noop", "description": "noop"})
+        False
+
+    """
+    return (
+        any(safe_tag(tag["term"]) in constants.NSFW_TAGS for tag in item.get("tags") or [])
+        or constants.NSFW in item["title"].lower()
+        or constants.NSFW in item["description"].lower()
+    )
 
 
 def load_metadata(feed: Path) -> list[tuple[float, custom_types.Metadata]]:
