@@ -369,12 +369,13 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
     create_thumbnail(output_file)
 
     # Keep up-to-date textual information
+    item.tags = [safe_tag(tag.term) for tag in getattr(item, "tags", [])]
     metadata = (cache or {}) | {
         "date": mktime(item.published_parsed),
         "desc": item.description,
         "file": output_file.name,
         "guid": item.guid,
-        "tags": [safe_tag(tag.term) for tag in getattr(item, "tags", [])],
+        "tags": item.tags,
         "title": item.title,
         "url": link,
     }
@@ -477,9 +478,9 @@ def is_nsfw(item: feedparser.FeedParserDict) -> bool:
     """
     Return True when the given `item` seems Not Safe For Work.
 
-        >>> is_nsfw({"tags": [{"term": "NSFW"}]})
+        >>> is_nsfw({"tags": ["nsfw"]})
         True
-        >>> is_nsfw({"tags": [{"term": "sexy"}]})
+        >>> is_nsfw({"tags": ["sexy"]})
         True
         >>> is_nsfw({"title": "NSFW Warning!"})
         True
@@ -490,14 +491,14 @@ def is_nsfw(item: feedparser.FeedParserDict) -> bool:
         False
         >>> is_nsfw({"title": "noop", "description": "noop"})
         False
-        >>> is_nsfw({"tags": [{"term": "foo"}], "title": "noop", "description": "noop"})
+        >>> is_nsfw({"tags": ["foo"], "title": "noop", "description": "noop"})
         False
 
     """
     return (
-        any(safe_tag(tag["term"]) in constants.NSFW_TAGS for tag in item.get("tags") or [])
-        or constants.NSFW in item["title"].lower()
-        or constants.NSFW in item["description"].lower()
+        any(tag in constants.NSFW_TAGS for tag in item.get("tags", []))
+        or constants.NSFW in item.get("title", "").lower()
+        or constants.NSFW in item.get("description", "").lower()
     )
 
 
