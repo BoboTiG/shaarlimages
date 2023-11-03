@@ -30,6 +30,7 @@ def fix_images_medatadata(force: bool = False):
 
             # Purge removed Imgur images
             if data[k]["checksum"] == MD5_EMPTY:
+                print("- Imgur", v["file"], flush=True)
                 del data[k]
                 changed = True
                 at_least_one_change = True
@@ -37,12 +38,21 @@ def fix_images_medatadata(force: bool = False):
 
             # Fix date
             if not isinstance(v["date"], float):
+                print("! date", v["file"], flush=True)
                 data[k] |= {"date": float(k)}
                 changed = True
                 at_least_one_change = True
 
+            # add missing NSFW tag
+            if constants.NSFW not in v["tags"] and functions.is_nsfw(v):
+                print("+ NSFW", v["file"], flush=True)
+                v["tags"].append(constants.NSFW)
+                v["tags"] = sorted(v["tags"])
+                changed = True
+                at_least_one_change = True
+
         if not data:
-            print(f" ! Remove empty feed {feed}")
+            print(f" ! Remove empty feed {feed}", flush=True)
             feed.unlink()
             at_least_one_change = True
         elif changed:
