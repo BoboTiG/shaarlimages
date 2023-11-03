@@ -43,7 +43,7 @@ def fix_images_medatadata(force: bool = False):
                 changed = True
                 at_least_one_change = True
 
-            # add missing NSFW tag
+            # Add missing NSFW tag
             if constants.NSFW not in v["tags"] and functions.is_nsfw(v):
                 print("+ NSFW", v["file"], flush=True)
                 v["tags"].append(constants.NSFW)

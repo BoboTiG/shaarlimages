@@ -82,7 +82,7 @@ def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
         feed.add_item(
             image.title,
             f"{config.SITE.url}/zoom/{image.file}",
-            f'<img src="{config.SITE.url}/image/{image.file}"/><br /><br />{image.desc}',
+            f'<img src="{config.SITE.url}/image/{image.file}"/><br /><br />{image.description}',
             categories=image.tags,
             pubdate=datetime.fromtimestamp(image.date, tz=timezone.utc),
             unique_id=f"{config.SITE.url}/zoom/{image.file}",
@@ -372,7 +372,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
     item.tags = [safe_tag(tag.term) for tag in getattr(item, "tags", [])]
     metadata = (cache or {}) | {
         "date": mktime(item.published_parsed),
-        "desc": item.description,
+        "description": item.description,
         "file": output_file.name,
         "guid": item.guid,
         "tags": item.tags,
@@ -535,7 +535,7 @@ def lookup(term: str) -> custom_types.Metadatas:
         for metadata in retrieve_all_uniq_metadata()
         if (
             term in metadata.title.lower()
-            or term in metadata.desc.lower()
+            or term in metadata.description.lower()
             or term in metadata.guid.lower()
             or term in metadata.file.lower()
             or term in metadata.tags

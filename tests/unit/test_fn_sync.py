@@ -196,7 +196,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path, setup_data):
     assert data.checksum == "29c25875e30fe9547349057887b19682"
     assert isinstance(data.date, float)
     assert data.date > 0
-    assert data.desc == "Simple description with the 'nsfw' keyword."
+    assert data.description == "Simple description with the 'nsfw' keyword."
     assert data.docolav == "585E50"
     assert data.file == "0_kVjw.jpg"
     assert data.height == 267

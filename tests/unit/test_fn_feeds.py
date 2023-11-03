@@ -16,7 +16,7 @@ from .constants import IMAGE_WEBP
 
 def check_item(item: custom_types.Metadata) -> None:
     assert isinstance(item, custom_types.Metadata)
-    assert isinstance(item.desc, str)
+    assert isinstance(item.description, str)
     assert isinstance(item.docolav, str)
     assert isinstance(item.guid, str)
     assert isinstance(item.height, int)
