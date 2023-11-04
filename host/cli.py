@@ -9,7 +9,7 @@ import functions
 MD5_EMPTY = "d835884373f4d6c8f24742ceabe74946"
 
 
-def fix_images_medatadata(force: bool = False):
+def fix_images_medatadata() -> None:
     at_least_one_change = False
 
     for feed in constants.FEEDS.glob("*.json"):
@@ -35,13 +35,6 @@ def fix_images_medatadata(force: bool = False):
                 changed = True
                 at_least_one_change = True
                 continue
-
-            # Fix date
-            if not isinstance(v["date"], float):
-                print("! date", v["file"], flush=True)
-                data[k] |= {"date": float(k)}
-                changed = True
-                at_least_one_change = True
 
             # Add missing NSFW tag
             if constants.NSFW not in v["tags"] and functions.is_nsfw(v):

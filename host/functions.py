@@ -29,7 +29,8 @@ import solvers
 import urllib3
 from feedgenerator import Atom1Feed
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from requests.structures import CaseInsensitiveDict
+from urllib3.util.retry import Retry
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -158,48 +159,43 @@ def docolav(file: Path) -> str:
     return "".join(f"{int(n):02X}" for n in avg_color[::-1])
 
 
-def feed_key(url: str, version: int = 2) -> str:
+def feed_key(url: str) -> str:
     """
     Craft the feed URL key for the local storage.
 
-        >>> feed_key("https://www.example.org/links/feed/rss", version=1)
+        >>> feed_key("https://www.example.org")
         'www.example.org'
-
-        >>> feed_key("https://www.example.org", version=2)
+        >>> feed_key("https://www.example.org/")
         'www.example.org'
-        >>> feed_key("https://www.example.org/", version=2)
-        'www.example.org'
-        >>> feed_key("https://shaarli.example.org/?do=rss", version=2)
+        >>> feed_key("https://shaarli.example.org/?do=rss")
         'shaarli.example.org'
-        >>> feed_key("https://shaarli.example.org/feed/rss?do=rss", version=2)
+        >>> feed_key("https://shaarli.example.org/feed/rss?do=rss")
         'shaarli.example.org'
-        >>> feed_key("https://shaarli.example.org//feed/rss?do=rss", version=2)
+        >>> feed_key("https://shaarli.example.org//feed/rss?do=rss")
         'shaarli.example.org'
-        >>> feed_key("https://www.example.org/links?do=rss", version=2)
+        >>> feed_key("https://www.example.org/links?do=rss")
         'www.example.org/links'
-        >>> feed_key("https://www.example.org/shaarli/?do=rss", version=2)
+        >>> feed_key("https://www.example.org/shaarli/?do=rss")
         'www.example.org/shaarli'
-        >>> feed_key("https://www.example.org//shaarli/feed/rss?do=rss", version=2)
+        >>> feed_key("https://www.example.org//shaarli/feed/rss?do=rss")
         'www.example.org/shaarli'
-        >>> feed_key("https://www.example.org/shaarli/feed/rss", version=2)
+        >>> feed_key("https://www.example.org/shaarli/feed/rss")
         'www.example.org/shaarli'
-        >>> feed_key("https://www.example.org/pro/liens/feed/rss?do=rss", version=2)
+        >>> feed_key("https://www.example.org/pro/liens/feed/rss?do=rss")
         'www.example.org/pro/liens'
-        >>> feed_key("https://www.example.org/rss.php?do=rss&mode=links", version=2)
+        >>> feed_key("https://www.example.org/rss.php?do=rss&mode=links")
         'www.example.org'
-        >>> feed_key("https://www.example.org/feed/atom?", version=2)
+        >>> feed_key("https://www.example.org/feed/atom?")
         'www.example.org'
 
     """
     parts = urlparse(url)
-    match version:
-        case 1:
-            return parts.hostname
-        case 2:
-            path = parts.path.replace("//", "/")
-            if len(path) > 1:
-                path = path.removesuffix("/rss.php").removesuffix("/rss").removesuffix("/atom").removesuffix("/feed")
-            return f"{parts.hostname}{path.removesuffix('/')}"
+    path = parts.path.replace("//", "/")
+
+    if len(path) > 1:
+        path = path.removesuffix("/rss.php").removesuffix("/rss").removesuffix("/atom").removesuffix("/feed")
+
+    return f"{parts.hostname}{path.removesuffix('/')}"
 
 
 def fetch(url: str, method: str = "get", verify: bool = False, from_the_past: bool = True) -> requests.Response:
@@ -620,7 +616,7 @@ def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
     return res
 
 
-def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
+def safe_tag(tag: str, cleanup: re.Pattern = re.compile(r"--+")) -> str:
     """
     Sanitize a tag.
 
@@ -628,7 +624,7 @@ def safe_tag(tag: str, cleanup=re.compile(r"--+").sub) -> str:
         'b-w-colors'
 
     """
-    return cleanup(
+    return cleanup.sub(
         "-",
         tag.lower()
         .replace("/", "-")
@@ -706,7 +702,7 @@ def try_wayback_machine(url: str, method: str) -> requests.Response:
 
     if method == "head" and waybackdata.content_type:
         response = requests.Response()
-        response.headers = {"Content-Type": waybackdata.content_type}
+        response.headers = CaseInsensitiveDict({"Content-Type": waybackdata.content_type})
         response.status_code = 200
         response.url = url
         return response

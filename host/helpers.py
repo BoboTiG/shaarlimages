@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from threading import get_ident
 from time import mktime
+from typing import Any
 
 import config
 import constants
@@ -28,8 +29,8 @@ def sync_feed(url: str, force: bool = False) -> int:
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
     cache_file = constants.FEEDS / f"{cache_key}.json"
-    cache: dict[str, str] = functions.read(cache_file)
-    latest_image = float(max(cache.keys(), key=float)) if cache else 0.0
+    cache = functions.load_metadata(cache_file)
+    latest_image = float(max(metadata.date for metadata in cache)) if cache else 0.0
 
     url = functions.fix_url(url)
 
@@ -150,7 +151,7 @@ def pagination(images: custom_types.Metadatas, total: int, page: int) -> str:
     return render("page", **locals())
 
 
-def render(tpl: str, **kwargs) -> str:
+def render(tpl: str, **kwargs: Any) -> str:
     """Render a template with provided keyword arguments."""
     return template(
         tpl,

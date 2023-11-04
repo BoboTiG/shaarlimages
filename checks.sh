@@ -1,6 +1,7 @@
 #!/bin/bash
 
-python -m isort host server.py tests || true
-python -m black host server.py tests || true
-python -m flake8 host server.py tests || true
-# python -m mypy host/*.py server.py tests
+python -m isort host server.py tests
+python -m black host server.py tests
+python -m flake8 host server.py tests
+python -m mypy host server.py
+python -m mypy tests || true

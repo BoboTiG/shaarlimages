@@ -5,6 +5,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 import re
 from time import struct_time
+from typing import Callable
 from urllib.parse import parse_qs, urlparse, urlunparse
 
 import constants
@@ -13,7 +14,11 @@ import functions
 IMGUR_SUFFIX = tuple(f"_d{ext}" for ext in constants.IMAGE_EXT)
 
 
-def cg_society(url: str, *_, pattern=re.compile(rb"<meta content='([^']+)' property='og:image'").search) -> str:
+def cg_society(
+    url: str,
+    *_: struct_time,
+    pattern: re.Pattern = re.compile(rb"<meta content='([^']+)' property='og:image'"),
+) -> str:
     """
     Resolve the original image URL from CG Society.
 
@@ -25,10 +30,12 @@ def cg_society(url: str, *_, pattern=re.compile(rb"<meta content='([^']+)' prope
         return url
 
     response = functions.fetch(url, verify=True)
-    return "" if (image := pattern(response.content)) is None else image[1].decode().replace("/medium/", "/large/")
+    return (
+        "" if (image := pattern.search(response.content)) is None else image[1].decode().replace("/medium/", "/large/")
+    )
 
 
-def cheeseburger(url: str, *_) -> str:
+def cheeseburger(url: str, *_: struct_time) -> str:
     """
     Resolve the original image URL from Cheeseburger.
 
@@ -39,7 +46,7 @@ def cheeseburger(url: str, *_) -> str:
     return url
 
 
-def developpez(url: str, *_) -> str:
+def developpez(url: str, *_: struct_time) -> str:
     """
     Resolve the original image URL from Developpez.net.
 
@@ -54,7 +61,7 @@ def developpez(url: str, *_) -> str:
     return url if functions.is_image_link(url) or "/forums/attachments/" in url else ""
 
 
-def imgur(url: str, *_) -> str:
+def imgur(url: str, *_: struct_time) -> str:
     """
     Resolve the original image URL from Imgut.
 
@@ -80,13 +87,10 @@ def imgur(url: str, *_) -> str:
 
     # Ensure the image still exists
     response = functions.fetch(url, method="head", verify=True)
-    if response.url.endswith("/removed.png"):
-        return ""
-
-    return url
+    return "" if response.url.endswith("/removed.png") else url
 
 
-def lutim(url: str, *_) -> str:
+def lutim(url: str, *_: struct_time) -> str:
     """
     Resolve the original image URL from Lutim.
 
@@ -97,7 +101,7 @@ def lutim(url: str, *_) -> str:
     return url
 
 
-def nasa_apod(url: str, date: struct_time, pattern=re.compile(rb'<a href="(image/[^"]+)"').search) -> str:
+def nasa_apod(url: str, date: struct_time, pattern: re.Pattern = re.compile(rb'<a href="(image/[^"]+)"')) -> str:
     """
     Resolve the original image URL from Astronomy Picture of the Day (APOD - NASA).
 
@@ -130,14 +134,14 @@ def nasa_apod(url: str, date: struct_time, pattern=re.compile(rb'<a href="(image
         parts = parts._replace(netloc="apod.nasa.gov")
 
     response = functions.fetch(urlunparse(parts), verify=True)
-    if (image := pattern(response.content)) is None:
+    if (image := pattern.search(response.content)) is None:
         return ""
 
     parts = parts._replace(path=f"/apod/{image[1].decode()}")
     return urlunparse(parts)
 
 
-def nasa_jpl(url: str, *_) -> str:
+def nasa_jpl(url: str, *_: struct_time) -> str:
     """
     Resolve the original image URL from NASA's Jet Propulsion Laboratory (JPL).
 
@@ -156,7 +160,11 @@ def nasa_jpl(url: str, *_) -> str:
     return f"https://photojournal.jpl.nasa.gov/jpeg/{catalog}.jpg"
 
 
-def quora(url: str, *_, pattern=re.compile(rb"<meta property='og:image' content='([^']+)'").search) -> str:
+def quora(
+    url: str,
+    *_: struct_time,
+    pattern: re.Pattern = re.compile(rb"<meta property='og:image' content='([^']+)'"),
+) -> str:
     """
     Resolve the original image URL from Quora.
 
@@ -169,10 +177,10 @@ def quora(url: str, *_, pattern=re.compile(rb"<meta property='og:image' content=
         return url
 
     response = functions.fetch(url, verify=True)
-    return "" if (image := pattern(response.content)) is None else image[1].decode()
+    return "" if (image := pattern.search(response.content)) is None else image[1].decode()
 
 
-def twitter_img(url: str, *_) -> str:
+def twitter_img(url: str, *_: struct_time) -> str:
     """
     Resolve the original image URL from Twitter.
 
@@ -205,10 +213,14 @@ def twitter_img(url: str, *_) -> str:
     return url if functions.is_image_link(url) else ""
 
 
-def webb_telescope(url: str, *_, pattern=re.compile(rb'<meta property="og:image" content="([^"]+)"').search) -> str:
+def webb_telescope(
+    url: str,
+    *_: struct_time,
+    pattern: re.Pattern = re.compile(rb'<meta property="og:image" content="([^"]+)"'),
+) -> str:
     """Resolve the original image URL from Webb Space Telescope."""
     response = functions.fetch(url, verify=True)
-    if not (url := "" if (image := pattern(response.content)) is None else image[1].decode()):
+    if not (url := "" if (image := pattern.search(response.content)) is None else image[1].decode()):
         return ""
 
     if not url.startswith("http"):
@@ -216,7 +228,7 @@ def webb_telescope(url: str, *_, pattern=re.compile(rb'<meta property="og:image"
     return url
 
 
-def wikimedia(url: str, *_) -> str:
+def wikimedia(url: str, *_: struct_time) -> str:
     """
     Resolve the original image URL from Wikimedia.
 
@@ -239,13 +251,17 @@ def wikimedia(url: str, *_) -> str:
     return files.get("original", {}).get("url") or ""
 
 
-def zbrush_central(url: str, *_, pattern=re.compile(rb'<meta property="og:image" content="([^"]+)"').search) -> str:
+def zbrush_central(
+    url: str,
+    *_: struct_time,
+    pattern: re.Pattern = re.compile(rb'<meta property="og:image" content="([^"]+)"'),
+) -> str:
     """Resolve the original image URL from ZBrushCentral."""
     response = functions.fetch(url, verify=True)
-    return "" if (image := pattern(response.content)) is None else image[1].decode()
+    return "" if (image := pattern.search(response.content)) is None else image[1].decode()
 
 
-SOLVERS = {
+SOLVERS: dict[str, Callable] = {
     "antwrp.gsfc.nasa.gov": nasa_apod,
     "apod.nasa.gov": nasa_apod,
     "i.chzbgr.com": cheeseburger,

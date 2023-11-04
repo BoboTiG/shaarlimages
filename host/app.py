@@ -4,6 +4,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 """
 
 from functools import wraps
+from typing import Callable
 
 import bottle
 import constants
@@ -26,11 +27,11 @@ modifications, that you make.
 """
 
 
-def cache(function):
+def cache(function: Callable) -> Callable:
     """Decorator used to cache HTTP responses."""
 
     @wraps(function)
-    def wrapper(*args, **kwargs) -> str:
+    def wrapper(*args: int | str, **kwargs: int | str) -> str:
         if bottle.DEBUG:  # pragma: nocover
             return function(*args, **kwargs)
 
@@ -45,7 +46,7 @@ def cache(function):
 
 
 @route("/")
-def page_home() -> str:
+def page_home() -> None:
     """Display the primary page."""
     redirect("/page/1")
 
@@ -58,7 +59,7 @@ def page_home_pagination(page: int) -> str:
 
 
 @route("/random")
-def page_random() -> str:
+def page_random() -> None:
     """Display a random image."""
     image = functions.get_random_image()
     redirect(f"/zoom/{image.file}")
@@ -134,7 +135,7 @@ def rss_search_by_tag_with_custom_items_count(tag: str, count: int) -> str:
 
 
 @route("/search/<term>")
-def search(term: str) -> str:
+def search(term: str) -> None:
     """Search for images."""
     redirect(f"/search/{term}/1")
 
@@ -147,7 +148,7 @@ def search_pagination(term: str, page: int) -> str:
 
 
 @route("/tag/<tag>")
-def search_by_tag(tag: str) -> str:
+def search_by_tag(tag: str) -> None:
     """Search for images by tag."""
     redirect(f"/tag/{tag}/1")
 
