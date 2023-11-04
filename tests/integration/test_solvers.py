@@ -71,7 +71,7 @@ from host import functions, solvers
         (
             "quora",
             "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3",  # noqa[W503]
-            "b3b0c5903a666b88965871fd034110d1",
+            "c419a1e03b967d4c9f61286a32f34613",
         ),
         (
             "twitter_img",

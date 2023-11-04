@@ -678,9 +678,9 @@ def today() -> datetime:
     return datetime.now(tz=timezone.utc)
 
 
-def try_wayback_machine(url: str, method: str) -> requests.Response:
+def try_wayback_machine(url: str, method: str, force: bool = False) -> requests.Response:
     """Try to fetch a given `url` using the great Wayback Machine."""
-    waybackdata = load_wayback_back_data(url)
+    waybackdata = load_wayback_back_data("unknown" if force else url)
 
     if waybackdata.is_lost:
         raise Evanesco()
@@ -709,7 +709,7 @@ def try_wayback_machine(url: str, method: str) -> requests.Response:
         response = requests.Response()
         response.headers = CaseInsensitiveDict({"Content-Type": waybackdata.content_type})
         response.status_code = 200
-        response.url = url
+        response.url = waybackdata.snapshot
         return response
 
     print(f">>> ⌛ [{method.upper()}]", url, flush=True)

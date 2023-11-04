@@ -19,4 +19,13 @@ from host import functions
 )
 @pytest.mark.parametrize("method", ["head", "get"])
 def test_wayback_machine(method: str, url: str, expected: str) -> None:
-    assert functions.try_wayback_machine(url, method=method).url == expected
+    response = functions.try_wayback_machine(url, method)
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "image/jpeg"
+    assert response.url == expected
+
+    # The second time, the cache will be used, simple check
+    response = functions.try_wayback_machine(url, method)
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "image/jpeg"
+    assert response.url == expected
