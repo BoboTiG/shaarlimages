@@ -3,6 +3,7 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
+from pathlib import Path
 from random import choice
 
 import feedparser
@@ -27,12 +28,24 @@ def test_cache_invalidation(setup_data: FixtureFunction) -> None:
 
 
 def test_page_home_is_redirection() -> None:
-    with pytest.raises(HTTPResponse) as exc:
+    with boddle(params={}), pytest.raises(HTTPResponse) as exc:
         app.page_home()
 
     response = exc.value
     assert response.status_code == 302
     assert response.headers["Location"] == "http://127.0.0.1/page/1"
+
+
+def test_page_home_is_redirection_backward_compatibility(setup_data: FixtureFunction) -> None:
+    image = choice(functions.retrieve_all_uniq_metadata())
+    file = Path(image.file)
+
+    with boddle(params={"i": file.stem}), pytest.raises(HTTPResponse) as exc:
+        app.page_home()
+
+    response = exc.value
+    assert response.status_code == 302
+    assert response.headers["Location"] == f"http://127.0.0.1/zoom/{file.stem}"
 
 
 def test_page_home_pagination(setup_data: FixtureFunction) -> None:

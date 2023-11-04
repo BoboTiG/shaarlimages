@@ -10,7 +10,7 @@ import feedparser
 from _pytest.fixtures import FixtureFunction
 
 from host import config, custom_types, functions
-from host.constants import DATA, FEEDS
+from host.constants import DATA, FEEDS, HASH_LEN
 
 
 def check_item(item: custom_types.Metadata) -> None:
@@ -24,7 +24,7 @@ def check_item(item: custom_types.Metadata) -> None:
     assert isinstance(item.title, str)
     assert isinstance(item.width, int)
 
-    assert len(item.docolav) == 6
+    assert len(item.docolav) == HASH_LEN
     assert item.height > 0
     assert item.width > 0
 

@@ -237,6 +237,11 @@ def fetch_image(url: str, verify: bool = False) -> bytes | None:
     return None
 
 
+def find_image(key: str) -> custom_types.Metadata:
+    """Find the image associated to the given `key`, which is a `small_hash()` value."""
+    return next((meta for meta in retrieve_all_uniq_metadata() if Path(meta.file).stem == key), "")
+
+
 def fix_url(url: str) -> str:
     """
     Fix common URL issues.
@@ -653,7 +658,7 @@ def small_hash(value: str) -> str:
 
     Small hashes:
     - are unique (well, as unique as crc32, at last)
-    - are always 6 characters long
+    - are always 6 characters long (`constants.HASH_LEN`)
     - only use the following characters: a-z A-Z 0-9 - _ @
     - are NOT cryptographically secure (they CAN be forged)
 

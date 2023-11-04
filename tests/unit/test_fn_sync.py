@@ -11,7 +11,7 @@ import responses
 from _pytest.capture import CaptureFixture
 
 from host import custom_types, functions, helpers
-from host.constants import DATA, FEEDS, FEEDS_URL, IMAGE_EXT, IMAGES
+from host.constants import DATA, FEEDS, FEEDS_URL, HASH_LEN, IMAGE_EXT, IMAGES
 
 from .constants import (
     FEED_URL,
@@ -189,7 +189,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
 
     # Check downloaded images
     for file in (tmp_path / DATA.name / IMAGES.name).glob("*"):
-        assert len(file.stem) == 6
+        assert len(file.stem) == HASH_LEN
         assert file.suffix in IMAGE_EXT
 
     # Check item metadata

@@ -39,6 +39,7 @@ IMAGES_CONTENT_TYPE_IGNORED = {"image/apng", "image/gif", "image/svg+xml", "imag
 NSFW = "nsfw"
 NSFW_TAGS = {NSFW, "sexy"}
 THUMBNAIL_MAX_SIZE = Size(width=400, height=400)
+HASH_LEN = 6  # `small_hash()` value is always 6 characters long
 
 # Local web server
 HTTP_PORT = 8080

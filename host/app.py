@@ -14,9 +14,9 @@ import version
 from bottle import HTTPResponse, default_app, redirect, request, route, static_file
 
 __version__ = version.__version__
-__author__ = "Mickaël Schoentgen"
+__author__ = "Mickaël 'Tiger-222' Schoentgen"
 __copyright__ = """
-Copyright (c) 2013-2014,2023, Mickaël 'Tiger-222' Schoentgen
+Copyright (c) 2013-2014,2023 Mickaël 'Tiger-222' Schoentgen
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee or royalty is hereby
@@ -48,7 +48,8 @@ def cache(function: Callable) -> Callable:
 @route("/")
 def page_home() -> None:
     """Display the primary page."""
-    redirect("/page/1")
+    # Backward compatibility (from 2013-2014) where an image could be shown using the `i=SMALL_HASH` query parameter
+    redirect(f"/zoom/{key}" if (key := request.params.get("i")) else "/page/1")
 
 
 @route("/page/<page:int>")
@@ -65,10 +66,11 @@ def page_random() -> None:
     redirect(f"/zoom/{image.file}")
 
 
-@route("/zoom/<image>")
-def page_zoom(image: str) -> str:
+@route("/zoom/<key>")
+def page_zoom(key: str) -> str:
     """Display an image."""
-    return helpers.render_zoom_page(image)
+    # Support both SMALL_HASH (preferred) and SMALL_HASH.EXT
+    return helpers.render_zoom_page(functions.find_image(key).file if len(key) == constants.HASH_LEN else key)
 
 
 @route("/rss")
