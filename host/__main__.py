@@ -18,8 +18,7 @@ def create_parser() -> ArgumentParser:
     subparsers = parser.add_subparsers(dest="action")
 
     # fix
-    parser_fix = subparsers.add_parser("fix", help="several fix actions on images")
-    parser_fix.add_argument("--force", "-f", action="store_true", help="force full recheck")
+    subparsers.add_parser("fix", help="several fix actions on images")
 
     # purge
     parser_purge = subparsers.add_parser("purge", help="remove an image")
@@ -41,7 +40,7 @@ def main(cli_args: list[str]) -> int:
 
     match args.action:
         case "fix":
-            cli.fix_images_medatadata(force=args.force)
+            cli.fix_images_medatadata()
         case "purge":
             cli.purge({args.FILE})
         case "sync":
