@@ -13,14 +13,7 @@ from host.__main__ import main
 def test_fix() -> None:
     with patch("cli.fix_images_medatadata") as mocker:
         assert main(["fix"]) == 0
-        mocker.assert_called_once_with(force=False)
-
-
-@pytest.mark.parametrize("arg_force", ["--force", "-f"])
-def test_fix_forced(arg_force: str) -> None:
-    with patch("cli.fix_images_medatadata") as mocker:
-        assert main(["fix", arg_force]) == 0
-        mocker.assert_called_once_with(force=True)
+        mocker.assert_called_once_with()
 
 
 def test_purge() -> None:
