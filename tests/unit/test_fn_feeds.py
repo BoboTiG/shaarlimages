@@ -11,8 +11,6 @@ import feedparser
 from host import config, custom_types, functions
 from host.constants import DATA, FEEDS
 
-from .constants import IMAGE_WEBP
-
 
 def check_item(item: custom_types.Metadata) -> None:
     assert isinstance(item, custom_types.Metadata)
@@ -42,17 +40,13 @@ def test_craft_feed(setup_data) -> None:
     assert feed.title == config.SITE.title
 
     items = parsed.entries
-    assert len(items) == 5
+    assert len(items) == 4
 
     item = items[0]
-    assert item.description == (
-        f'<img src="{config.SITE.url}/image/{IMAGE_WEBP.name}" />'
-        "<br /><br />"
-        "Simple description with the 'robe' keyword."
-    )
-    assert item.id == f"{config.SITE.url}/zoom/{IMAGE_WEBP.name}"
-    assert item.link == f"{config.SITE.url}/zoom/{IMAGE_WEBP.name}"
-    assert sorted(tag.term for tag in item.tags) == ["image", "nsfw", "sample", "test"]
+    assert config.SITE.url in item.description
+    assert "Simple description with the 'robe' keyword." in item.description
+    assert item.link.startswith(f"{config.SITE.url}/zoom/")
+    assert sorted(tag.term for tag in item.tags) == ["clothes", "image", "sample", "test"]
     assert item.title == "Awesome image!"
 
 
@@ -114,8 +108,7 @@ def test_load_metadata(tmp_path: Path, setup_data) -> None:
     assert data
     assert isinstance(data, list)
 
-    key, item = choice(data)
-    assert isinstance(key, float)
+    item = choice(data)
     check_item(item)
 
 

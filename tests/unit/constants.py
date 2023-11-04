@@ -10,18 +10,45 @@ from host.custom_types import Size
 
 HERE = Path(__file__).parent
 DATA = HERE / "data"
-IMAGE_JPG = DATA / "0_kVjw.jpg"
-IMAGE_JPG_IS_PNG = DATA / "ZKwOVg.jpg"
-IMAGE_PNG = DATA / "8kZBBg.png"
-IMAGE_SQUARE = DATA / "-1hlcA.jpg"
-IMAGE_WEBP = DATA / "HR-aQw.webp"
+IMAGE_JPG = DATA / "1.jpg"
+IMAGE_PNG = DATA / "2.png"
+IMAGE_SQUARE = DATA / "3.jpg"
+IMAGE_WEBP = DATA / "4.webp"
 
 TEST_IMAGES = [
-    (IMAGE_JPG, 22548, Size(width=400, height=267), "585E50", "29c25875e30fe9547349057887b19682"),
-    (IMAGE_JPG_IS_PNG, 503, Size(width=161, height=81), "323232", "d835884373f4d6c8f24742ceabe74946"),
-    (IMAGE_PNG, 61283, Size(width=317, height=400), "B19C95", "2a4ab87892014129a4f1e73ba9dfe22d"),
-    (IMAGE_SQUARE, 21519, Size(width=400, height=400), "656B72", "8bdecafe89fd9e02981720ba8172dad4"),
-    (IMAGE_WEBP, 123482, Size(width=358, height=400), "6A7777", "95603fa0936de10e5068b1d200680273"),
+    # (local file, file size, original size, thumbnail size, docolav, checksum)
+    (
+        IMAGE_JPG,
+        22548,
+        Size(width=2880, height=1920),
+        Size(width=400, height=267),
+        "585E50",
+        "29c25875e30fe9547349057887b19682",
+    ),
+    (
+        IMAGE_PNG,
+        61283,
+        Size(width=684, height=864),
+        Size(width=317, height=400),
+        "B19C95",
+        "2a4ab87892014129a4f1e73ba9dfe22d",
+    ),
+    (
+        IMAGE_SQUARE,
+        21519,
+        Size(width=500, height=500),
+        Size(width=400, height=400),
+        "656B72",
+        "8bdecafe89fd9e02981720ba8172dad4",
+    ),
+    (
+        IMAGE_WEBP,
+        123482,
+        Size(width=460, height=514),
+        Size(width=358, height=400),
+        "6A7777",
+        "95603fa0936de10e5068b1d200680273",
+    ),
 ]
 FEED_URL = "https://shaarli.example.org"
 FEED_XML = (

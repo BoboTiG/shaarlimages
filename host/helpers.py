@@ -7,7 +7,6 @@ import math
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from threading import get_ident
-from time import mktime
 from typing import Any
 
 import config
@@ -29,8 +28,7 @@ def sync_feed(url: str, force: bool = False) -> int:
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
     cache_file = constants.FEEDS / f"{cache_key}.json"
-    cache = functions.load_metadata(cache_file)
-    latest_image = float(max(metadata.date for metadata in cache)) if cache else 0.0
+    cache = functions.read(cache_file)
 
     url = functions.fix_url(url)
 
@@ -54,26 +52,16 @@ def sync_feed(url: str, force: bool = False) -> int:
             # Sadly, Shaarli is configured with HIDE_TIMESTAMPS=true
             # https://github.com/sebsauvage/Shaarli/blob/029f75f/index.php#L23
             now = functions.today()
-            item.published = now.isoformat("T")
             item.published_parsed = now.utctimetuple()
 
-        published = mktime(item.published_parsed)
-        if not force and published < latest_image:
-            break
-
         try:
-            is_new, metadata = functions.handle_item(item, cache.get(str(published), {}))
+            is_new = functions.handle_item(item, cache)
         except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError, functions.Evanesco):
             continue
         except Exception as exc:
             print(f"🐛 {get_ident()} {type(exc).__name__} on {item=}", flush=True)
             print(f"{exc}", flush=True)
             continue
-
-        if not metadata:
-            continue
-
-        cache[str(published)] = metadata
 
         if is_new:
             total_new_images += 1

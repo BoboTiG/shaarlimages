@@ -36,6 +36,8 @@ def setup_data_folders(tmp_path: Path) -> None:
         patch("constants.THUMBNAILS", data / THUMBNAILS.name),
         patch("constants.WAYBACK_MACHINE", data / WAYBACK_MACHINE.name),
     ):
+        (data / IMAGES.name).mkdir(exist_ok=True, parents=True)
+        (data / THUMBNAILS.name).mkdir(exist_ok=True)
         yield
 
 
@@ -47,33 +49,30 @@ def setup_data(tmp_path: Path):
         {"feeds": [FEED_URL], "updated": functions.now()},
     )
 
-    # Create the JSON feed
-    feed_key = functions.small_hash(functions.feed_key(FEED_URL))
-    functions.persist(
-        tmp_path / DATA.name / FEEDS.name / f"{feed_key}.json",
-        {
-            str(idx): {
-                "checksum": functions.checksum(file),
-                "date": functions.now(),
-                "description": f"Simple description with the '{'nsfw' if idx == 1 else 'robe'}' keyword.",
-                "docolav": color,
-                "file": file.name,
-                "guid": f"{FEED_URL}/shaare/{idx}",
-                "height": size.height,
-                "tags": ["sample", "test", "image"] + ["nsfw" if idx % 2 == 1 else "clothes"],
-                "title": "Awesome image!",
-                "width": size.width,
-                "url": f"{FEED_URL}/original/{idx}",
-            }
-            for idx, (file, _, size, color, *__) in enumerate(TEST_IMAGES, 1)
-        },
-    )
-
-    # Copy images
+    # Will copy images there
     images = tmp_path / DATA.name / IMAGES.name
     thumbs = tmp_path / DATA.name / THUMBNAILS.name
-    images.mkdir(parents=True)
-    thumbs.mkdir()
-    for file, *_ in TEST_IMAGES:
-        copyfile(file, images / file.name)
-        copyfile(file, thumbs / file.name)
+
+    # Create the JSON feed
+    feed_key = functions.small_hash(functions.feed_key(FEED_URL))
+    data = {}
+    for idx, (file, file_size, size, thumb_size, color, checksum) in enumerate(TEST_IMAGES, 1):
+        url = f"{FEED_URL}/{file.name}"
+        cache_key = functions.small_hash(url)
+        stored_file = f"{cache_key}{file.suffix}"
+        data[cache_key] = {
+            "checksum": functions.checksum(file),
+            "date": functions.now(),
+            "description": f"Simple description with the '{'nsfw' if idx == 1 else 'robe'}' keyword.",
+            "docolav": color,
+            "file": stored_file,
+            "guid": f"{FEED_URL}/shaare/{idx}",
+            "height": size.height,
+            "tags": ["sample", "test", "image"] + ["nsfw" if idx % 2 == 1 else "clothes"],
+            "title": "Awesome image!",
+            "width": size.width,
+            "url": url,
+        }
+        copyfile(file, images / stored_file)
+        copyfile(file, thumbs / stored_file)
+    functions.persist(tmp_path / DATA.name / FEEDS.name / f"{feed_key}.json", data)

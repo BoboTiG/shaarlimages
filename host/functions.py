@@ -342,22 +342,26 @@ def get_tags() -> list[str]:
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
 
 
-def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dict]:
-    """Take a feed entry, and return appropriate data."""
+def handle_item(item: feedparser.FeedParserDict, cache: dict) -> bool:
+    """Take a feed `item`, and populate the `cache` on success."""
     if not (link := solvers.guess_url(item.link, item.published_parsed)):
-        return False, {}
+        return False
 
-    if not (ext := fetch_image_type(link)):
+    cache_key = small_hash(link)
+    metadata = cache.get(cache_key, {})
+    in_cache = bool(metadata)
+
+    if not (ext := Path(metadata["file"]).suffix if in_cache else fetch_image_type(link)):
         # Cannot guess the image type (either because the URL does not end with a file extension,
         # or because we failed to fetch the image type from the Content-Type header response).
-        return False, {}
+        return False
 
-    output_file = constants.IMAGES / f"{small_hash(link)}{ext}"
+    output_file = constants.IMAGES / f"{cache_key}{ext}"
     if output_file.is_file():
         is_new = False
     else:
         if not (image := fetch_image(link)):
-            return False, {}
+            return False
 
         output_file.write_bytes(image)
         is_new = True
@@ -366,7 +370,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
 
     # Keep up-to-date textual information
     item.tags = [safe_tag(tag.term) for tag in getattr(item, "tags", [])]
-    metadata = (cache or {}) | {
+    metadata |= {
         "date": mktime(item.published_parsed),
         "description": item.description,
         "file": output_file.name,
@@ -377,7 +381,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
     }
 
     # It's a fresh new image
-    if not cache:
+    if not in_cache:
         size = get_size(output_file)
         metadata |= {
             "checksum": checksum(output_file),
@@ -392,7 +396,8 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> tuple[bool, dic
 
     metadata["tags"] = sorted(metadata["tags"])
 
-    return is_new, metadata
+    cache[cache_key] = metadata
+    return is_new
 
 
 def invalidate_caches() -> None:
@@ -498,10 +503,10 @@ def is_nsfw(item: feedparser.FeedParserDict) -> bool:
     )
 
 
-def load_metadata(feed: Path) -> list[tuple[float, custom_types.Metadata]]:
+def load_metadata(feed: Path) -> custom_types.Metadatas:
     """Load a given `feed` into more a readable object."""
     cls = custom_types.Metadata
-    return [(float(date), cls(**metadata)) for date, metadata in read(feed).items()]
+    return [cls(**metadata) for metadata in read(feed).values()]
 
 
 def load_wayback_back_data(url: str) -> custom_types.Waybackdata:
@@ -600,12 +605,12 @@ def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
     for feed in constants.FEEDS.glob("*.json"):
         all_images.extend(load_metadata(feed))
     if not all_images:
-        return all_images
+        return []
 
     # Then, keep only the first published version of an image, skipping eventual duplicates (via reshares mostly)
     know_images = set()
     uniq_images = []
-    for _, metadata in sorted(all_images, key=lambda i: i[0]):
+    for metadata in sorted(all_images, key=lambda meta: meta.date):
         if metadata.checksum in know_images:
             continue
         know_images.add(metadata.checksum)

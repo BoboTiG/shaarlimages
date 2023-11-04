@@ -10,7 +10,7 @@ import pytest
 import responses
 
 from host import custom_types, functions, helpers
-from host.constants import DATA, FEEDS, IMAGE_EXT, IMAGES
+from host.constants import DATA, FEEDS, FEEDS_URL, IMAGE_EXT, IMAGES
 
 from .constants import (
     FEED_URL,
@@ -96,12 +96,15 @@ def test_fetch_rss() -> None:
 
 @responses.activate
 @pytest.mark.parametrize("with_timestamps", [True, False])
-def test_sync_feed(with_timestamps: bool, tmp_path: Path, setup_data):
+def test_sync_feed(with_timestamps: bool, tmp_path: Path):
     feed_data = FEED_XML if with_timestamps else FEED_XML_NO_TIMESTAMPS
 
     # Remove several copied files in conftest.py to cover more code
     for file in (tmp_path / DATA.name / IMAGES.name).glob("*.jpg"):
         file.unlink()
+
+    # Shaarlis list
+    responses.add(method="GET", url=FEEDS_URL, json=[])
 
     # XML feed
     responses.add(method="GET", url=FEED_URL, body=feed_data)
@@ -174,7 +177,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path, setup_data):
             body=file.read_bytes(),
         )
 
-    assert helpers.sync_feed(FEED_URL) == 4
+    assert helpers.sync_feed(FEED_URL) == 3
     assert helpers.sync_feed(FEED_URL) == 0
 
     # Force the sync
@@ -190,20 +193,19 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path, setup_data):
 
     # Check item metadata
     file = tmp_path / DATA.name / FEEDS.name / f"{functions.small_hash(functions.feed_key(FEED_URL))}.json"
-    when, data = functions.load_metadata(file)[0]
-    assert isinstance(when, float)
-    assert when == 1.0
-    assert data.checksum == "29c25875e30fe9547349057887b19682"
+    data = sorted(functions.load_metadata(file), key=lambda meta: meta.url)[-1]
+    image = TEST_IMAGES[-1]
+    assert data.checksum == image[5]
     assert isinstance(data.date, float)
     assert data.date > 0.0
-    assert data.description == "Simple description with the 'nsfw' keyword."
-    assert data.docolav == "585E50"
-    assert data.file == "0_kVjw.jpg"
-    assert data.height == 267
-    assert data.tags == ["sample", "test", "image", "nsfw"]
-    assert data.title == "Awesome image!"
-    assert data.url == f"{FEED_URL}/original/1"
-    assert data.width == 400
+    assert data.description.startswith("Some description with the 'robe' keyword.")
+    assert data.docolav == image[4]
+    assert data.file == f'{functions.small_hash(f"{FEED_URL}/{image[0].name}")}{image[0].suffix}'
+    assert data.height == image[2].height
+    assert data.tags == ["image", "nsfw", "sample", "test"]
+    assert data.title == f"Image - {image[0].name}"
+    assert data.url == f"{FEED_URL}/{image[0].name}"
+    assert data.width == image[2].width
 
 
 @responses.activate

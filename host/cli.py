@@ -16,31 +16,26 @@ def fix_images_medatadata() -> None:
         changed = False
         data = functions.read(feed)
 
-        if not data:
-            print(f" ! Remove empty feed {feed}")
-            feed.unlink()
-            continue
-
-        for k, v in data.copy().items():
-            if not v:
-                del data[k]
+        for stem, metadata in data.copy().items():
+            if not metadata:
+                del data[stem]
                 changed = True
                 at_least_one_change = True
                 continue
 
             # Purge removed Imgur images
-            if data[k]["checksum"] == MD5_EMPTY:
-                print("- Imgur", v["file"], flush=True)
-                del data[k]
+            if data[stem]["checksum"] == MD5_EMPTY:
+                print("- Imgur", metadata["file"], flush=True)
+                del data[stem]
                 changed = True
                 at_least_one_change = True
                 continue
 
             # Add missing NSFW tag
-            if constants.NSFW not in v["tags"] and functions.is_nsfw(v):
-                print("+ NSFW", v["file"], flush=True)
-                v["tags"].append(constants.NSFW)
-                v["tags"] = sorted(v["tags"])
+            if constants.NSFW not in metadata["tags"] and functions.is_nsfw(metadata):
+                print("+ NSFW", metadata["file"], flush=True)
+                metadata["tags"].append(constants.NSFW)
+                metadata["tags"] = sorted(metadata["tags"])
                 changed = True
                 at_least_one_change = True
 
@@ -66,9 +61,9 @@ def purge(files: set[str]) -> None:
         changed = False
         cache = functions.read(feed)
 
-        for date, metadata in cache.copy().items():
+        for stem, metadata in cache.copy().items():
             if metadata["file"] in files:
-                cache.pop(date)
+                cache.pop(stem)
                 changed = True
                 at_least_one_change = True
 
