@@ -69,7 +69,7 @@ window.onload = (event) => {
             let img = document.createElement("img");
             let image = images[index];
 
-            a.href = "/zoom/" + image.src;
+            a.href = "/zoom/" + image.src.split(".")[0];
             a.style.width = item + "%";
             a.style.background = image.docolav;
             img.setAttribute("data-src", "/thumbnail/" + image.src);

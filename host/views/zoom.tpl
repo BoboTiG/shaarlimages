@@ -37,12 +37,12 @@ document.onkeydown = function (e) {
     switch (e.code) {
         %if prev_img:
         case "ArrowLeft":
-            document.location = "/zoom/{{ prev_img }}";
+            document.location = "/zoom/{{ prev_img.split(".")[0] }}";
             break;
         %end
         %if next_img:
         case "ArrowRight":
-            document.location = "/zoom/{{ next_img }}";
+            document.location = "/zoom/{{ next_img.split(".")[0] }}";
             break;
         %end
     }
@@ -58,12 +58,12 @@ if ("ontouchend" in document) {
         if (start - e.targetTouches[0].clientX < 0) {
             // Slide to the left
             %if prev_img:
-            document.location = "/zoom/{{ prev_img }}";
+            document.location = "/zoom/{{ prev_img.split(".")[0] }}";
             %end
         } else {
             // Slide to the right
             %if next_img:
-            document.location = "/zoom/{{ next_img }}";
+            document.location = "/zoom/{{ next_img.split(".")[0] }}";
             %end
         }
     };

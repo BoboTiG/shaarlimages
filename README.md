@@ -11,7 +11,7 @@ Galleries:
 - [/random](https://www.shaarlimages.net/random): display a random image;
 - [/search/TERM](https://www.shaarlimages.net/search/animaux), and [/search/TERM/NUMBER](https://www.shaarlimages.net/search/animaux/42): search by term;
 - [/tag/TAG](https://www.shaarlimages.net/tag/animaux), and [/tag/TAG/NUMBER](https://www.shaarlimages.net/tag/animaux)/42: search by tag;
-- [/zoom/IMAGE](https://www.shaarlimages.net/zoom/urIokw.jpg): display the `IMAGE`;
+- [/zoom/IMAGE](https://www.shaarlimages.net/zoom/urIokw): display the `IMAGE`;
 
 Files:
 - [/image/IMAGE](https://www.shaarlimages.net/image/urIokw.jpg): direct link to the original `IMAGE` file;
