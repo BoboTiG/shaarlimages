@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 import responses
+from _pytest.capture import CaptureFixture
 
 from host import custom_types, functions, helpers
 from host.constants import DATA, FEEDS, FEEDS_URL, IMAGE_EXT, IMAGES
@@ -22,7 +23,7 @@ from .constants import (
 
 
 @responses.activate
-def test_fetch_image(capsys) -> None:
+def test_fetch_image(capsys: CaptureFixture) -> None:
     url = f"https://example.org/{IMAGE_JPG.name}"
     body = IMAGE_JPG.read_bytes()
 
@@ -34,7 +35,7 @@ def test_fetch_image(capsys) -> None:
 
 
 @responses.activate
-def test_fetch_image_not_an_image(capsys) -> None:
+def test_fetch_image_not_an_image(capsys: CaptureFixture) -> None:
     url = f"https://example.org/{IMAGE_JPG.name}"
     body = b"not an image!"
 
@@ -46,7 +47,7 @@ def test_fetch_image_not_an_image(capsys) -> None:
 
 
 @responses.activate
-def test_fetch_image_request_error(capsys) -> None:
+def test_fetch_image_request_error(capsys: CaptureFixture) -> None:
     url = f"https://example.org/{IMAGE_JPG.name}"
 
     responses.add(method="GET", url=url, status=404)
@@ -90,13 +91,13 @@ def test_fetch_rss() -> None:
     feed = functions.fetch_rss_feed(url)
 
     assert isinstance(feed, dict)
-    assert feed.feed.title == "Test"
-    assert not feed.entries
+    assert feed.feed.title == "Test"  # type:ignore[attr-defined]
+    assert not feed.entries  # type:ignore[attr-defined]
 
 
 @responses.activate
 @pytest.mark.parametrize("with_timestamps", [True, False])
-def test_sync_feed(with_timestamps: bool, tmp_path: Path):
+def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
     feed_data = FEED_XML if with_timestamps else FEED_XML_NO_TIMESTAMPS
 
     # Remove several copied files in conftest.py to cover more code
@@ -209,14 +210,14 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path):
 
 
 @responses.activate
-def test_sync_feed_error():
+def test_sync_feed_error() -> None:
     responses.add(method="GET", url=FEED_URL, body=ConnectionError("Boom"))
 
     assert helpers.sync_feed(FEED_URL) == -1
 
 
 @responses.activate
-def test_try_wayback_machine_get():
+def test_try_wayback_machine_get() -> None:
     url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
     url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
     data = {
@@ -234,7 +235,7 @@ def test_try_wayback_machine_get():
 
 
 @responses.activate
-def test_try_wayback_machine_head():
+def test_try_wayback_machine_head() -> None:
     url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
     url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
     data = {
@@ -255,7 +256,7 @@ def test_try_wayback_machine_head():
 
 
 @responses.activate
-def test_try_wayback_machine_head_cache():
+def test_try_wayback_machine_head_cache() -> None:
     url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
 
     waybackdata = custom_types.Waybackdata(content_type="image/png", snapshot=url_final)
@@ -271,7 +272,7 @@ def test_try_wayback_machine_head_cache():
 
 
 @responses.activate
-def test_try_wayback_machine_cache():
+def test_try_wayback_machine_cache() -> None:
     url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
     responses.add(method="HEAD", url=FEED_URL, status=404)
     responses.add(method="HEAD", url=url_final, content_type="image/png")
@@ -288,8 +289,8 @@ def test_try_wayback_machine_cache():
 
 
 @responses.activate
-def test_try_wayback_machine_not_found():
-    data = {"archived_snapshots": {}}
+def test_try_wayback_machine_not_found() -> None:
+    data: dict[str, dict] = {"archived_snapshots": {}}
     responses.add(method="GET", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
 

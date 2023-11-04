@@ -221,7 +221,7 @@ def test_wikimedia(url: str) -> None:
     }
 
     responses.add(method="GET", url=url_files, json=body)
-    assert solvers.guess_url(url, None) == body["original"]["url"]
+    assert solvers.guess_url(url, None) == body["original"]["url"]  # type:ignore[index]
 
 
 @responses.activate

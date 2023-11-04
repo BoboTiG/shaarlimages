@@ -5,6 +5,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 from pathlib import Path
 from shutil import copyfile
+from typing import Generator
 from unittest.mock import patch
 
 import pytest
@@ -24,7 +25,7 @@ from .constants import FEED_URL, TEST_IMAGES
 
 
 @pytest.fixture(autouse=True)
-def setup_data_folders(tmp_path: Path) -> None:
+def setup_data_folders(tmp_path: Path) -> Generator:
     data = tmp_path / DATA.name
 
     with (
@@ -42,7 +43,7 @@ def setup_data_folders(tmp_path: Path) -> None:
 
 
 @pytest.fixture()
-def setup_data(tmp_path: Path):
+def setup_data(tmp_path: Path) -> None:
     # Create the shaarlis.json file
     functions.persist(
         tmp_path / DATA.name / SHAARLIS.name,

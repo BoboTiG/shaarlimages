@@ -5,6 +5,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 
 from pathlib import Path
 from random import choice, randint
+from typing import Callable
 
 import feedparser
 
@@ -28,7 +29,7 @@ def check_item(item: custom_types.Metadata) -> None:
     assert item.width > 0
 
 
-def test_craft_feed(setup_data) -> None:
+def test_craft_feed(setup_data: Callable) -> None:
     images = functions.retrieve_all_uniq_metadata()
     parsed = feedparser.parse(functions.craft_feed(images, "/rss"))
 
@@ -50,7 +51,7 @@ def test_craft_feed(setup_data) -> None:
     assert item.title == "Awesome image!"
 
 
-def test_get_last(setup_data) -> None:
+def test_get_last(setup_data: Callable) -> None:
     data = functions.retrieve_all_uniq_metadata()
     total = len(data)
 
@@ -61,7 +62,7 @@ def test_get_last(setup_data) -> None:
     assert functions.get_last(2, 10) == (total, data[10:20])
 
 
-def test_get_metadata(setup_data) -> None:
+def test_get_metadata(setup_data: Callable) -> None:
     data = functions.retrieve_all_uniq_metadata()
     idx = randint(1, len(data) - 2)
     image = data[idx]
@@ -72,7 +73,7 @@ def test_get_metadata(setup_data) -> None:
     assert next_img == data[idx + 1].file
 
 
-def test_get_metadata_first(setup_data) -> None:
+def test_get_metadata_first(setup_data: Callable) -> None:
     data = functions.retrieve_all_uniq_metadata()
     image = data[0]
 
@@ -82,7 +83,7 @@ def test_get_metadata_first(setup_data) -> None:
     assert next_img == data[1].file
 
 
-def test_get_metadata_last(setup_data) -> None:
+def test_get_metadata_last(setup_data: Callable) -> None:
     data = functions.retrieve_all_uniq_metadata()
     image = data[-1]
 
@@ -92,16 +93,16 @@ def test_get_metadata_last(setup_data) -> None:
     assert next_img == ""
 
 
-def test_get_tags(setup_data) -> None:
+def test_get_tags(setup_data: Callable) -> None:
     assert functions.get_tags() == ["clothes", "image", "nsfw", "sample", "test"]
 
 
-def test_get_random_image(setup_data) -> None:
+def test_get_random_image(setup_data: Callable) -> None:
     metadata = functions.get_random_image()
     assert isinstance(metadata, custom_types.Metadata)
 
 
-def test_load_metadata(tmp_path: Path, setup_data) -> None:
+def test_load_metadata(tmp_path: Path, setup_data: Callable) -> None:
     feed = choice(list((tmp_path / DATA.name / FEEDS.name).glob("*.json")))
     data = functions.load_metadata(feed)
 
@@ -112,7 +113,7 @@ def test_load_metadata(tmp_path: Path, setup_data) -> None:
     check_item(item)
 
 
-def test_lookup(setup_data) -> None:
+def test_lookup(setup_data: Callable) -> None:
     result_lowercase = functions.lookup("robe")
 
     assert result_lowercase
@@ -124,7 +125,7 @@ def test_lookup(setup_data) -> None:
     assert result_lowercase == result_uppercase
 
 
-def test_lookup_tag(setup_data) -> None:
+def test_lookup_tag(setup_data: Callable) -> None:
     result_lowercase = functions.lookup_tag("sample")
 
     assert result_lowercase
@@ -136,7 +137,7 @@ def test_lookup_tag(setup_data) -> None:
     assert result_lowercase == result_uppercase
 
 
-def test_retrieve_all_uniq_metadata(setup_data) -> None:
+def test_retrieve_all_uniq_metadata(setup_data: Callable) -> None:
     data = functions.retrieve_all_uniq_metadata()
     assert data
 

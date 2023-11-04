@@ -4,6 +4,7 @@ Source: https://github.com/BoboTiG/shaarlimages
 """
 
 from random import choice
+from typing import Callable
 
 import feedparser
 import pytest
@@ -13,7 +14,7 @@ from bottle import HTTPResponse
 from host import app, functions
 
 
-def test_cache_invalidation(setup_data) -> None:
+def test_cache_invalidation(setup_data: Callable) -> None:
     content = app.page_home_pagination(1)
     assert "Cached:" not in content
 
@@ -34,7 +35,7 @@ def test_page_home_is_redirection() -> None:
     assert response.headers["Location"] == "http://127.0.0.1/page/1"
 
 
-def test_page_home_pagination(setup_data) -> None:
+def test_page_home_pagination(setup_data: Callable) -> None:
     content = app.page_home_pagination(1)
     assert "Ouh !" in content
 
@@ -62,7 +63,7 @@ def test_page_home_pagination_higher_than_max() -> None:
     assert response.headers["Location"] == "http://127.0.0.1/page/1"
 
 
-def test_page_random(setup_data) -> None:
+def test_page_random(setup_data: Callable) -> None:
     with pytest.raises(HTTPResponse) as exc:
         app.page_random()
 
@@ -71,7 +72,7 @@ def test_page_random(setup_data) -> None:
     assert response.headers["Location"].startswith("http://127.0.0.1/zoom/")
 
 
-def test_page_zoom(setup_data) -> None:
+def test_page_zoom(setup_data: Callable) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
     content = app.page_zoom(image.file)
     assert image.file in content
@@ -86,7 +87,7 @@ def test_page_zoom_image_not_found() -> None:
     assert response.headers["Location"] == "http://127.0.0.1/"
 
 
-def test_rss(setup_data) -> None:
+def test_rss(setup_data: Callable) -> None:
     feed1 = app.rss()
     feed2 = app.rss()
 
@@ -101,56 +102,56 @@ def test_rss(setup_data) -> None:
     assert "Cached:" in feed2
 
 
-def test_rss_all(setup_data) -> None:
+def test_rss_all(setup_data: Callable) -> None:
     feed = app.rss_all()
 
     parsed = feedparser.parse(feed)
     assert len(parsed.entries) == 4
 
 
-def test_rss_with_custom_items_count(setup_data) -> None:
+def test_rss_with_custom_items_count(setup_data: Callable) -> None:
     feed = app.rss_with_custom_items_count(2)
 
     parsed = feedparser.parse(feed)
     assert len(parsed.entries) == 2
 
 
-def test_rss_search_by_term(setup_data) -> None:
+def test_rss_search_by_term(setup_data: Callable) -> None:
     feed = app.rss_search_by_term("robe")
 
     parsed = feedparser.parse(feed)
     assert len(parsed.entries) == 3
 
 
-def test_rss_search_by_term_all(setup_data) -> None:
+def test_rss_search_by_term_all(setup_data: Callable) -> None:
     feed = app.rss_search_by_term_all("robe")
 
     parsed = feedparser.parse(feed)
     assert len(parsed.entries) == 3
 
 
-def test_rss_search_by_term_with_custom_items_count(setup_data) -> None:
+def test_rss_search_by_term_with_custom_items_count(setup_data: Callable) -> None:
     feed = app.rss_search_by_term_with_custom_items_count("robe", 3)
 
     parsed = feedparser.parse(feed)
     assert len(parsed.entries) == 3
 
 
-def test_rss_search_by_tag(setup_data) -> None:
+def test_rss_search_by_tag(setup_data: Callable) -> None:
     feed = app.rss_search_by_tag("nsfw")
 
     parsed = feedparser.parse(feed)
     assert len(parsed.entries) == 2
 
 
-def test_rss_search_by_tag_all(setup_data) -> None:
+def test_rss_search_by_tag_all(setup_data: Callable) -> None:
     feed = app.rss_search_by_tag_all("nsfw")
 
     parsed = feedparser.parse(feed)
     assert len(parsed.entries) == 2
 
 
-def test_rss_search_by_tag_with_custom_items_count(setup_data) -> None:
+def test_rss_search_by_tag_with_custom_items_count(setup_data: Callable) -> None:
     feed = app.rss_search_by_tag_with_custom_items_count("nsfw", 1)
 
     parsed = feedparser.parse(feed)
@@ -166,7 +167,7 @@ def test_search_first_page_is_redirection() -> None:
     assert response.headers["Location"] == "http://127.0.0.1/search/robe/1"
 
 
-def test_search_case_insensitive(setup_data) -> None:
+def test_search_case_insensitive(setup_data: Callable) -> None:
     response_lowercase = app.search_pagination("robe", 1)
     response_uppercase = app.search_pagination("ROBE", 1)
 
@@ -205,7 +206,7 @@ def test_search_by_tag_first_page_is_redirection() -> None:
     assert response.headers["Location"] == "http://127.0.0.1/tag/sample/1"
 
 
-def test_search_by_tag_case_insensitive(setup_data) -> None:
+def test_search_by_tag_case_insensitive(setup_data: Callable) -> None:
     response_lowercase = app.search_by_tag_pagination("sample", 1)
     response_uppercase = app.search_by_tag_pagination("SAMPLE", 1)
 
@@ -249,7 +250,7 @@ def test_static_favicon() -> None:
     assert response.content_type == "image/png"
 
 
-def test_static_image(setup_data) -> None:
+def test_static_image(setup_data: Callable) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
     response = app.static_image(image.file)
     response.body.close()
@@ -257,7 +258,7 @@ def test_static_image(setup_data) -> None:
     assert response.content_type.startswith("image/")
 
 
-def test_static_thumbnail(setup_data) -> None:
+def test_static_thumbnail(setup_data: Callable) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
     response = app.static_thumbnail(image.file)
     response.body.close()
