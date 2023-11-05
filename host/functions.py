@@ -239,7 +239,7 @@ def fetch_image(url: str, verify: bool = False) -> bytes | None:
 
 def find_image(key: str) -> custom_types.Metadata:
     """Find the image associated to the given `key`, which is a `small_hash()` value."""
-    return next((meta for meta in retrieve_all_uniq_metadata() if Path(meta.file).stem == key), "")
+    return next((meta for meta in retrieve_all_uniq_metadata() if meta.file[: constants.HASH_LEN] == key), "")
 
 
 def fix_url(url: str) -> str:
@@ -356,7 +356,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> bool:
     metadata = cache.get(cache_key, {})
     in_cache = bool(metadata)
 
-    if not (ext := Path(metadata["file"]).suffix if in_cache else fetch_image_type(link)):
+    if not (ext := metadata["file"][constants.HASH_LEN :] if in_cache else fetch_image_type(link)):
         # Cannot guess the image type (either because the URL does not end with a file extension,
         # or because we failed to fetch the image type from the Content-Type header response).
         return False
