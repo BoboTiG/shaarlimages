@@ -44,8 +44,7 @@ def sync_feed(url: str, force: bool = False) -> int:
         print(f"END {get_ident()} {feed_key=} {cache_key=} (-1)", flush=True)
         return -1
 
-    total_new_images = 0
-    count = 0
+    new_images = 0
 
     for item in feed.entries:
         if not hasattr(item, "published_parsed"):
@@ -55,32 +54,20 @@ def sync_feed(url: str, force: bool = False) -> int:
             item.published_parsed = now.utctimetuple()
 
         try:
-            is_new = functions.handle_item(item, cache)
+            new_images += int(functions.handle_item(item, cache))
         except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError, functions.Evanesco):
-            continue
+            pass
         except Exception as exc:
             print(f"🐛 {get_ident()} {type(exc).__name__} on {item=}", flush=True)
             print(f"{exc}", flush=True)
-            continue
 
-        if is_new:
-            total_new_images += 1
-
-        if cache:
-            count += 1
-            if count % 10 == 0:
-                functions.persist(cache_file, cache)
-                count = 0
-
-    if count:
+    if new_images:
         functions.persist(cache_file, cache)
-
-    if total_new_images:
         functions.invalidate_caches()
 
-    amount = f"+{total_new_images}" if total_new_images else "0"
+    amount = f"+{new_images}" if new_images else "0"
     print(f"END {get_ident()} {feed_key=} {cache_key=} ({amount})", flush=True)
-    return total_new_images
+    return new_images
 
 
 def sync_feeds(force: bool = False) -> custom_types.Shaarlis:

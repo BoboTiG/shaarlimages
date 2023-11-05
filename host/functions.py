@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from random import choice
 from shutil import copyfile
-from time import mktime
+from time import mktime, struct_time
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 from zlib import compress, decompress
@@ -362,38 +362,35 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> bool:
         return False
 
     output_file = constants.IMAGES / f"{cache_key}{ext}"
-    if output_file.is_file():
-        is_new = False
-    else:
+    if not output_file.is_file():
         if not (image := fetch_image(link)):
             return False
 
         output_file.write_bytes(image)
-        is_new = True
 
     create_thumbnail(output_file)
 
-    # Keep up-to-date textual information
+    if in_cache:
+        return False
+
+    # Prevent timeshift issues (https://stackoverflow.com/a/14467744/1117028)
+    date = struct_time(list(item.published_parsed)[:8] + [-1])
+
+    size = get_size(output_file)
     item.tags = [safe_tag(tag.term) for tag in getattr(item, "tags", [])]
     metadata |= {
-        "date": mktime(item.published_parsed),
+        "checksum": checksum(output_file),
+        "date": mktime(date),
         "description": item.description,
+        "docolav": docolav(output_file),
         "file": output_file.name,
         "guid": item.guid,
+        "height": size.height,
         "tags": item.tags,
         "title": item.title,
         "url": link,
+        "width": size.width,
     }
-
-    # It's a fresh new image
-    if not in_cache:
-        size = get_size(output_file)
-        metadata |= {
-            "checksum": checksum(output_file),
-            "docolav": docolav(output_file),
-            "height": size.height,
-            "width": size.width,
-        }
 
     # NSFW
     if constants.NSFW not in metadata["tags"] and is_nsfw(item):
@@ -402,7 +399,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict) -> bool:
     metadata["tags"] = sorted(metadata["tags"])
 
     cache[cache_key] = metadata
-    return is_new
+    return True
 
 
 def invalidate_caches() -> None:
