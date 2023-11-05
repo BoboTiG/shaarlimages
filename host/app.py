@@ -67,6 +67,7 @@ def page_random() -> None:
 
 
 @route("/zoom/<key>")
+@cache
 def page_zoom(key: str) -> str:
     """Display an image."""
     # Support both SMALL_HASH (preferred) and SMALL_HASH.EXT
