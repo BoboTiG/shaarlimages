@@ -13,6 +13,7 @@ from boddle import boddle
 from bottle import HTTPResponse
 
 from host import app, functions
+from host.constants import HASH_LEN
 
 
 def test_cache_invalidation(setup_data: FixtureFunction) -> None:
@@ -83,6 +84,9 @@ def test_page_random(setup_data: FixtureFunction) -> None:
     response = exc.value
     assert response.status_code == 302
     assert response.headers["Location"].startswith("http://127.0.0.1/zoom/")
+
+    key = response.headers["Location"].split("/")[-1]
+    assert len(key) == HASH_LEN
 
 
 def test_page_zoom(setup_data: FixtureFunction) -> None:
