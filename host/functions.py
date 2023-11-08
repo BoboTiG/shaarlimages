@@ -687,6 +687,13 @@ def try_wayback_machine(url: str, method: str, force: bool = False) -> requests.
     if waybackdata.is_lost:
         raise Evanesco()
 
+    if method == "head" and waybackdata.content_type:
+        response = requests.Response()
+        response.headers = CaseInsensitiveDict({"Content-Type": waybackdata.content_type})
+        response.status_code = 200
+        response.url = waybackdata.snapshot
+        return response
+
     if not waybackdata.snapshot:
         url_archive = f"https://archive.org/wayback/available?url={url}"
         with SESSION.get(url_archive, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
@@ -707,20 +714,19 @@ def try_wayback_machine(url: str, method: str, force: bool = False) -> requests.
         waybackdata.snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
         set_wayback_back_data(url, waybackdata)
 
-    if method == "head" and waybackdata.content_type:
-        response = requests.Response()
-        response.headers = CaseInsensitiveDict({"Content-Type": waybackdata.content_type})
-        response.status_code = 200
-        response.url = waybackdata.snapshot
-        return response
-
     print(f">>> ⌛ [{method.upper()}]", url, flush=True)
 
     with SESSION.request(method=method, url=waybackdata.snapshot, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
         req.raise_for_status()
 
         if method == "head":
-            waybackdata.content_type = extract_content_type(req)
-            set_wayback_back_data(url, waybackdata)
+            if content_type := extract_content_type(req):
+                waybackdata.content_type = content_type
+                set_wayback_back_data(url, waybackdata)
+            else:
+                print(">>> 💀", url, flush=True)
+                waybackdata.is_lost = True
+                set_wayback_back_data(url, waybackdata)
+                raise Evanesco()
 
         return req

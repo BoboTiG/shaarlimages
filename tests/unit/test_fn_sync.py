@@ -289,7 +289,37 @@ def test_try_wayback_machine_cache() -> None:
 
 
 @responses.activate
-def test_try_wayback_machine_not_found() -> None:
+def test_try_wayback_machine_head_is_lost() -> None:
+    url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
+    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
+    data: dict[str, dict] = {
+        "archived_snapshots": {
+            "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
+        }
+    }
+
+    responses.add(method="HEAD", url=FEED_URL, status=404)
+    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
+    responses.add(method="HEAD", url=url_final, content_type=None)
+
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert not waybackdata.content_type
+    assert not waybackdata.is_lost
+    assert not waybackdata.snapshot
+
+    with pytest.raises(functions.Evanesco) as exc:
+        functions.try_wayback_machine(FEED_URL, "head")
+
+    assert str(exc.value) == "Cannot found the resource on internet anymore."
+
+    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    assert not waybackdata.content_type
+    assert waybackdata.is_lost
+    assert waybackdata.snapshot
+
+
+@responses.activate
+def test_try_wayback_machine_get_is_lost() -> None:
     data: dict[str, dict] = {"archived_snapshots": {}}
     responses.add(method="GET", url=FEED_URL, status=404)
     responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
