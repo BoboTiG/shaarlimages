@@ -1,4 +1,4 @@
-black==23.10.1
+black==23.11.0
 boddle==0.2.9
 bottle==0.12.25
 charset-normalizer==3.3.2
