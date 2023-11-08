@@ -54,7 +54,7 @@ def sync_feed(url: str, force: bool = False) -> int:
             item.published_parsed = now.utctimetuple()
 
         try:
-            new_images += int(functions.handle_item(item, cache))
+            new_images += int(functions.handle_item(item, cache, feed_key=cache_key))
         except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError, functions.Evanesco):
             pass
         except Exception as exc:

@@ -198,15 +198,15 @@ def feed_key(url: str) -> str:
     return f"{parts.hostname}{path.removesuffix('/')}"
 
 
-def fetch(url: str, method: str = "get", verify: bool = False, from_the_past: bool = True) -> requests.Response:
+def fetch(
+    url: str,
+    method: str = "get",
+    verify: bool = False,
+    from_the_past: bool = True,
+    feed_key: str = "",
+) -> requests.Response:
     """Make a HTTP call."""
-    with SESSION.request(
-        method=method,
-        url=url,
-        headers=constants.HTTP_HEADERS,
-        timeout=120.0,
-        verify=verify,
-    ) as req:
+    with SESSION.request(method=method, url=url, headers=constants.HTTP_HEADERS, timeout=120.0, verify=verify) as req:
         try:
             req.raise_for_status()
             return req
@@ -214,26 +214,26 @@ def fetch(url: str, method: str = "get", verify: bool = False, from_the_past: bo
             if not from_the_past:
                 raise
 
-    return try_wayback_machine(url, method)
+    return try_wayback_machine(url, method, feed_key=feed_key)
 
 
-def fetch_json(url: str, verify: bool = False) -> dict[str, Any]:
+def fetch_json(url: str, verify: bool = False, feed_key: str = "") -> dict[str, Any]:
     """Fetch a JSON file."""
-    print(">>> 📑", url)
-    return fetch(url, verify=verify).json()
+    print(">>> 📑", url, f"{feed_key=}")
+    return fetch(url, verify=verify, feed_key=feed_key).json()
 
 
-def fetch_image(url: str, verify: bool = False) -> bytes | None:
+def fetch_image(url: str, verify: bool = False, feed_key: str = "") -> bytes | None:
     """Fetch an image."""
     try:
-        req = fetch(url, verify=verify)
+        req = fetch(url, verify=verify, feed_key=feed_key)
         image = req.content
         if is_image_data(image):
-            print(">>> ✅", url)
+            print(">>> ✅", url, f"{feed_key=}")
             return image
-        print(">>> 📛", url)
+        print(">>> 📛", url, f"{feed_key=}")
     except Exception:
-        print(">>> ❌", url)
+        print(">>> ❌", url, f"{feed_key=}")
     return None
 
 
@@ -266,16 +266,16 @@ def extract_content_type(req: requests.Response) -> str:
     return req.headers.get("content-type", "").replace(" ", "").split(";", 1)[0].lower()
 
 
-def fetch_image_type(url: str) -> str:
+def fetch_image_type(url: str, feed_key: str = "") -> str:
     """Fetch an image type using HTTP headers from the HEAD response."""
-    req = fetch(url, method="head")
+    req = fetch(url, method="head", feed_key=feed_key)
     content_type = extract_content_type(req)
     if (
         "image/" in content_type
         and content_type not in constants.IMAGES_CONTENT_TYPE
         and content_type not in constants.IMAGES_CONTENT_TYPE_IGNORED
     ):
-        print(f"🎨 Unhandled {content_type=} for {url=}", flush=True)
+        print(f"🎨 Unhandled {content_type=} for {url=} {feed_key=}", flush=True)
     return constants.IMAGES_CONTENT_TYPE.get(content_type, "")
 
 
@@ -347,23 +347,23 @@ def get_tags() -> list[str]:
     return sorted({tag for metadata in retrieve_all_uniq_metadata() for tag in metadata.tags})
 
 
-def handle_item(item: feedparser.FeedParserDict, cache: dict) -> bool:
+def handle_item(item: feedparser.FeedParserDict, cache: dict, feed_key: str = "") -> bool:
     """Take a feed `item`, and populate the `cache` on success."""
-    if not (link := solvers.guess_url(item.link, item.published_parsed)):
+    if not (link := solvers.guess_url(item.link, item.published_parsed, feed_key=feed_key)):
         return False
 
     cache_key = small_hash(link)
     metadata = cache.get(cache_key, {})
     in_cache = bool(metadata)
 
-    if not (ext := metadata["file"][constants.HASH_LEN :] if in_cache else fetch_image_type(link)):
+    if not (ext := metadata["file"][constants.HASH_LEN :] if in_cache else fetch_image_type(link, feed_key=feed_key)):
         # Cannot guess the image type (either because the URL does not end with a file extension,
         # or because we failed to fetch the image type from the Content-Type header response).
         return False
 
     output_file = constants.IMAGES / f"{cache_key}{ext}"
     if not output_file.is_file():
-        if not (image := fetch_image(link)):
+        if not (image := fetch_image(link, feed_key=feed_key)):
             return False
 
         output_file.write_bytes(image)
@@ -680,7 +680,7 @@ def today() -> datetime:
     return datetime.now(tz=timezone.utc)
 
 
-def try_wayback_machine(url: str, method: str, force: bool = False) -> requests.Response:
+def try_wayback_machine(url: str, method: str, force: bool = False, feed_key: str = "") -> requests.Response:
     """Try to fetch a given `url` using the great Wayback Machine."""
     waybackdata = load_wayback_back_data("unknown" if force else url)
 
@@ -696,9 +696,7 @@ def try_wayback_machine(url: str, method: str, force: bool = False) -> requests.
 
     if not waybackdata.snapshot:
         url_archive = f"https://archive.org/wayback/available?url={url}"
-        with SESSION.get(url_archive, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
-            req.raise_for_status()
-
+        with fetch(url_archive, from_the_past=False, feed_key=feed_key) as req:
             if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
                 print(">>> 💀", url, flush=True)
                 waybackdata.is_lost = True
@@ -716,9 +714,7 @@ def try_wayback_machine(url: str, method: str, force: bool = False) -> requests.
 
     print(f">>> ⌛ [{method.upper()}]", url, flush=True)
 
-    with SESSION.request(method=method, url=waybackdata.snapshot, headers=constants.HTTP_HEADERS, timeout=120.0) as req:
-        req.raise_for_status()
-
+    with fetch(waybackdata.snapshot, method=method, from_the_past=False, feed_key=feed_key) as req:
         if method == "head":
             if content_type := extract_content_type(req):
                 waybackdata.content_type = content_type

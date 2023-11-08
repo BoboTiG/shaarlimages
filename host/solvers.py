@@ -16,60 +16,61 @@ IMGUR_SUFFIX = tuple(f"_d{ext}" for ext in constants.IMAGE_EXT)
 
 def cg_society(
     url: str,
-    *_: struct_time,
+    date: struct_time,
     pattern: re.Pattern = re.compile(rb"<meta content='([^']+)' property='og:image'"),
+    feed_key: str = "",
 ) -> str:
     """
     Resolve the original image URL from CG Society.
 
-        >>> cg_society("https://cg0.cgsociety.org/uploads/images/original/oscarfb-aspidochelone-1-a6c5cb99-9ndp.png")
-        'https://cg0.cgsociety.org/uploads/images/original/oscarfb-aspidochelone-1-a6c5cb99-9ndp.png'
+        >>> cg_society("https://cg0.cgsociety.org/uploads/images/original/oscarfb-1-a6c5cb99-9ndp.png", None, feed_key="012345")
+        'https://cg0.cgsociety.org/uploads/images/original/oscarfb-1-a6c5cb99-9ndp.png'
 
-    """
+    """  # noqa[E501]
     if functions.is_image_link(url):
         return url
 
-    response = functions.fetch(url, verify=True)
+    response = functions.fetch(url, verify=True, feed_key=feed_key)
     return (
         "" if (image := pattern.search(response.content)) is None else image[1].decode().replace("/medium/", "/large/")
     )
 
 
-def cheeseburger(url: str, *_: struct_time) -> str:
+def cheeseburger(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve the original image URL from Cheeseburger.
 
-        >>> cheeseburger("https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/")
+        >>> cheeseburger("https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/", None, feed_key="012345")
         'https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/'
 
     """
     return url
 
 
-def developpez(url: str, *_: struct_time) -> str:
+def developpez(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve the original image URL from Developpez.net.
 
-        >>> developpez("https://www.developpez.net/forums/attachments/p627433d1/a/a/a")
+        >>> developpez("https://www.developpez.net/forums/attachments/p627433d1/a/a/a", None)
         'https://www.developpez.net/forums/attachments/p627433d1/a/a/a'
-        >>> developpez("https://www.developpez.com/images/logos/forum.png")
+        >>> developpez("https://www.developpez.com/images/logos/forum.png", None)
         'https://www.developpez.com/images/logos/forum.png'
-        >>> developpez("https://www.developpez.net/forums/d1526370/")
+        >>> developpez("https://www.developpez.net/forums/d1526370/", None, feed_key="012345")
         ''
 
     """
     return url if functions.is_image_link(url) or "/forums/attachments/" in url else ""
 
 
-def imgur(url: str, *_: struct_time) -> str:
+def imgur(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve the original image URL from Imgut.
 
-        >>> imgur("https://i.imgur.com/qypAs0A_d.gif")
+        >>> imgur("https://i.imgur.com/qypAs0A_d.gif", None, feed_key="012345")
         ''
-        >>> imgur("https://i.imgur.com/qypAs0A_d.gifv")
+        >>> imgur("https://i.imgur.com/qypAs0A_d.gifv", None)
         ''
-        >>> imgur("https://i.imgur.com/qypAs0A_d.mp4")
+        >>> imgur("https://i.imgur.com/qypAs0A_d.mp4", None)
         ''
 
     """
@@ -86,22 +87,27 @@ def imgur(url: str, *_: struct_time) -> str:
         return ""
 
     # Ensure the image still exists
-    response = functions.fetch(url, method="head", verify=True)
+    response = functions.fetch(url, method="head", verify=True, feed_key=feed_key)
     return "" if response.url.endswith("/removed.png") else url
 
 
-def lutim(url: str, *_: struct_time) -> str:
+def lutim(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve the original image URL from Lutim.
 
-        >>> lutim("https://lut.im/0p6CmKuV/YyBE3qfb")
+        >>> lutim("https://lut.im/0p6CmKuV/YyBE3qfb", None, feed_key="012345")
         'https://lut.im/0p6CmKuV/YyBE3qfb'
 
     """
     return url
 
 
-def nasa_apod(url: str, date: struct_time, pattern: re.Pattern = re.compile(rb'<a href="(image/[^"]+)"')) -> str:
+def nasa_apod(
+    url: str,
+    date: struct_time,
+    pattern: re.Pattern = re.compile(rb'<a href="(image/[^"]+)"'),
+    feed_key: str = "",
+) -> str:
     """
     Resolve the original image URL from Astronomy Picture of the Day (APOD - NASA).
 
@@ -111,7 +117,7 @@ def nasa_apod(url: str, date: struct_time, pattern: re.Pattern = re.compile(rb'<
         'https://apod.nasa.gov/apod/image/1204/EndeavourFlightDeck_cooper_1050.jpg'
         >>> nasa_apod("http://antwrp.gsfc.nasa.gov/apod/image/0702/mcnaught3_kemppainen.jpg", None)
         'http://antwrp.gsfc.nasa.gov/apod/image/0702/mcnaught3_kemppainen.jpg'
-        >>> nasa_apod("http://apod.nasa.gov/apod/archivepix.html", None)
+        >>> nasa_apod("http://apod.nasa.gov/apod/archivepix.html", None, feed_key="012345")
         'http://apod.nasa.gov/apod/archivepix.html'
 
     """
@@ -133,7 +139,7 @@ def nasa_apod(url: str, date: struct_time, pattern: re.Pattern = re.compile(rb'<
     if parts.hostname != "apod.nasa.gov":
         parts = parts._replace(netloc="apod.nasa.gov")
 
-    response = functions.fetch(urlunparse(parts), verify=True)
+    response = functions.fetch(urlunparse(parts), verify=True, feed_key=feed_key)
     if (image := pattern.search(response.content)) is None:
         return ""
 
@@ -141,15 +147,15 @@ def nasa_apod(url: str, date: struct_time, pattern: re.Pattern = re.compile(rb'<
     return urlunparse(parts)
 
 
-def nasa_jpl(url: str, *_: struct_time) -> str:
+def nasa_jpl(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve the original image URL from NASA's Jet Propulsion Laboratory (JPL).
 
-        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg")
+        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg", None)
         'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
-        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.JPG")
+        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.JPG", None)
         'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.JPG'
-        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/catalog/PIA25440")
+        >>> nasa_jpl("https://photojournal.jpl.nasa.gov/catalog/PIA25440", None, feed_key="012345")
         'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
 
     """
@@ -162,13 +168,14 @@ def nasa_jpl(url: str, *_: struct_time) -> str:
 
 def quora(
     url: str,
-    *_: struct_time,
+    date: struct_time,
     pattern: re.Pattern = re.compile(rb"<meta property='og:image' content='([^']+)'"),
+    feed_key: str = "",
 ) -> str:
     """
     Resolve the original image URL from Quora.
 
-        >>> quora("https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46")
+        >>> quora("https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46", None, feed_key="012345")
         'https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46'
 
     """
@@ -176,27 +183,27 @@ def quora(
     if parts.path.startswith("/main-qimg-"):
         return url
 
-    response = functions.fetch(url, verify=True)
+    response = functions.fetch(url, verify=True, feed_key=feed_key)
     return "" if (image := pattern.search(response.content)) is None else image[1].decode()
 
 
-def twitter_img(url: str, *_: struct_time) -> str:
+def twitter_img(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve the original image URL from Twitter.
 
-        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg")
+        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg", None)
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
-        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.JPG")
+        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.JPG", None)
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.JPG'
-        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:small")
+        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:small", None)
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
-        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:medium")
+        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:medium", None)
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
-        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:large")
+        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:large", None)
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
-        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:something")
+        >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:something", None)
         'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
-        >>> twitter_img("https://pbs.twimg.com/media/DJrIPolXoAAKn6_?format=jpg")
+        >>> twitter_img("https://pbs.twimg.com/media/DJrIPolXoAAKn6_?format=jpg", None, feed_key="012345")
         'https://pbs.twimg.com/media/DJrIPolXoAAKn6_.jpg'
 
     """
@@ -215,11 +222,12 @@ def twitter_img(url: str, *_: struct_time) -> str:
 
 def webb_telescope(
     url: str,
-    *_: struct_time,
+    date: struct_time,
     pattern: re.Pattern = re.compile(rb'<meta property="og:image" content="([^"]+)"'),
+    feed_key: str = "",
 ) -> str:
     """Resolve the original image URL from Webb Space Telescope."""
-    response = functions.fetch(url, verify=True)
+    response = functions.fetch(url, verify=True, feed_key=feed_key)
     if not (url := "" if (image := pattern.search(response.content)) is None else image[1].decode()):
         return ""
 
@@ -228,13 +236,13 @@ def webb_telescope(
     return url
 
 
-def wikimedia(url: str, *_: struct_time) -> str:
+def wikimedia(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve the original image URL from Wikimedia.
 
-        >>> wikimedia("http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg")
+        >>> wikimedia("http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg", None)
         'http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg'
-        >>> wikimedia("https://en.wikipedia.org/wiki/File:Douglas-Peucker_animated.gif")
+        >>> wikimedia("https://en.wikipedia.org/wiki/File:Douglas-Peucker_animated.gif", None, feed_key="012345")
         ''
 
     """
@@ -247,17 +255,20 @@ def wikimedia(url: str, *_: struct_time) -> str:
     if not functions.is_image_link(file):
         return ""
 
-    files = functions.fetch_json(f"https://api.wikimedia.org/core/v1/commons/file/File:{file}", verify=True)
+    files = functions.fetch_json(
+        f"https://api.wikimedia.org/core/v1/commons/file/File:{file}", verify=True, feed_key=feed_key
+    )
     return files.get("original", {}).get("url") or ""
 
 
 def zbrush_central(
     url: str,
-    *_: struct_time,
+    date: struct_time,
     pattern: re.Pattern = re.compile(rb'<meta property="og:image" content="([^"]+)"'),
+    feed_key: str = "",
 ) -> str:
     """Resolve the original image URL from ZBrushCentral."""
-    response = functions.fetch(url, verify=True)
+    response = functions.fetch(url, verify=True, feed_key=feed_key)
     return "" if (image := pattern.search(response.content)) is None else image[1].decode()
 
 
@@ -275,7 +286,7 @@ SOLVERS: dict[str, Callable] = {
 }
 
 
-def guess_url(url: str, date: struct_time) -> str:
+def guess_url(url: str, date: struct_time, feed_key: str = "") -> str:
     """
     Resolve a specific URL.
     Return an empty string if the URL was not resolved to an image.
@@ -292,15 +303,15 @@ def guess_url(url: str, date: struct_time) -> str:
         return ""
 
     if solver := SOLVERS.get(hostname):
-        return solver(url, date)
+        return solver(url, date, feed_key=feed_key)
 
     if hostname.endswith((".wikimedia.org", ".wikipedia.org")):
-        return wikimedia(url)
+        return wikimedia(url, date, feed_key=feed_key)
 
     if hostname.endswith((".quora.com", ".quoracdn.net")):
-        return quora(url)
+        return quora(url, date, feed_key=feed_key)
 
     if hostname.endswith("cgsociety.org"):
-        return cg_society(url)
+        return cg_society(url, date, feed_key=feed_key)
 
     return url if functions.is_image_link(url) else ""
