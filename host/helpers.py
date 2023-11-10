@@ -67,7 +67,7 @@ def sync_feed(url: str, force: bool = False) -> int:
 
     amount = f"+{new_images}" if new_images else "0"
     if new_images:
-        functions.debug(f"END {get_ident()} {feed_key=} {cache_key=} ({amount})")
+        print(f"END {get_ident()} {feed_key=} {cache_key=} ({amount})", flush=True)
     return new_images
 
 
