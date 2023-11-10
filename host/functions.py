@@ -146,6 +146,12 @@ def create_thumbnail(file: Path) -> Path | None:
     return thumbnail
 
 
+def debug(*msg: str) -> None:
+    """Print a message, but only when run outside the CI."""
+    if not constants.IS_CI:
+        print(*msg, flush=True)
+
+
 def docolav(file: Path) -> str:
     """
     Determine the DOminant COlor AVerage of the given image.
@@ -219,7 +225,7 @@ def fetch(
 
 def fetch_json(url: str, verify: bool = False, feed_key: str = "") -> dict[str, Any]:
     """Fetch a JSON file."""
-    print(">>> 📑", url, f"{feed_key=}")
+    debug(">>> 📑", url, f"{feed_key=}")
     return fetch(url, verify=verify, feed_key=feed_key).json()
 
 
@@ -229,11 +235,11 @@ def fetch_image(url: str, verify: bool = False, feed_key: str = "") -> bytes | N
         req = fetch(url, verify=verify, feed_key=feed_key)
         image = req.content
         if is_image_data(image):
-            print(">>> ✅", url, f"{feed_key=}")
+            print(">>> ✅", url, f"{feed_key=}", flush=True)
             return image
-        print(">>> 📛", url, f"{feed_key=}")
+        print(">>> 📛", url, f"{feed_key=}", flush=True)
     except Exception:
-        print(">>> ❌", url, f"{feed_key=}")
+        print(">>> ❌", url, f"{feed_key=}", flush=True)
     return None
 
 
@@ -279,9 +285,9 @@ def fetch_image_type(url: str, feed_key: str = "") -> str:
     return constants.IMAGES_CONTENT_TYPE.get(content_type, "")
 
 
-def fetch_rss_feed(url: str) -> feedparser.FeedParserDict:
+def fetch_rss_feed(url: str, feed_key: str = "") -> feedparser.FeedParserDict:
     """Fetch a XML RSS feed."""
-    print(">>> 📜", url)
+    debug(">>> 📜", url)
     """Make a HTTP call."""
     return feedparser.parse(fetch(url, from_the_past=False).text)
 
@@ -712,7 +718,7 @@ def try_wayback_machine(url: str, method: str, force: bool = False, feed_key: st
         waybackdata.snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
         set_wayback_back_data(url, waybackdata)
 
-    print(f">>> ⌛ [{method.upper()}]", url, flush=True)
+    debug(f">>> ⌛ [{method.upper()}]", url)
 
     with fetch(waybackdata.snapshot, method=method, from_the_past=False, feed_key=feed_key) as req:
         if method == "head":

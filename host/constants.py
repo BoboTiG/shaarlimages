@@ -3,9 +3,13 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
+import os
 from pathlib import Path
 
 from custom_types import Size
+
+# CI
+IS_CI = "CI" in os.environ
 
 # Folders
 ROOT = Path(__file__).parent.parent

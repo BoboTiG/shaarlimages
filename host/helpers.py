@@ -36,12 +36,12 @@ def sync_feed(url: str, force: bool = False) -> int:
     if force or not cache:
         url += "&nb=all" if url.endswith(("?do=rss", "?do=atom")) else "?nb=all"
 
-    print(f"START {get_ident()} {feed_key=} {cache_key=}", flush=True)
+    functions.debug(f"START {get_ident()} {feed_key=} {cache_key=}")
 
     try:
         feed = functions.fetch_rss_feed(url)
     except Exception:
-        print(f"END {get_ident()} {feed_key=} {cache_key=} (-1)", flush=True)
+        functions.debug(f"END {get_ident()} {feed_key=} {cache_key=} (-1)")
         return -1
 
     new_images = 0
@@ -66,7 +66,8 @@ def sync_feed(url: str, force: bool = False) -> int:
         functions.invalidate_caches()
 
     amount = f"+{new_images}" if new_images else "0"
-    print(f"END {get_ident()} {feed_key=} {cache_key=} ({amount})", flush=True)
+    if new_images:
+        functions.debug(f"END {get_ident()} {feed_key=} {cache_key=} ({amount})")
     return new_images
 
 
