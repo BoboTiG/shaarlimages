@@ -73,7 +73,7 @@ def sync_feed(url: str, force: bool = False) -> int:
 
 def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
     """Retrieve the JSON file containing all shaarlis."""
-    data = {"feeds": [], "updated": functions.now()}
+    data = {"feeds": None, "updated": functions.now()}
     file = constants.SHAARLIS
 
     if not force and file.is_file():
@@ -89,11 +89,13 @@ def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
         if url and key not in known_feeds:
             known_feeds.add(key)
             uniq_feeds.append(url)
+    uniq_feeds = sorted(uniq_feeds)
 
-    data["feeds"] = sorted(uniq_feeds)
+    if data["feeds"] != uniq_feeds:
+        data["feeds"] = uniq_feeds
+        functions.persist(file, data)
 
-    functions.persist(file, data)
-    return data["feeds"]
+    return uniq_feeds
 
 
 def sync_them_all(force: bool = False) -> None:
