@@ -489,26 +489,16 @@ def is_nsfw(item: feedparser.FeedParserDict) -> bool:
 
         >>> is_nsfw({"tags": ["nsfw"]})
         True
+        >>> is_nsfw({"tags": ["porn"]})
+        True
         >>> is_nsfw({"tags": ["sexy"]})
         True
-        >>> is_nsfw({"title": "NSFW Warning!"})
-        True
-        >>> is_nsfw({"title": "noop", "description": "NSFW Warning!"})
-        True
 
-        >>> is_nsfw({"title": "Sexy picture!", "description": "Sexy picture! (maybe SFW)"})
-        False
-        >>> is_nsfw({"title": "noop", "description": "noop"})
-        False
-        >>> is_nsfw({"tags": ["foo"], "title": "noop", "description": "noop"})
+        >>> is_nsfw({"tags": ["fun"]})
         False
 
     """
-    return (
-        any(tag in constants.NSFW_TAGS for tag in item.get("tags", []))
-        or constants.NSFW in item.get("title", "").lower()
-        or constants.NSFW in item.get("description", "").lower()
-    )
+    return any(tag in constants.NSFW_TAGS for tag in item.get("tags", []))
 
 
 def load_metadata(feed: Path) -> custom_types.Metadatas:

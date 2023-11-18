@@ -109,11 +109,11 @@ FEED_XML = (
         <published>2023-08-20T22:41:4{idx}+02:00</published>
         <content type="html" xml:lang="en"><![CDATA[
             Some description with the 'robe' keyword.
-            {"Lets also trigger the Not Safe For Work filter here: NSFW!" if file == TEST_IMAGES[-1][0] else ""}
         ]]></content>
         <category scheme="{FEED_URL}/?searchtags=" term="sample" label="sample" />
         <category scheme="{FEED_URL}/?searchtags=" term="test" label="test" />
         <category scheme="{FEED_URL}/?searchtags=" term="image" label="image" />
+        {'<category scheme="{FEED_URL}/?searchtags=" term="nsfw" label="nsfw" />' if file == TEST_IMAGES[-1][0] else ""}
     </entry>
 """
         for idx, (file, *_) in enumerate(TEST_IMAGES)
