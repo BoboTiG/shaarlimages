@@ -168,39 +168,27 @@ def docolav(file: Path) -> str:
 def feed_key(url: str) -> str:
     """
     Craft the feed URL key for the local storage.
+    Note: The URL is already sanitized here: https://github.com/BoboTiG/shaarlis/blob/main/sync.py#L31
 
-        >>> feed_key("https://www.example.org")
+        >>> feed_key("http://www.example.org/?do=rss")
         'www.example.org'
-        >>> feed_key("https://www.example.org/")
+        >>> feed_key("https://www.example.org/?do=rss")
         'www.example.org'
         >>> feed_key("https://shaarli.example.org/?do=rss")
         'shaarli.example.org'
-        >>> feed_key("https://shaarli.example.org/feed/rss?do=rss")
-        'shaarli.example.org'
-        >>> feed_key("https://shaarli.example.org//feed/rss?do=rss")
-        'shaarli.example.org'
-        >>> feed_key("https://www.example.org/links?do=rss")
+        >>> feed_key("https://www.example.org/shaarli?do=rss")
+        'www.example.org/shaarli'
+        >>> feed_key("https://www.example.org/rss.php?mode=linksédo=rss")
+        'www.example.org'
+        >>> feed_key("https://www.example.org/links/rss.php?mode=linksédo=rss")
         'www.example.org/links'
-        >>> feed_key("https://www.example.org/shaarli/?do=rss")
-        'www.example.org/shaarli'
-        >>> feed_key("https://www.example.org//shaarli/feed/rss?do=rss")
-        'www.example.org/shaarli'
-        >>> feed_key("https://www.example.org/shaarli/feed/rss")
-        'www.example.org/shaarli'
-        >>> feed_key("https://www.example.org/pro/liens/feed/rss?do=rss")
-        'www.example.org/pro/liens'
-        >>> feed_key("https://www.example.org/rss.php?do=rss&mode=links")
-        'www.example.org'
-        >>> feed_key("https://www.example.org/feed/atom?")
-        'www.example.org'
+        >>> feed_key("https://example.org/carnet.atom")
+        'example.org/carnet.atom'
 
     """
     parts = urlparse(url)
-    path = parts.path.replace("//", "/")
-
-    if len(path) > 1:
-        path = path.removesuffix("/rss.php").removesuffix("/rss").removesuffix("/atom").removesuffix("/feed")
-
+    # BlogoText / oText support
+    path = parts.path.removesuffix("/rss.php")
     return f"{parts.hostname}{path.removesuffix('/')}"
 
 

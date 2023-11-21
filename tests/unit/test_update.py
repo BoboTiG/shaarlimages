@@ -16,17 +16,11 @@ def test_sync_feeds(tmp_path: Path) -> None:
     file = tmp_path / DATA.name / SHAARLIS.name
     assert not file.is_file()
 
-    body = [
-        "https://example.shaarli.net/links/?do=rss",
-        "https://example.shaarli.net/links?do=rss",
-        "",
-    ]
+    body = ["https://example.shaarli.net/links?do=rss"]
     resp = responses.add(method="GET", url=FEEDS_URL, json=body)
 
     feeds = helpers.sync_feeds()
     assert body[0] in feeds
-    assert body[1] not in feeds
-    assert body[2] not in feeds
     assert len(feeds) == 1
     assert resp.call_count == 1
     assert file.is_file()

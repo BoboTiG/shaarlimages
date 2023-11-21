@@ -81,21 +81,12 @@ def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
         if data["updated"] - stored_data["updated"] < constants.FEEDS_TTL:
             return stored_data["feeds"]
 
-    # Remove duplicates
-    uniq_feeds = []
-    known_feeds = set()
-    for url in functions.fetch_json(constants.FEEDS_URL, verify=True):
-        key = functions.feed_key(url)
-        if url and key not in known_feeds:
-            known_feeds.add(key)
-            uniq_feeds.append(url)
-    uniq_feeds = sorted(uniq_feeds)
-
-    if data["feeds"] != uniq_feeds:
-        data["feeds"] = uniq_feeds
+    fetched_feeds = functions.fetch_json(constants.FEEDS_URL, verify=True)
+    if data["feeds"] != fetched_feeds:
+        data["feeds"] = fetched_feeds
         functions.persist(file, data)
 
-    return uniq_feeds
+    return fetched_feeds
 
 
 def sync_them_all(force: bool = False) -> None:
