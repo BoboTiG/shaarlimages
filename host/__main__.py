@@ -17,6 +17,13 @@ def create_parser() -> ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="action")
 
+    # download
+    parser_dl = subparsers.add_parser(
+        "download", help="download an image found elsewhere than at its original location"
+    )
+    parser_dl.add_argument("url_original", metavar="URL_ORIGINAL", help="original URL of the image")
+    parser_dl.add_argument("url_download", metavar="URL_DOWNLOAD", help="download URL of the image")
+
     # fix
     subparsers.add_parser("fix", help="several fix actions on images")
 
@@ -39,6 +46,8 @@ def main(cli_args: list[str]) -> int:
     args = create_parser().parse_args(cli_args)
 
     match args.action:
+        case "download":
+            cli.download(args.url_original, args.url_download)
         case "fix":
             cli.fix_images_medatadata()
         case "purge":

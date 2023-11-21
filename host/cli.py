@@ -9,6 +9,21 @@ import functions
 MD5_EMPTY = "d835884373f4d6c8f24742ceabe74946"
 
 
+def download(url_original: str, url_download: str) -> None:
+    cache_key = functions.small_hash(url_original)
+    ext = functions.fetch_image_type(url_download)
+    output_file = constants.IMAGES / f"{cache_key}{ext}"
+
+    if output_file.is_file():
+        return
+
+    image = functions.fetch_image(url_download)
+    output_file.write_bytes(image)
+
+    functions.create_thumbnail(output_file)
+    print(f"+ {cache_key}{ext}", flush=True)
+
+
 def fix_images_medatadata() -> None:
     at_least_one_change = False
 
