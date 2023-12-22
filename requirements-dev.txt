@@ -7,7 +7,7 @@ feedparser==6.0.11
 flake8-pyproject
 freezegun==1.4.0
 isort==5.13.2
-mypy==1.7.1
+mypy==1.8.0
 opencv-contrib-python-headless==4.8.1.78
 paste==3.7.1
 pytest==7.4.3
