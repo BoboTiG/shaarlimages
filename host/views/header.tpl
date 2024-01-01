@@ -20,7 +20,7 @@
 <body>
 
 <!--
-    (2013-2014, 2023)
+    (2013-2014, 2023-2024)
     Ouh ! Un hackeur est parmi nous ? Ou peut-être une hackeuse ?
     Bref, cette galerie d’images fort sympathique peut-être téléchargée et bidouillée :
         https://github.com/BoboTiG/shaarlimages

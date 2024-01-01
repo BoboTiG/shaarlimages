@@ -16,7 +16,7 @@ from bottle import HTTPResponse, default_app, redirect, request, route, static_f
 __version__ = version.__version__
 __author__ = "Mickaël 'Tiger-222' Schoentgen"
 __copyright__ = """
-Copyright (c) 2013-2014,2023 Mickaël 'Tiger-222' Schoentgen
+Copyright (c) 2013-2014,2023-2024 Mickaël 'Tiger-222' Schoentgen
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee or royalty is hereby
