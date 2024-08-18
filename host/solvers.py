@@ -14,7 +14,7 @@ import functions
 IMGUR_SUFFIX = tuple(f"_d{ext}" for ext in constants.IMAGE_EXT)
 
 
-def cheeseburger(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
+def cheeseburger(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from Cheeseburger.
 
     >>> cheeseburger("https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/", None, feed_key="012345")
@@ -24,7 +24,7 @@ def cheeseburger(url: str, date: struct_time, feed_key: str = "") -> str:  # noq
     return url
 
 
-def developpez(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
+def developpez(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from Developpez.net.
 
     >>> developpez("https://www.developpez.net/forums/attachments/p627433d1/a/a/a", None)
@@ -38,7 +38,7 @@ def developpez(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa:
     return url if functions.is_image_link(url) or "/forums/attachments/" in url else ""
 
 
-def imgur(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
+def imgur(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from Imgut.
 
     >>> imgur("https://i.imgur.com/qypAs0A_d.gif", None, feed_key="012345")
@@ -69,6 +69,7 @@ def imgur(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG0
 def nasa_apod(
     url: str,
     date: struct_time,
+    *,
     pattern: re.Pattern = re.compile(rb'<a href="(image/[^"]+)"'),
     feed_key: str = "",
 ) -> str:
@@ -110,7 +111,7 @@ def nasa_apod(
     return urlunparse(parts)
 
 
-def nasa_jpl(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
+def nasa_jpl(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from NASA's Jet Propulsion Laboratory (JPL).
 
     >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg", None)
@@ -131,6 +132,7 @@ def nasa_jpl(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: A
 def quora(
     url: str,
     date: struct_time,  # noqa: ARG001
+    *,
     pattern: re.Pattern = re.compile(rb"<meta property='og:image' content='([^']+)'"),
     feed_key: str = "",
 ) -> str:
@@ -148,7 +150,7 @@ def quora(
     return "" if (image := pattern.search(response.content)) is None else image[1].decode()
 
 
-def twitter_img(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
+def twitter_img(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from Twitter.
 
     >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg", None)
@@ -183,6 +185,7 @@ def twitter_img(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa
 def webb_telescope(
     url: str,
     date: struct_time,  # noqa: ARG001
+    *,
     pattern: re.Pattern = re.compile(rb'<meta property="og:image" content="([^"]+)"'),
     feed_key: str = "",
 ) -> str:
@@ -196,7 +199,7 @@ def webb_telescope(
     return url
 
 
-def wikimedia(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
+def wikimedia(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from Wikimedia.
 
     >>> wikimedia("http://upload.wikimedia.org/wikipedia/en/a/a8/New_British_Coinage_2008.jpg", None)
@@ -225,6 +228,7 @@ def wikimedia(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: 
 def zbrush_central(
     url: str,
     date: struct_time,  # noqa: ARG001
+    *,
     pattern: re.Pattern = re.compile(rb'<meta property="og:image" content="([^"]+)"'),
     feed_key: str = "",
 ) -> str:
@@ -246,7 +250,7 @@ SOLVERS: dict[str, Callable] = {
 }
 
 
-def guess_url(url: str, date: struct_time, feed_key: str = "") -> str:
+def guess_url(url: str, date: struct_time, *, feed_key: str = "") -> str:
     """Resolve a specific URL.
 
     Return an empty string if the URL was not resolved to an image.
