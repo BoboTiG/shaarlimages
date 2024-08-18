@@ -14,11 +14,6 @@ from host import functions, solvers
     "solver, url, checksum",
     [
         (
-            "cg_society",
-            "https://cgsociety.org/c/editors-pick/omq4/wile-e-coyote",
-            "fc30fac6cc68df13544d22ca278c83da",
-        ),
-        (
             "cheeseburger",
             "https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/",
             "b303c658fe124f27a60c161ea021e1fc",

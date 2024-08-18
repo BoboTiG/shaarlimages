@@ -14,29 +14,6 @@ import functions
 IMGUR_SUFFIX = tuple(f"_d{ext}" for ext in constants.IMAGE_EXT)
 
 
-def cg_society(
-    url: str,
-    date: struct_time,  # noqa: ARG001
-    pattern: re.Pattern = re.compile(rb"<meta content='([^']+)' property='og:image'"),
-    feed_key: str = "",
-) -> str:
-    """Resolve the original image URL from CG Society.
-
-    >>> cg_society(
-    ...     "https://cg0.cgsociety.org/uploads/images/original/oscarfb-1-a6c5cb99-9ndp.png", None, feed_key="012345"
-    ... )
-    'https://cg0.cgsociety.org/uploads/images/original/oscarfb-1-a6c5cb99-9ndp.png'
-
-    """
-    if functions.is_image_link(url):
-        return url
-
-    response = functions.fetch(url, verify=True, feed_key=feed_key)
-    return (
-        "" if (image := pattern.search(response.content)) is None else image[1].decode().replace("/medium/", "/large/")
-    )
-
-
 def cheeseburger(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from Cheeseburger.
 
@@ -304,8 +281,5 @@ def guess_url(url: str, date: struct_time, feed_key: str = "") -> str:
 
     if hostname.endswith((".quora.com", ".quoracdn.net")):
         return quora(url, date, feed_key=feed_key)
-
-    if hostname.endswith("cgsociety.org"):
-        return cg_society(url, date, feed_key=feed_key)
 
     return url if functions.is_image_link(url) else ""

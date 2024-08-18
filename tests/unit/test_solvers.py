@@ -15,23 +15,6 @@ FEED_KEY = "012345"
 
 
 @responses.activate
-def test_cg_society() -> None:
-    url = "https://oscarfb.cgsociety.org/9ndp/aspidochelone"
-    body = """
-<meta content='https://cg3.cgsociety.org/uploads/images/medium/oscarfb-aspidochelone-1-a6c5cb99-9ndp.jpg' name='twitter:image'>
-<meta content='The myth of the living island' name='twitter:description'>
-<meta content='OscarFB — Aspidochelone' property='og:title'>
-<meta content='https://cg3.cgsociety.org/uploads/images/medium/oscarfb-aspidochelone-1-a6c5cb99-9ndp.jpg' property='og:image'>
-<meta content='1366' property='og:image:width'>
-	"""  # noqa: W503
-
-    responses.add(method="GET", url=url, body=body)
-
-    expected = "https://cg3.cgsociety.org/uploads/images/large/oscarfb-aspidochelone-1-a6c5cb99-9ndp.jpg"
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == expected
-
-
-@responses.activate
 @pytest.mark.parametrize(
     "url, expected",
     [
