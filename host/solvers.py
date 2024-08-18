@@ -66,16 +66,6 @@ def imgur(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG0
     return "" if response.url.endswith("/removed.png") else url
 
 
-def lutim(url: str, date: struct_time, feed_key: str = "") -> str:  # noqa: ARG001
-    """Resolve the original image URL from Lutim.
-
-    >>> lutim("https://lut.im/0p6CmKuV/YyBE3qfb", None, feed_key="012345")
-    'https://lut.im/0p6CmKuV/YyBE3qfb'
-
-    """
-    return url
-
-
 def nasa_apod(
     url: str,
     date: struct_time,
@@ -248,7 +238,6 @@ SOLVERS: dict[str, Callable] = {
     "apod.nasa.gov": nasa_apod,
     "i.chzbgr.com": cheeseburger,
     "i.imgur.com": imgur,
-    "lut.im": lutim,
     "pbs.twimg.com": twitter_img,
     "photojournal.jpl.nasa.gov": nasa_jpl,
     "webbtelescope.org": webb_telescope,

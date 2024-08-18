@@ -34,11 +34,6 @@ from host import functions, solvers
             "bca5dcf37292b684035984ff69f5ecb8",
         ),
         (
-            "lutim",
-            "https://lut.im/0p6CmKuV/YyBE3qfb",
-            "becb6c495c6927446158b822deca3f0e",
-        ),
-        (
             "nasa_apod",
             "https://apod.nasa.gov/apod/ap110904.html",
             "fff00e95a3b1ce41c8860287c82a0410",
