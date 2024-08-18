@@ -23,7 +23,7 @@ def test_cg_society() -> None:
 <meta content='OscarFB — Aspidochelone' property='og:title'>
 <meta content='https://cg3.cgsociety.org/uploads/images/medium/oscarfb-aspidochelone-1-a6c5cb99-9ndp.jpg' property='og:image'>
 <meta content='1366' property='og:image:width'>
-	"""  # noqa[W503]
+	"""  # noqa: W503
 
     responses.add(method="GET", url=url, body=body)
 
@@ -122,7 +122,7 @@ featured, along with a brief explanation written by a professional astronomer.
 
 @responses.activate
 def test_quora() -> None:
-    url = "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3"  # noqa[W503]
+    url = "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3"  # noqa: W503
     body = """
 <title>(15) André Abrahão&#039;s answer to What is the history of Japanese jacket wrestlers (judoka) beating up founding family members of Brazilian Jiu-Jitsu (the Gracie family)? - Quora</title>
 <link rel='icon' href='https://qsf.cf2.quoracdn.net/-4-images.favicon-new.ico-26-07ecf7cd341b6919.ico' />
@@ -149,7 +149,7 @@ BJJ is a direct “son” of the original Judo.
 And Judo is a “son” of the original Japanese JuJutsu, an old martial art used by the samurais in real wars, that was banned with the end of the Feudal ...' />
 <meta name='twitter:image' content='https://qph.cf2.quoracdn.net/main-qimg-c419a1e03b967d4c9f61286a32f34613' />
 <link rel='canonical' href='https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family' />
-"""  # noqa[W503]
+"""  # noqa: W503
 
     responses.add(method="GET", url=url, body=body)
     expected = "https://qph.cf2.quoracdn.net/main-qimg-c419a1e03b967d4c9f61286a32f34613"
@@ -158,12 +158,12 @@ And Judo is a “son” of the original Japanese JuJutsu, an old martial art use
 
 @responses.activate
 def test_webb_telescope() -> None:
-    url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa[W503]
+    url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa: W503
     body = """
     <meta property="og:url" content="https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M">
     <meta property="og:image" content="//stsci-opo.org/STScI-01GD3HTYP68G8VQFJPNZ0RVBT9.png">
     <meta property="og:image:type" content="image/png">
-    """  # noqa[W503]
+    """  # noqa: W503
 
     responses.add(method="GET", url=url, body=body)
     expected = "https://stsci-opo.org/STScI-01GD3HTYP68G8VQFJPNZ0RVBT9.png"
@@ -172,11 +172,11 @@ def test_webb_telescope() -> None:
 
 @responses.activate
 def test_webb_telescope_nothing_found() -> None:
-    url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa[W503]
+    url = "https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M?page=2&filterUUID=91dfa083-c258-4f9f-bef1-8f40c26f4c97"  # noqa: W503
     body = """
     <meta property="og:url" content="https://webbtelescope.org/contents/media/images/2022/041/01GA77HHT9R4WR4XT89704VT4M">
     <meta property="og:image:type" content="image/png">
-	"""  # noqa[W503]
+	"""  # noqa: W503
 
     responses.add(method="GET", url=url, body=body)
     assert solvers.guess_url(url, None, feed_key=FEED_KEY) == ""
@@ -250,9 +250,9 @@ def test_zbrushcentral() -> None:
 <meta property="og:image" content="http://www.zbrushcentral.com/uploads/default/optimized/4X/1/a/b/1abfaaf8e1c27403c147abe77407231d79a9172c_2_1024x683.jpeg" />
 <meta property="og:url" content="http://www.zbrushcentral.com/t/tdk-batman/453080" />
 <meta name="twitter:url" content="http://www.zbrushcentral.com/t/tdk-batman/453080" />
-	"""  # noqa[W503]
+	"""  # noqa: W503
 
     responses.add(method="GET", url=url, body=body)
 
-    expected = "http://www.zbrushcentral.com/uploads/default/optimized/4X/1/a/b/1abfaaf8e1c27403c147abe77407231d79a9172c_2_1024x683.jpeg"  # noqa[W503]
+    expected = "http://www.zbrushcentral.com/uploads/default/optimized/4X/1/a/b/1abfaaf8e1c27403c147abe77407231d79a9172c_2_1024x683.jpeg"  # noqa: W503
     assert solvers.guess_url(url, None, feed_key=FEED_KEY) == expected

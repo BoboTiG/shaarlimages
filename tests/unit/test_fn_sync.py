@@ -307,7 +307,7 @@ def test_try_wayback_machine_head_is_lost() -> None:
     assert not waybackdata.is_lost
     assert not waybackdata.snapshot
 
-    with pytest.raises(functions.Evanesco) as exc:
+    with pytest.raises(functions.EvanescoError) as exc:
         functions.try_wayback_machine(FEED_URL, "head")
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."
@@ -329,7 +329,7 @@ def test_try_wayback_machine_get_is_lost() -> None:
     assert not waybackdata.is_lost
     assert not waybackdata.snapshot
 
-    with pytest.raises(functions.Evanesco) as exc:
+    with pytest.raises(functions.EvanescoError) as exc:
         functions.fetch(FEED_URL)
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."
@@ -350,7 +350,7 @@ def test_try_wayback_machine_resource_is_lost() -> None:
     assert waybackdata.is_lost
     assert not waybackdata.snapshot
 
-    with pytest.raises(functions.Evanesco) as exc:
+    with pytest.raises(functions.EvanescoError) as exc:
         functions.try_wayback_machine(FEED_URL, "get")
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."

@@ -1,6 +1,6 @@
-"""
-This is part of Shaarlimages.
-Source: https://github.com/BoboTiG/shaarlimages
+"""This is part of Shaarlimages.
+
+Source: https://github.com/BoboTiG/shaarlimages.
 """
 
 import hashlib
@@ -23,7 +23,7 @@ import constants
 import custom_types
 import cv2
 import feedparser
-import numpy
+import numpy as np
 import requests
 import solvers
 import urllib3
@@ -40,13 +40,15 @@ SESSION.mount("http://", ADAPTER)
 SESSION.mount("https://", ADAPTER)
 
 
-class Evanesco(Exception):
-    def __str__(self) -> str:
+class EvanescoError(Exception):
+    """Exception raised when an image no more exist on the internet."""
+
+    def __str__(self) -> str:  # noqa: D105
         return "Cannot found the resource on internet anymore."
 
 
 def any_css_class_question() -> str:
-    """Should we add a custom CSS class to the zoom'ed image?"""
+    """Return an eventual custom CSS class to add to the zoom'ed image."""
     right_now = today()
 
     if (right_now.day, right_now.month) == (28, 6):
@@ -63,7 +65,6 @@ def checksum(file: Path, algo: str = "md5") -> str:
 
 def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
     """RSS feed creator."""
-
     title = config.SITE.title
     if "/search/" in rss_link:
         title += f" 🔎 {rss_link.split('/')[-1]}"
@@ -93,8 +94,7 @@ def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
 
 
 def create_thumbnail(file: Path) -> Path | None:
-    """
-    Generate the image thumbnail.
+    """Generate the image thumbnail.
 
     Inspiration: https://stackoverflow.com/a/44724368/1117028
     """
@@ -153,37 +153,37 @@ def debug(*msg: str) -> None:
 
 
 def docolav(file: Path) -> str:
-    """
-    Determine the DOminant COlor AVerage of the given image.
+    """Determine the DOminant COlor AVerage of the given image.
+
     Return the RGB hex code.
 
-    https://stackoverflow.com/a/43112217/1117028
+    Source: https://stackoverflow.com/a/43112217/1117028
     """
     im = cv2.imread(str(file))
-    avg_color_per_row = numpy.average(im, axis=0)
-    avg_color = numpy.average(avg_color_per_row, axis=0)
+    avg_color_per_row = np.average(im, axis=0)
+    avg_color = np.average(avg_color_per_row, axis=0)
     return "".join(f"{int(n):02X}" for n in avg_color[::-1])
 
 
 def feed_key(url: str) -> str:
-    """
-    Craft the feed URL key for the local storage.
-    Note: The URL is already sanitized here: https://github.com/BoboTiG/shaarlis/blob/main/sync.py#L31
+    """Craft the feed URL key for the local storage.
 
-        >>> feed_key("http://www.example.org/?do=rss")
-        'www.example.org'
-        >>> feed_key("https://www.example.org/?do=rss")
-        'www.example.org'
-        >>> feed_key("https://shaarli.example.org/?do=rss")
-        'shaarli.example.org'
-        >>> feed_key("https://www.example.org/shaarli?do=rss")
-        'www.example.org/shaarli'
-        >>> feed_key("https://www.example.org/rss.php?mode=linksédo=rss")
-        'www.example.org'
-        >>> feed_key("https://www.example.org/links/rss.php?mode=linksédo=rss")
-        'www.example.org/links'
-        >>> feed_key("https://example.org/carnet.atom")
-        'example.org/carnet.atom'
+    Note: The URL is already sanitized here: https://github.com/BoboTiG/shaarlis/blob/main/sync.py#L31.
+
+    >>> feed_key("http://www.example.org/?do=rss")
+    'www.example.org'
+    >>> feed_key("https://www.example.org/?do=rss")
+    'www.example.org'
+    >>> feed_key("https://shaarli.example.org/?do=rss")
+    'shaarli.example.org'
+    >>> feed_key("https://www.example.org/shaarli?do=rss")
+    'www.example.org/shaarli'
+    >>> feed_key("https://www.example.org/rss.php?mode=linksédo=rss")
+    'www.example.org'
+    >>> feed_key("https://www.example.org/links/rss.php?mode=linksédo=rss")
+    'www.example.org/links'
+    >>> feed_key("https://example.org/carnet.atom")
+    'example.org/carnet.atom'
 
     """
     parts = urlparse(url)
@@ -194,6 +194,7 @@ def feed_key(url: str) -> str:
 
 def fetch(
     url: str,
+    *,
     method: str = "get",
     verify: bool = False,
     from_the_past: bool = True,
@@ -203,21 +204,22 @@ def fetch(
     with SESSION.request(method=method, url=url, headers=constants.HTTP_HEADERS, timeout=120.0, verify=verify) as req:
         try:
             req.raise_for_status()
-            return req
         except requests.exceptions.HTTPError:
             if not from_the_past:
                 raise
+        else:
+            return req
 
     return try_wayback_machine(url, method, feed_key=feed_key)
 
 
-def fetch_json(url: str, verify: bool = False, feed_key: str = "") -> dict[str, Any]:
+def fetch_json(url: str, *, verify: bool = False, feed_key: str = "") -> dict[str, Any]:
     """Fetch a JSON file."""
     debug(">>> 📑", url, f"{feed_key=}")
     return fetch(url, verify=verify, feed_key=feed_key).json()
 
 
-def fetch_image(url: str, verify: bool = False, feed_key: str = "") -> bytes | None:
+def fetch_image(url: str, *, verify: bool = False, feed_key: str = "") -> bytes | None:
     """Fetch an image."""
     try:
         req = fetch(url, verify=verify, feed_key=feed_key)
@@ -237,17 +239,16 @@ def find_image(key: str) -> custom_types.Metadata:
 
 
 def fix_url(url: str) -> str:
-    """
-    Fix common URL issues.
+    """Fix common URL issues.
 
-        >>> fix_url("https://example.org/")
-        'https://example.org/'
-        >>> fix_url("https://example.org?do=rss")
-        'https://example.org?do=rss'
-        >>> fix_url("https://example.org/?do=rss")
-        'https://example.org/?do=rss'
-        >>> fix_url("https://example.org//shaarli/feed/rss?do=rss")
-        'https://example.org/shaarli/feed/rss?do=rss'
+    >>> fix_url("https://example.org/")
+    'https://example.org/'
+    >>> fix_url("https://example.org?do=rss")
+    'https://example.org?do=rss'
+    >>> fix_url("https://example.org/?do=rss")
+    'https://example.org/?do=rss'
+    >>> fix_url("https://example.org//shaarli/feed/rss?do=rss")
+    'https://example.org/shaarli/feed/rss?do=rss'
 
     """
     parts = urlparse(url)
@@ -273,7 +274,7 @@ def fetch_image_type(url: str, feed_key: str = "") -> str:
     return constants.IMAGES_CONTENT_TYPE.get(content_type, "")
 
 
-def fetch_rss_feed(url: str, feed_key: str = "") -> feedparser.FeedParserDict:
+def fetch_rss_feed(url: str, feed_key: str = "") -> feedparser.FeedParserDict:  # noqa: ARG001
     """Fetch a XML RSS feed."""
     debug(">>> 📜", url)
     """Make a HTTP call."""
@@ -281,21 +282,20 @@ def fetch_rss_feed(url: str, feed_key: str = "") -> feedparser.FeedParserDict:
 
 
 def get_a_slice(data: list, page: int, count: int) -> list:
-    """
-    Get a slice of a list.
+    """Get a slice of a list.
 
-        >>> get_a_slice(list(range(10)), 1, 1)
-        [0]
-        >>> get_a_slice(list(range(10)), 1, 5)
-        [0, 1, 2, 3, 4]
-        >>> get_a_slice(list(range(10)), 2, 5)
-        [5, 6, 7, 8, 9]
-        >>> get_a_slice(list(range(10)), 3, 5)
-        []
-        >>> get_a_slice(list(range(10)), 1, -1)
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        >>> get_a_slice(list(range(10)), 2, -1)
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    >>> get_a_slice(list(range(10)), 1, 1)
+    [0]
+    >>> get_a_slice(list(range(10)), 1, 5)
+    [0, 1, 2, 3, 4]
+    >>> get_a_slice(list(range(10)), 2, 5)
+    [5, 6, 7, 8, 9]
+    >>> get_a_slice(list(range(10)), 3, 5)
+    []
+    >>> get_a_slice(list(range(10)), 1, -1)
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    >>> get_a_slice(list(range(10)), 2, -1)
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     """
     return data if count == -1 else data[(page - 1) * count : page * count]
 
@@ -315,6 +315,7 @@ def get_last(page: int, count: int) -> tuple[int, custom_types.Metadatas]:
 
 
 def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
+    """Retrieve an given image metadata, including previous & next images."""
     all_cache = retrieve_all_uniq_metadata()
     for idx, metadata in enumerate(all_cache):
         if metadata.file == image:
@@ -327,7 +328,7 @@ def get_metadata(image: str) -> tuple[str, custom_types.Metadata, str] | None:
 
 def get_random_image() -> custom_types.Metadata:
     """Get a random image."""
-    return choice(retrieve_all_uniq_metadata())
+    return choice(retrieve_all_uniq_metadata())  # noqa: S311
 
 
 def get_size(file: Path) -> custom_types.Size:
@@ -403,66 +404,65 @@ def invalidate_caches() -> None:
 
 
 def is_image_data(raw: bytes) -> bool:
-    r"""
-    Check whenever the provided `raw` data seems like a supported image format.
+    r"""Check whenever the provided `raw` data seems like a supported image format.
 
-        >>> is_image_data(b"\xff\xd8\xff\xe0\x00\x10JFIF\x00")  # JPG with exif data
-        True
-        >>> is_image_data(b"\xff\xd8\xff\xe14\xbbExif\x00")  # JPG
-        True
-        >>> is_image_data(b"\x89PNG\r\n\x1a")  # PNG
-        True
-        >>> is_image_data(b"RIFFRh\x00\x00WE")  # WEBP
-        True
-        >>> is_image_data(b"\00")
-        False
+    >>> is_image_data(b"\xff\xd8\xff\xe0\x00\x10JFIF\x00")  # JPG with exif data
+    True
+    >>> is_image_data(b"\xff\xd8\xff\xe14\xbbExif\x00")  # JPG
+    True
+    >>> is_image_data(b"\x89PNG\r\n\x1a")  # PNG
+    True
+    >>> is_image_data(b"RIFFRh\x00\x00WE")  # WEBP
+    True
+    >>> is_image_data(b"\00")
+    False
 
     """
     return raw.startswith(tuple(constants.IMAGES_MAGIC_SIG.values()))
 
 
 def is_image_link(url: str) -> bool:
-    """
-    Check whenever the given `url` points to a supported image format.
+    """Check whenever the given `url` points to a supported image format.
+
     It will also prevent downloading again images from Shaarlimages.
 
-        >>> is_image_link("ok.JPG")
-        True
-        >>> is_image_link("ok.jpeg")
-        True
-        >>> is_image_link("ok.jpg")
-        True
-        >>> is_image_link("ok.jfif")
-        True
-        >>> is_image_link("ok.pjp")
-        True
-        >>> is_image_link("ok.pjpeg")
-        True
-        >>> is_image_link("ok.png")
-        True
-        >>> is_image_link("ok.webp")
-        True
+    >>> is_image_link("ok.JPG")
+    True
+    >>> is_image_link("ok.jpeg")
+    True
+    >>> is_image_link("ok.jpg")
+    True
+    >>> is_image_link("ok.jfif")
+    True
+    >>> is_image_link("ok.pjp")
+    True
+    >>> is_image_link("ok.pjpeg")
+    True
+    >>> is_image_link("ok.png")
+    True
+    >>> is_image_link("ok.webp")
+    True
 
-        >>> is_image_link("unwanted.apng")
-        False
-        >>> is_image_link("unwanted.gif")
-        False
-        >>> is_image_link("unwanted.gifv")
-        False
-        >>> is_image_link("unwanted.svg")
-        False
-        >>> is_image_link("unwanted.tif")
-        False
+    >>> is_image_link("unwanted.apng")
+    False
+    >>> is_image_link("unwanted.gif")
+    False
+    >>> is_image_link("unwanted.gifv")
+    False
+    >>> is_image_link("unwanted.svg")
+    False
+    >>> is_image_link("unwanted.tif")
+    False
 
-        >>> is_image_link("")
-        False
-        >>> is_image_link("bad.html")
-        False
+    >>> is_image_link("")
+    False
+    >>> is_image_link("bad.html")
+    False
 
-        >>> is_image_link(f"https://{config.SITE.host}/image/ok.jpg")
-        False
-        >>> is_image_link(f"{config.SITE.url}/image/ok.png")
-        False
+    >>> is_image_link(f"https://{config.SITE.host}/image/ok.jpg")
+    False
+    >>> is_image_link(f"{config.SITE.url}/image/ok.png")
+    False
 
     """
     if not url:
@@ -472,18 +472,17 @@ def is_image_link(url: str) -> bool:
 
 
 def is_nsfw(item: feedparser.FeedParserDict) -> bool:
-    """
-    Return True when the given `item` seems Not Safe For Work.
+    """Return True when the given `item` seems Not Safe For Work.
 
-        >>> is_nsfw({"tags": ["nsfw"]})
-        True
-        >>> is_nsfw({"tags": ["porn"]})
-        True
-        >>> is_nsfw({"tags": ["sexy"]})
-        True
+    >>> is_nsfw({"tags": ["nsfw"]})
+    True
+    >>> is_nsfw({"tags": ["porn"]})
+    True
+    >>> is_nsfw({"tags": ["sexy"]})
+    True
 
-        >>> is_nsfw({"tags": ["fun"]})
-        False
+    >>> is_nsfw({"tags": ["fun"]})
+    False
 
     """
     return any(tag in constants.NSFW_TAGS for tag in item.get("tags", []))
@@ -506,14 +505,13 @@ def load_wayback_back_data(url: str) -> custom_types.Waybackdata:
 
 
 def lookup(term: str) -> custom_types.Metadatas:
-    """
-    Search for images.
+    """Search for images.
 
-        >>> lookup("ab")
-        []
+    >>> lookup("ab")
+    []
 
     """
-    if len(term) < 3:
+    if len(term) < 3:  # noqa: PLR2004
         return []
 
     term = term.lower()
@@ -538,10 +536,12 @@ def lookup_tag(tag: str) -> custom_types.Metadatas:
 
 
 def now() -> float:
+    """Return the current UTC timestamp."""
     return today().timestamp()
 
 
 def persist(file: Path, data: dict[str, Any]) -> None:
+    """Save data into a JSON file."""
     file.parent.mkdir(exist_ok=True, parents=True)
     with file.open(mode="w") as fh:
         json.dump(data, fh, sort_keys=True, indent=0)
@@ -550,15 +550,17 @@ def persist(file: Path, data: dict[str, Any]) -> None:
 
 
 def php_crc32(value: str) -> str:
-    """
-    References:
-    - https://www.php.net/manual/en/function.hash-file.php#104836
-    - https://stackoverflow.com/a/50843127/636849
+    """PHP's `hash('crc32' $text, true)` equivalent function in Python.
 
-        >>> php_crc32("20111006_131924")
-        'c991f6df'
-        >>> php_crc32("liens.mohja.fr")
-        '0c05b1a5'
+    >>> php_crc32("20111006_131924")
+    'c991f6df'
+    >>> php_crc32("liens.mohja.fr")
+    '0c05b1a5'
+
+    References
+    ----------
+        - https://www.php.net/manual/en/function.hash-file.php#104836
+        - https://stackoverflow.com/a/50843127/636849
 
     """
     crc = 0xFFFFFFFF
@@ -576,6 +578,7 @@ def php_crc32(value: str) -> str:
 
 
 def read(file: Path) -> dict[str, Any]:
+    """Get contents of the JSON file."""
     return json.loads(file.read_text() or "{}") if file.is_file() else {}
 
 
@@ -608,11 +611,10 @@ def retrieve_all_uniq_metadata() -> custom_types.Metadatas:
 
 
 def safe_tag(tag: str, cleanup: re.Pattern = re.compile(r"--+")) -> str:
-    """
-    Sanitize a tag.
+    """Sanitize a tag.
 
-        >>> safe_tag("B/W_&_colors?!§")
-        'b-w-colors'
+    >>> safe_tag("B/W_&_colors?!§")
+    'b-w-colors'
 
     """
     return cleanup.sub(
@@ -633,9 +635,9 @@ def set_wayback_back_data(url: str, waybackdata: custom_types.Waybackdata) -> No
 
 
 def small_hash(value: str) -> str:
-    """
-    Returns the small hash of a string, using RFC 4648 base64url format
-    http://sebsauvage.net/wiki/doku.php?id=php:shaarli
+    """Return the small hash of a string, using RFC 4648 base64url format.
+
+    http://sebsauvage.net/wiki/doku.php?id=php:shaarli.
 
     Small hashes:
     - are unique (well, as unique as crc32, at last)
@@ -650,7 +652,7 @@ def small_hash(value: str) -> str:
     return b64encode(bytes.fromhex(php_crc32(value)), altchars=b"-_").rstrip(b"=").decode()
 
 
-def store_in_cache(cache_key: str, response: str, info: bool = True) -> None:
+def store_in_cache(cache_key: str, response: str, *, info: bool = True) -> None:
     """Store a HTTP response into a compressed cache file."""
     if info:
         response += f"\n<!-- Cached: {today()} -->\n"
@@ -661,15 +663,16 @@ def store_in_cache(cache_key: str, response: str, info: bool = True) -> None:
 
 
 def today() -> datetime:
+    """Return the current UTC date."""
     return datetime.now(tz=timezone.utc)
 
 
-def try_wayback_machine(url: str, method: str, force: bool = False, feed_key: str = "") -> requests.Response:
+def try_wayback_machine(url: str, method: str, *, force: bool = False, feed_key: str = "") -> requests.Response:
     """Try to fetch a given `url` using the great Wayback Machine."""
     waybackdata = load_wayback_back_data("unknown" if force else url)
 
     if waybackdata.is_lost:
-        raise Evanesco()
+        raise EvanescoError
 
     if method == "head" and waybackdata.content_type:
         response = requests.Response()
@@ -685,7 +688,7 @@ def try_wayback_machine(url: str, method: str, force: bool = False, feed_key: st
                 print(">>> 💀", url, flush=True)
                 waybackdata.is_lost = True
                 set_wayback_back_data(url, waybackdata)
-                raise Evanesco()
+                raise EvanescoError
 
         # Use direct access to the resource
         parts = urlparse(snapshot)
@@ -707,6 +710,6 @@ def try_wayback_machine(url: str, method: str, force: bool = False, feed_key: st
                 print(">>> 💀", url, flush=True)
                 waybackdata.is_lost = True
                 set_wayback_back_data(url, waybackdata)
-                raise Evanesco()
+                raise EvanescoError
 
         return req

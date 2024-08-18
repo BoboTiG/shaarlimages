@@ -70,7 +70,7 @@ from host import functions, solvers
         ),
         (
             "quora",
-            "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3",  # noqa[W503]
+            "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3",  # noqa: W503
             "c419a1e03b967d4c9f61286a32f34613",
         ),
         (
@@ -95,7 +95,7 @@ from host import functions, solvers
         ),
         (
             "wikimedia",
-            "https://commons.wikimedia.org/wiki/Gustave_Dor%C3%A9#/media/File:Chess_Single_Image_Stereogram_by_3Dimka.jpg",  # noqa[W503]
+            "https://commons.wikimedia.org/wiki/Gustave_Dor%C3%A9#/media/File:Chess_Single_Image_Stereogram_by_3Dimka.jpg",  # noqa: W503
             "67c199c4fd2d641e9d608c957193fe07",
         ),
         (

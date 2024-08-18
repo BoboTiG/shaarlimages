@@ -12,8 +12,8 @@ from host import functions
     "url, expected",
     [
         (
-            "https://lh4.googleusercontent.com/-Rw5ELCgTOwc/VLVE6HNxicI/AAAAAAAAGTM/YDtaR8Qc-Ys/w960-h614-no/Patrio%2Bact%2Bfrance.jpg",  # noqa[W503]
-            "https://web.archive.org/web/20160826130632if_/https://lh4.googleusercontent.com/-Rw5ELCgTOwc/VLVE6HNxicI/AAAAAAAAGTM/YDtaR8Qc-Ys/w960-h614-no/Patrio%2Bact%2Bfrance.jpg",  # noqa[W503]
+            "https://lh4.googleusercontent.com/-Rw5ELCgTOwc/VLVE6HNxicI/AAAAAAAAGTM/YDtaR8Qc-Ys/w960-h614-no/Patrio%2Bact%2Bfrance.jpg",  # noqa: W503
+            "https://web.archive.org/web/20160826130632if_/https://lh4.googleusercontent.com/-Rw5ELCgTOwc/VLVE6HNxicI/AAAAAAAAGTM/YDtaR8Qc-Ys/w960-h614-no/Patrio%2Bact%2Bfrance.jpg",  # noqa: W503
         ),
     ],
 )

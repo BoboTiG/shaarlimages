@@ -1,6 +1,6 @@
-"""
-This is part of Shaarlimages.
-Source: https://github.com/BoboTiG/shaarlimages
+"""This is part of Shaarlimages.
+
+Source: https://github.com/BoboTiG/shaarlimages.
 """
 
 import constants
@@ -10,6 +10,7 @@ MD5_EMPTY = "d835884373f4d6c8f24742ceabe74946"
 
 
 def download(url_original: str, url_download: str) -> None:
+    """Download an image."""
     cache_key = functions.small_hash(url_original)
     ext = functions.fetch_image_type(url_download)
     output_file = constants.IMAGES / f"{cache_key}{ext}"
@@ -25,6 +26,7 @@ def download(url_original: str, url_download: str) -> None:
 
 
 def fix_images_medatadata() -> None:
+    """Fix images metadata."""
     at_least_one_change = False
 
     for feed in constants.FEEDS.glob("*.json"):

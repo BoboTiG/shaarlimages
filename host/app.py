@@ -1,10 +1,10 @@
-"""
-This is part of Shaarlimages.
-Source: https://github.com/BoboTiG/shaarlimages
+"""This is part of Shaarlimages.
+
+Source: https://github.com/BoboTiG/shaarlimages.
 """
 
+from collections.abc import Callable
 from functools import wraps
-from typing import Callable
 
 import bottle
 import constants
@@ -14,9 +14,9 @@ import version
 from bottle import HTTPResponse, default_app, redirect, request, route, static_file
 
 __version__ = version.__version__
-__author__ = "Mickaël 'Tiger-222' Schoentgen"
+__author__ = "Mickaël Schoentgen"
 __copyright__ = """
-Copyright (c) 2013-2014,2023-2024 Mickaël 'Tiger-222' Schoentgen
+Copyright (c) 2013-2024 Mickaël Schoentgen
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee or royalty is hereby
@@ -28,7 +28,7 @@ modifications, that you make.
 
 
 def cache(function: Callable) -> Callable:
-    """Decorator used to cache HTTP responses."""
+    """Decorate a HTTP requester function to cache HTTP responses."""
 
     @wraps(function)
     def wrapper(*args: int | str, **kwargs: int | str) -> str:
@@ -77,21 +77,21 @@ def page_zoom(key: str) -> str:
 @route("/rss")
 @cache
 def rss() -> str:
-    """Main RSS feed."""
+    """Render the main RSS feed."""
     return helpers.render_rss(functions.retrieve_all_uniq_metadata())
 
 
 @route("/rss/all")
 @cache
 def rss_all() -> str:
-    """Main RSS feed for all entries (do not abuse)."""
+    """Render the main RSS feed for all entries (do not abuse)."""
     return helpers.render_rss(functions.retrieve_all_uniq_metadata(), count=-1)
 
 
 @route("/rss/<count:int>")
 @cache
 def rss_with_custom_items_count(count: int) -> str:
-    """Main RSS feed with custom items count."""
+    """Render the main RSS feed with custom items count."""
     return helpers.render_rss(functions.retrieve_all_uniq_metadata(), count=count)
 
 

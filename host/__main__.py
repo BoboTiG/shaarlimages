@@ -1,8 +1,8 @@
+"""This is part of Shaarlimages.
+
+Source: https://github.com/BoboTiG/shaarlimages.
 """
-Shaarlimages CLI • https://github.com/BoboTiG/shaarlimages
-This is part of Shaarlimages.
-Source: https://github.com/BoboTiG/shaarlimages
-"""
+
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 
 def create_parser() -> ArgumentParser:
+    """Create the arguments parser."""
     parser = ArgumentParser(
         prog="python -m host",
         description="Shaarlimages CLI • https://github.com/BoboTiG/shaarlimages",
@@ -19,7 +20,8 @@ def create_parser() -> ArgumentParser:
 
     # download
     parser_dl = subparsers.add_parser(
-        "download", help="download an image found elsewhere than at its original location"
+        "download",
+        help="download an image found elsewhere than at its original location",
     )
     parser_dl.add_argument("url_original", metavar="URL_ORIGINAL", help="original URL of the image")
     parser_dl.add_argument("url_download", metavar="URL_DOWNLOAD", help="download URL of the image")
@@ -40,6 +42,7 @@ def create_parser() -> ArgumentParser:
 
 
 def main(cli_args: list[str]) -> int:
+    """Run the entry point."""
     import cli
     import helpers
 

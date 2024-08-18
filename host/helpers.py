@@ -1,6 +1,6 @@
-"""
-This is part of Shaarlimages.
-Source: https://github.com/BoboTiG/shaarlimages
+"""This is part of Shaarlimages.
+
+Source: https://github.com/BoboTiG/shaarlimages.
 """
 
 import math
@@ -23,7 +23,7 @@ from bottle import redirect, request, response, template
 #
 
 
-def sync_feed(url: str, force: bool = False) -> int:
+def sync_feed(url: str, *, force: bool = False) -> int:
     """Sync a shaarli."""
     feed_key = functions.feed_key(url)
     cache_key = functions.small_hash(feed_key)
@@ -55,7 +55,7 @@ def sync_feed(url: str, force: bool = False) -> int:
 
         try:
             new_images += int(functions.handle_item(item, cache, feed_key=cache_key))
-        except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError, functions.Evanesco):
+        except (requests.exceptions.RequestException, urllib3.exceptions.HTTPError, functions.EvanescoError):
             pass
         except Exception as exc:
             print(f"🐛 {get_ident()} {type(exc).__name__} on {item=}", flush=True)
@@ -71,7 +71,7 @@ def sync_feed(url: str, force: bool = False) -> int:
     return new_images
 
 
-def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
+def sync_feeds(*, force: bool = False) -> custom_types.Shaarlis:
     """Retrieve the JSON file containing all shaarlis."""
     data = {"feeds": None, "updated": functions.now()}
     file = constants.SHAARLIS
@@ -89,7 +89,7 @@ def sync_feeds(force: bool = False) -> custom_types.Shaarlis:
     return fetched_feeds
 
 
-def sync_them_all(force: bool = False) -> None:
+def sync_them_all(*, force: bool = False) -> None:
     """Sync all shaarlis."""
     sync_feeds(force=force)
 
@@ -120,7 +120,7 @@ def pagination(images: custom_types.Metadatas, total: int, page: int) -> str:
     return render("page", **locals())
 
 
-def render(tpl: str, **kwargs: Any) -> str:
+def render(tpl: str, **kwargs: Any) -> str:  # noqa: ANN401
     """Render a template with provided keyword arguments."""
     return template(
         tpl,
