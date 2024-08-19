@@ -1,0 +1,98 @@
+{
+"Covdqw": {
+"checksum": "e01f86a96fb89e2ebd99fd7b9a910ce7",
+"date": 1407316218.0,
+"description": "<div class=\"markdown\"><p>savoir rester kiss ^^</p>\n<p>via fiax<br />\n&#8212; <a href=\"https://links.infomee.fr/?z88W8w\">Permalink</a></p></div>",
+"docolav": "E6E5E6",
+"file": "Covdqw.jpg",
+"guid": "https://links.infomee.fr/?z88W8w",
+"height": 964,
+"tags": [
+"kiss"
+],
+"title": "49f448a01794cdd6164159bb1b95d167.jpg (Image JPEG, 499\u00a0\u00d7\u00a0964 pixels) - Redimensionn\u00e9e (88%)",
+"url": "http://media-cache-ak0.pinimg.com/736x/49/f4/48/49f448a01794cdd6164159bb1b95d167.jpg",
+"width": 499
+},
+"Gcralw": {
+"checksum": "86277c4e8f555bccba2edc6d70b8198c",
+"date": 1481107680.0,
+"description": "<div class=\"markdown\"><p>Bient\u00f4t 3 mois que j'ai commenc\u00e9 avec AWS</p>\n<p>En vert ce avec quoi j'ai pu bien jouer<br />\nEn orange survol\u00e9<br />\nEt tout le reste</p>\n<p>Ce qui me plait le plus : tout est automatisable soit avec des appels \u00e0 l'api (SDK dans beaucoup de langage) donc en mode s\u00e9quentiel, soit avec CloudFormation, une sorte de Configuration Management donc en mode declaratif</p>\n<p>rdv dans 3 mois ;)<br />\n&#8212; <a href=\"https://links.infomee.fr/?lOTbFg\">Permalink</a></p></div>",
+"docolav": "F4F8F8",
+"file": "Gcralw.png",
+"guid": "https://links.infomee.fr/?lOTbFg",
+"height": 934,
+"tags": [
+"aws"
+],
+"title": "aws.png",
+"url": "https://infomee.fr/vrac/aws.png",
+"width": 1638
+},
+"MKw8CA": {
+"checksum": "7da91c3cce5830565e13c5373f5b8330",
+"date": 1392898970.0,
+"description": "<div class=\"markdown\"><ul>\n<li><a href=\"http://symfony.com/doc/2.0/contributing/code/patches.html#step-3-submit-your-patch\">http://symfony.com/doc/2.0/contributing/code/patches.html#step-3-submit-your-patch</a></li>\n<li><a href=\"http://labs.excilys.com/2012/02/28/preparez-vous-a-reecrire-lhistoire-avec-git-rebase/\">http://labs.excilys.com/2012/02/28/preparez-vous-a-reecrire-lhistoire-avec-git-rebase/</a><br />\n&#8212; <a href=\"https://links.infomee.fr/?SZFCTg\">Permalink</a></li>\n</ul></div>",
+"docolav": "3D0505",
+"file": "MKw8CA.png",
+"guid": "https://links.infomee.fr/?SZFCTg",
+"height": 519,
+"tags": [
+"git",
+"rebase"
+],
+"title": "Exemple git rebase",
+"url": "http://infomee.fr/vrac/rebase.png",
+"width": 921
+},
+"Nlae2g": {
+"checksum": "7793f6b00bf911394540008aa010e8b2",
+"date": 1454245099.0,
+"description": "<div class=\"markdown\"><p>I'm going to answer this question as wholly and honestly as I possibly can. Nevertheless, I have filled this answer with an occasional shameless plug. You've been warned.</p>\n<p>For starters, I work at www.bazaarvoice.com | Bazaarvoice. We're big fans of cloud. Real big. We're also fans of DevOps. There's a lot of discussion these days about &quot;What is DevOps?&quot; Usually, this term is used to describe Systems Programmers (sometimes called Infrastructure Engineers, Systems Engineers, Operations Engineers or, in the most unfortunate case, Systems Administrators). This is not what DevOps means, but in the context of career development, it carries the connotation of a &quot;modern&quot; Systems Programmer.</p>\n<p>So, you're a developer and you want to get in on the ops action. Boy, are you in for a surprise. This isn't about installing Arch Linux and learning to write Perl. There's a place for that kind of thing (a very small, dark place in a very distant corner of the universe), but let's first consider a few things about what DevOps is and what DevOps is not.</p>\n<p>What a DevOps role is:</p>\n<pre><code>Writing code / software.\nBuilding tools.\nDoing the painful things, as often as you can.\nBeing on the on-call rotation for 2 a.m. production outages.\nInfrastructure design.\n*NIX. Because Windows freaking sucks. (That said, I use OS X and prefer it to any *NIX distribution, but under the hood, it's *NIX, too.)\nScaling stuff. Scale matters.\nMaintenance. Like rebooting that frail vhost with a memory leak that no one's bothered to fix or take ownership of.\nMonitoring. Lots of it.\nVirtualization.\nAgile development methodology.\nSoftware release cycles and management.\nAutomation. Automation. Automation.\nDesigning a branch/release strategy for the provided SCM (git, Mercurial, svn, etc).\nMetrics / reporting. Goes hand-in-hand with monitoring.\nOptimization / tuning.\nLoad / performance testing and benchmarking, including performance testing of highly complex systems.\nCloud. Really, you don't have to have cloud experience, but it can fundamentally change the way you think about complex systems.\nConfiguration management. (You've surely heard of Puppet, Chef, Ansible, etc. Yes?)\nSecurity.\nLoad balancing / proxying. (Of services, systems, components and processes.)\nAuthentication services.\nCommand-line fu (like\n\nawk\n\n.\nPackage management. Freaking package management.\nCI/CIT/CD -- continuous integration, continuous integration testing, and continuous deployment. This is the closest thing to the real meaning of \"DevOps\" that a Systems Programmer will do.\nDatabases. All of them. SQL, NoSQL, whatever.\nSolid systems expertise. We're talking about the networking stack, how hard disks work, how filesystems work, how system memory works, how CPU's work, and how all these things come together. This is the traditional \"operations\" expertise you've heard about.</code></pre>\n<p>What a DevOps role is not:</p>\n<pre><code>Easier than being a software engineer.\nNever writing code. I write tons of code.\nInstalling Linux and never touching your favorite OS again.\nWorking the third shift. (At least, it shouldn't be; if it is, quit your job and come work with me: Keep Austin Bazaar.)\nMore \"fun\" than being a software engineer.\nGreenfield. You'll deal with old stuff in addition to new stuff.</code></pre>\n<p>&#8212; <a href=\"https://links.infomee.fr/?DM5lGw\">Permalink</a></p></div>",
+"docolav": "ABA9AD",
+"file": "Nlae2g.jpg",
+"guid": "https://links.infomee.fr/?DM5lGw",
+"height": 315,
+"tags": [
+"devops"
+],
+"title": "As a software engineer, how do I shift my career to devops? - Quora",
+"url": "https://qph.cf2.quoracdn.net/main-custom-t-7249-600x315-lusxrkycuejsfvmmkfygfxnqzfvkqcvy.jpeg",
+"width": 600
+},
+"WNpUOA": {
+"checksum": "89600f7bd6ea605da75ccd89079b4f14",
+"date": 1392972649.0,
+"description": "<div class=\"markdown\"><p><a href=\"http://www.webpagetest.org/\">http://www.webpagetest.org/</a></p>\n<p>Sympa la d\u00e9coupe : DNS Lookup / Initial Connection (RTT) / SSL nego / TTFB<br />\n&#8212; <a href=\"https://links.infomee.fr/?UR7bMg\">Permalink</a></p></div>",
+"docolav": "ECEDE7",
+"file": "WNpUOA.png",
+"guid": "https://links.infomee.fr/?UR7bMg",
+"height": 609,
+"tags": [
+"analyse",
+"graph",
+"http",
+"https",
+"tools"
+],
+"title": "Analyse du load de page",
+"url": "http://infomee.fr/vrac/waterfall.png",
+"width": 976
+},
+"nSw8qg": {
+"checksum": "f1e09718140d272c71701a019430b646",
+"date": 1412684696.0,
+"description": "<div class=\"markdown\"><p>Un screenshot d'un dashboard qu'il est bien<br />\n&#8212; <a href=\"https://links.infomee.fr/?0ITcMQ\">Permalink</a></p></div>",
+"docolav": "7B7E7F",
+"file": "nSw8qg.png",
+"guid": "https://links.infomee.fr/?0ITcMQ",
+"height": 1080,
+"tags": [
+"grafana",
+"graphite"
+],
+"title": "yeah.png (Image PNG, 3840\u00a0\u00d7\u00a01080 pixels)",
+"url": "https://files.gitter.im/grafana/grafana/trFy/yeah.png",
+"width": 3840
+}
+}

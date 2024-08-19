@@ -1,0 +1,93 @@
+{
+"c9igdw": {
+"checksum": "733b54e22997336c1f2fc551f1203933",
+"date": 1577260911.0,
+"description": "<div class=\"markdown\"><p>Yes, most definitely.</p>\n<p>This is assuming you\u2019re on 10.3.3. If you\u2019re on an older version the steps might be different so just update for now.</p>\n<p>First of all, sideload the h3lix jailbreak by tihmstar onto your iPhone using Cydia Impactor (if you don\u2019t know how to use that google it) and press the big Jailbreak button inside the app.</p>\n<p>Now, there\u2019s two ways you can go from here. If you want an untethered iOS 6 install (your phone boots straight to iOS 6 when you power it on) then you\u2019ll want to downgrade to iOS 8.4.1 and jailbreak it by following these steps. If you don\u2019t want an untether, skip ahead to the part where I talk about Cydia.</p>\n<hr />\n<p>Step 1: On your jailbroken device, go to Cydia &gt; Sources &gt; Add and then add the <a href=\"http://repo.ftios.vn\">http://repo.ftios.vn</a> repository.</p>\n<p>Step 2: Navigate to the newly addded <a href=\"http://ftios.vn\">http://ftios.vn</a> repository and install the \u201cDowngrade iOS 10.x to 8.x\u201d package.</p>\n<p>Step 3: After installation, reboot your device. This might take a while \u2013 sit tight!</p>\n<p>Step 4: Once the restart completes, go to Settings &gt; General &gt; Software Update and install iOS 8.4.1 OTA update.</p>\n<p>Step 5: After installing iOS 8.4.1, go to Settings &gt; General &gt; Reset &gt; Erase all contents and settings.</p>\n<p>Step 6: After erasing all contents and settings, use Cydia Impactor to sideload the Etason 8.4.1 jailbreak by tihmstar. Open Etason on your iPhone and click the jailbreak button. Your phone will now have an untethered jailbreak and you can now continue.</p>\n<hr />\n<p>Once Cydia is installed, open it. Tap sources. Click edit, then add. Type coolbooter.com in the textbox that comes up and click done.</p>\n<p>In the black pop-up, there\u2019ll be a lot of scrolling text and then a button will say Return to Cydia. Click that.</p>\n<p>Click done and then click on the newly added CoolBooter Repo in the list of sources.</p>\n<p>Tap \u2018System\u2019</p>\n<p>Tap CoolBooter</p>\n<p>Tap modify, then install, then install again.</p>\n<p>Wait for it to finish, and click Return to Cydia.</p>\n<p>Go to your home screen and open CoolBooter, then click Install. Choose which iOS version you would like (in this case iOS 6.x.x), choose how much storage you\u2019d like to allocate to iOS 6 and then click I\u2019m ready.</p>\n<p>Choose whether you\u2019d like to jailbreak your iOS 6 install, whether you\u2019d like verbose boot and whether you\u2019d like to use a custom bootlogo, and then let CoolBooter perform its magic.</p>\n<p>If you have iOS 10, restart your phone and open h3lix. Wait for the cooldown and then click Jailbreak. Then, open coolbooter and click boot. You\u2019ll now be on iOS 6. Everytime you have to restart your phone though you will have to jailbreak with h3lix and then boot with coolbooter.</p>\n<p>If you have iOS 8, restart your phone, and don\u2019t open coolbooter yet. Return to Cydia, go back to sources, click coolbooter and this time in the System area you\u2019re going to install the coolbooter untetherer. After that installs, reboot your device and it should boot to iOS 6 directly.</p>\n<p>You should now have iOS 6 on your iPhone 5!</p></div>\n\n<br />&#8212; <a href=\"https:/shaare/trMwvA\" title=\"Permalink\">Permalink</a>",
+"docolav": "979291",
+"file": "c9igdw.jpg",
+"guid": "https:/shaare/trMwvA",
+"height": 315,
+"tags": [
+"iphone"
+],
+"title": "Can you downgrade iPhone 5 to iOS 6? - Quora",
+"url": "https://qph.cf2.quoracdn.net/main-custom-t-831-600x315-xblqsnnczwjxdgxswhnsbqftydslwxdu.jpeg",
+"width": 600
+},
+"nRATqA": {
+"checksum": "81ca1e9a9669aab7932a41fa6e5eea01",
+"date": 1544650626.0,
+"description": "<br />&#8212; <a href=\"https:/shaare/42UkLQ\" title=\"Permalink\">Permalink</a>",
+"docolav": "AD937C",
+"file": "nRATqA.jpg",
+"guid": "https:/shaare/42UkLQ",
+"height": 2305,
+"tags": [
+"gaming"
+],
+"title": "Conan Exile Resources Map",
+"url": "https://i.redd.it/0i5d01yb39kz.jpg",
+"width": 1803
+},
+"nU9Dtw": {
+"checksum": "2b46a0ab650bf0411c1eb199c93b06a2",
+"date": 1664746083.0,
+"description": "<br />&#8212; <a href=\"https:/shaare/ar4gcg\" title=\"Permalink\">Permalink</a>",
+"docolav": "E3E3DF",
+"file": "nU9Dtw.jpg",
+"guid": "https:/shaare/ar4gcg",
+"height": 944,
+"tags": [
+"instapaper"
+],
+"title": "rXKB8wW.jpg (1500\u00d76000)",
+"url": "https://i.imgur.com/rXKB8wW.jpg",
+"width": 1913
+},
+"oAbdOw": {
+"checksum": "2b46a0ab650bf0411c1eb199c93b06a2",
+"date": 1664746083.0,
+"description": "<br />&#8212; <a href=\"https:/shaare/3aPhdg\" title=\"Permalink\">Permalink</a>",
+"docolav": "E3E3DF",
+"file": "oAbdOw.png",
+"guid": "https:/shaare/3aPhdg",
+"height": 944,
+"tags": [
+"instapaper"
+],
+"title": "XkZwMKj.png (1913\u00d7944)",
+"url": "http://i.imgur.com/XkZwMKj.png",
+"width": 1913
+},
+"tGWLaA": {
+"checksum": "cae87e04a88530c1013d9f6accfa11fd",
+"date": 1553784376.0,
+"description": "<div class=\"markdown\"><p>Plug in the USB flash drive and determine the device it's mounted on with the command:</p>\n<p>sudo fdisk -l </p>\n<p>This time around it was /dev/sdc1 for me, so I'll use that as my example.</p>\n<p>Umount the device</p>\n<p>umount /dev/sdc1 </p>\n<p>The next step is to copy the iso. copy to the device not partition (i.e copy to  sdc not sdc1) as shown below :</p>\n<p>sudo dd if=filename.iso of=/dev/sdc bs=4M </p>\n<p>now perform final steps :</p>\n<p>sync</p>\n<p>sudo eject /dev/sdc</p>\n<p>That's all . :)</p></div>\n\n<br />&#8212; <a href=\"https:/shaare/JE5wZw\" title=\"Permalink\">Permalink</a>",
+"docolav": "8F9B7D",
+"file": "tGWLaA.png",
+"guid": "https:/shaare/JE5wZw",
+"height": 720,
+"tags": [
+"linux",
+"tools"
+],
+"title": "Where can I get the Rufus app for Ubuntu? How can I install it? - Quora",
+"url": "https://qsf.cf2.quoracdn.net/-4-images.Illustration_fb_share_default_1280x720.png-26-7b8bc71e8107b6f5.png",
+"width": 1280
+},
+"yvglpw": {
+"checksum": "da45ac97636e1b37485f43e472cd5b5c",
+"date": 1544644795.0,
+"description": "<br />&#8212; <a href=\"https:/shaare/73tV8A\" title=\"Permalink\">Permalink</a>",
+"docolav": "5C491F",
+"file": "yvglpw.png",
+"guid": "https:/shaare/73tV8A",
+"height": 1900,
+"tags": [
+"warframe"
+],
+"title": "Warframe Cetus Resource\u00a0Map",
+"url": "http://i.imgur.com/f6pVmZZ.png",
+"width": 2300
+}
+}

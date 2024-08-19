@@ -1,0 +1,53 @@
+{
+"606bPg": {
+"checksum": "86314a56d6d333f2dcee68e1d19bc4b6",
+"date": 1394609213.0,
+"description": "<div class=\"markdown\"><p>Voici un &quot;effet timo&quot; suite \u00e0 ce lien : <a href=\"http://lehollandaisvolant.net/index.php?mode=links&amp;id=20140310112051\">http://lehollandaisvolant.net/index.php?mode=links&amp;id=20140310112051</a></p>\n<p>Ce n'est pas encore un effet sebsauvage ou bien un effet korben, mais c'est d\u00e9j\u00e0 pas mal !</p>\n<p>Ne reste plus qu'\u00e0 fid\u00e9liser ces nouveaux visiteurs ;)<br />\n&#8212; <a href=\"http://ziirish.info/bm/?i12m4A\" title=\"Permalink\">Permalink</a></p></div>",
+"docolav": "F2F3F3",
+"file": "606bPg.png",
+"guid": "http://ziirish.info/bm/?i12m4A",
+"height": 490,
+"tags": [
+"converse",
+"timo"
+],
+"title": "timo-effect.png (PNG Image, 716\u00a0\u00d7\u00a0132 pixels)",
+"url": "http://ziirish.info/pics/timo-effect.png",
+"width": 700
+},
+"OwFCqQ": {
+"checksum": "26356b400ca9075ac90491edd6623eae",
+"date": 1374738500.0,
+"description": "<div class=\"markdown\"><p>How do the SQL joins work<br />\n&#8212; <a href=\"http://ziirish.info/bm/?b3K60Q\" title=\"Permalink\">Permalink</a></p></div>",
+"docolav": "E3C0C0",
+"file": "OwFCqQ.png",
+"guid": "http://ziirish.info/bm/?b3K60Q",
+"height": 472,
+"tags": [
+"howto",
+"join",
+"pic",
+"sql"
+],
+"title": "SQL Joins schema",
+"url": "http://i.stack.imgur.com/1UKp7.png",
+"width": 600
+},
+"gu3Rlg": {
+"checksum": "e8edd39ee6bf8bf521a7055a200b5b61",
+"date": 1375367441.0,
+"description": "<div class=\"markdown\"><p>VMware... Quelle bande de raclures de pelles \u00e0 merde.</p>\n<p>Dans le cadre d'un projet de P2V, je r\u00e9alise que les machines RHEL6 sont migr\u00e9es sans probl\u00e8mes. Par contre, quand on attaque une CentOS6, le convertor retourne une erreur :</p>\n<p>\u00ab  <em> got kernel major revision as<br />\n--&gt; ERROR: kernel version has to be in format 2.6.</em>, version 2.6.32-279.el6.x86_64 is not supported<br />\n--&gt;  (return code 1) \u00bb</p>\n<p>Ce qui est dr\u00f4le, c'est que la commande &quot;uname -a&quot; sur une RHEL6 ou une CentOS6 retourne exactement la m\u00eame chose. Je me dis donc que l'erreur ne provient probablement pas de l\u00e0.<br />\nJe tente donc une bidouille un peu crade : installer le paquet &quot;redhat-release&quot; provenant d'une RedHat sur la CentOS.</p>\n<p>Et l\u00e0, magie, la conversion se passe sans probl\u00e8me !</p>\n<p>VMware, croyez-moi, JAMAIS je ne vendrai vos merdes \u00e0 mes clients !<br />\n&#8212; <a href=\"http://ziirish.info/bm/?q35_kA\" title=\"Permalink\">Permalink</a></p></div>",
+"docolav": "BEBEBD",
+"file": "gu3Rlg.png",
+"guid": "http://ziirish.info/bm/?q35_kA",
+"height": 1035,
+"tags": [
+"bullshit",
+"converse",
+"vmware"
+],
+"title": "vmware.png (PNG Image, 1594\u00a0\u00d7\u00a01035 pixels)",
+"url": "http://ziirish.info/pics/vmware.png",
+"width": 1594
+}
+}

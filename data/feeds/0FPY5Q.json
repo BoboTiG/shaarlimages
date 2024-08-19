@@ -1,0 +1,48 @@
+{
+"BumfJQ": {
+"checksum": "10f08f949520db6b7c8ee119904405a3",
+"date": 1416828208.0,
+"description": "<div class=\"markdown\"><p>BGInfo est un utilitaire qui affiche les informations syst\u00e8me de votre choix sur le papier-peint du bureau de Windows. Vous pouvez ainsi avoir acc\u00e8s au nom de l'ordinateur sur le r\u00e9seau, l'adresse IP, la version de Windows, l'occupation m\u00e9moire, l'espace disque restant, etc. La couleur de fond, la police et la liste des champs sont enti\u00e8rement param\u00e9trables. L'application effectue une photographie de votre ordinateur selon les champs sp\u00e9cifi\u00e9s, les incruste sur votre fond d'\u00e9cran ou sur la page de d\u00e9marrage de Windows puis se ferme pour ne pas occuper des ressources mat\u00e9rielles inutilement.</p>\n<p><a href=\"http://technet.microsoft.com/en-us/sysinternals/bb897557.aspx\">http://technet.microsoft.com/en-us/sysinternals/bb897557.aspx</a></p></div>\n\n<br />&#8212; <a href=\"https://shaarli.sebw.info/shaare/7t3KAQ\" title=\"Permalink\">Permalink</a>",
+"docolav": "3F917E",
+"file": "BumfJQ.jpg",
+"guid": "https://shaarli.sebw.info/shaare/7t3KAQ",
+"height": 331,
+"tags": [
+"logiciel"
+],
+"title": "BgInfo",
+"url": "http://i.technet.microsoft.com/bb897557.BgInfo(en-us,MSDN.10).jpg",
+"width": 440
+},
+"iBNmyA": {
+"checksum": "a7af773479e6f2ce9ca523e21058ad73",
+"date": 1416764088.0,
+"description": "<div class=\"markdown\"><p>A l\u2019occasion d\u2019une conf\u00e9rence au NoSuchCon, un chercheur en s\u00e9curit\u00e9 a d\u00e9taill\u00e9 une faille de s\u00e9curit\u00e9 permettant de s\u2019introduire \u00e0 distance dans un grand nombre de prises courant porteur en ligne (CPL). Cela rend possible une connexion \u00e0 des r\u00e9seaux priv\u00e9s inconnus</p>\n<p><a href=\"http://www.undernews.fr/reseau-securite/nosuchcon-piratage-du-cpl-possible-et-bien-reel.html\">http://www.undernews.fr/reseau-securite/nosuchcon-piratage-du-cpl-possible-et-bien-reel.html</a></p></div>\n\n<br />&#8212; <a href=\"https://shaarli.sebw.info/shaare/t3wtaA\" title=\"Permalink\">Permalink</a>",
+"docolav": "BEB5A3",
+"file": "iBNmyA.jpg",
+"guid": "https://shaarli.sebw.info/shaare/t3wtaA",
+"height": 338,
+"tags": [
+"breve",
+"securite"
+],
+"title": "NoSuchCon - Piratage du CPL possible et bien r\u00e9el | UnderNews",
+"url": "http://www.undernews.fr/wp-content/uploads/2014/11/CPL-566x338.jpg",
+"width": 566
+},
+"nKX6PQ": {
+"checksum": "e5a72ad3c93b4c2dc662de374015a7ac",
+"date": 1416827738.0,
+"description": "<div class=\"markdown\"><p>Nous allons voir ici, quelques mesures \u00e0 prendre avant le d\u00e9ploiement d\u2019un serveur sur votre r\u00e9seau. Depuis Windows 2012, il est beaucoup plus simple d\u2019effectuer ces t\u00e2ches, en effet, la plupart sont list\u00e9s sur le Gestionnaire de Serveur. Si c\u2019est tout nouveau pour vous, alors voici un aper\u00e7u du Gestionnaire de Serveur :</p>\n<p><a href=\"http://www.tech2tech.fr/preparer-windows-server-2012-avant-linstallation-dun-role/\">http://www.tech2tech.fr/preparer-windows-server-2012-avant-linstallation-dun-role/</a></p></div>\n\n<br />&#8212; <a href=\"https://shaarli.sebw.info/shaare/TkV3tw\" title=\"Permalink\">Permalink</a>",
+"docolav": "092A5E",
+"file": "nKX6PQ.jpg",
+"guid": "https://shaarli.sebw.info/shaare/TkV3tw",
+"height": 330,
+"tags": [
+"serveur-windows"
+],
+"title": "Pr\u00e9parer Windows Server 2012 avant l\u2019installation d\u2019un R\u00f4le | Tech2Tech : La communaut\u00e9 des techniciens informatique",
+"url": "http://www.tech2tech.fr/wp-content/uploads/2014/11/WS2012-preparation.jpg",
+"width": 660
+}
+}
