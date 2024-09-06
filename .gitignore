@@ -1,2 +1,8 @@
+# Folders
+host/
+tests/
+venv/
+
+# Files
 .coverage
 
