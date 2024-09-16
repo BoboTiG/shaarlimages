@@ -6,7 +6,7 @@ warn_unused_configs = true
 
 # Imports management
 ignore_missing_imports = true
-follow_imports = "skip"
+#follow_imports = "skip"
 
 # Ensure full coverage
 disallow_untyped_defs = true

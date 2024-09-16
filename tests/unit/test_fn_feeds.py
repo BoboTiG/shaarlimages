@@ -67,7 +67,9 @@ def test_get_metadata(setup_data: FixtureFunction) -> None:
     idx = randint(1, len(data) - 2)
     image = data[idx]
 
-    prev_img, metadata, next_img = functions.get_metadata(image.file)
+    res = functions.get_metadata(image.file)
+    assert res
+    prev_img, metadata, next_img = res
     assert metadata == image
     assert prev_img == data[idx - 1].file
     assert next_img == data[idx + 1].file
@@ -77,7 +79,9 @@ def test_get_metadata_first(setup_data: FixtureFunction) -> None:
     data = functions.retrieve_all_uniq_metadata()
     image = data[0]
 
-    prev_img, metadata, next_img = functions.get_metadata(image.file)
+    res = functions.get_metadata(image.file)
+    assert res
+    prev_img, metadata, next_img = res
     assert metadata == image
     assert prev_img == ""
     assert next_img == data[1].file
@@ -87,7 +91,9 @@ def test_get_metadata_last(setup_data: FixtureFunction) -> None:
     data = functions.retrieve_all_uniq_metadata()
     image = data[-1]
 
-    prev_img, metadata, next_img = functions.get_metadata(image.file)
+    res = functions.get_metadata(image.file)
+    assert res
+    prev_img, metadata, next_img = res
     assert metadata == image
     assert prev_img == data[-2].file
     assert next_img == ""

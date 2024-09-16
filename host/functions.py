@@ -160,7 +160,7 @@ def docolav(file: Path) -> str:
     Source: https://stackoverflow.com/a/43112217/1117028
     """
     im = cv2.imread(str(file))
-    avg_color_per_row = np.average(im, axis=0)
+    avg_color_per_row = np.average(im, axis=0)  # type: ignore[arg-type]
     avg_color = np.average(avg_color_per_row, axis=0)
     return "".join(f"{int(n):02X}" for n in avg_color[::-1])
 
