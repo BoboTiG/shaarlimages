@@ -32,7 +32,7 @@ FEED_KEY = "012345"
 )
 def test_imgur(url: str, expected: str) -> None:
     responses.add(method="HEAD", url=expected, content_type="image/jpg")
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == expected
+    assert solvers.guess_url(url, DATE, feed_key=FEED_KEY) == expected
 
 
 @responses.activate
@@ -43,7 +43,7 @@ def test_imgur_removed() -> None:
 
     responses.add(method="HEAD", url=url1, status=302, headers={"Location": url2})
     responses.add(method="HEAD", url=url2, content_type="image/png")
-    assert solvers.guess_url(url0, None, feed_key=FEED_KEY) == ""
+    assert solvers.guess_url(url0, DATE, feed_key=FEED_KEY) == ""
 
 
 @responses.activate
@@ -136,7 +136,7 @@ And Judo is a “son” of the original Japanese JuJutsu, an old martial art use
 
     responses.add(method="GET", url=url, body=body)
     expected = "https://qph.cf2.quoracdn.net/main-qimg-c419a1e03b967d4c9f61286a32f34613"
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == expected
+    assert solvers.guess_url(url, DATE, feed_key=FEED_KEY) == expected
 
 
 @responses.activate
@@ -150,7 +150,7 @@ def test_webb_telescope() -> None:
 
     responses.add(method="GET", url=url, body=body)
     expected = "https://stsci-opo.org/STScI-01GD3HTYP68G8VQFJPNZ0RVBT9.png"
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == expected
+    assert solvers.guess_url(url, DATE, feed_key=FEED_KEY) == expected
 
 
 @responses.activate
@@ -162,7 +162,7 @@ def test_webb_telescope_nothing_found() -> None:
 	"""  # noqa: W503
 
     responses.add(method="GET", url=url, body=body)
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == ""
+    assert solvers.guess_url(url, DATE, feed_key=FEED_KEY) == ""
 
 
 @responses.activate
@@ -208,7 +208,7 @@ def test_wikimedia(url: str) -> None:
     }
 
     responses.add(method="GET", url=url_files, json=body)
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == body["original"]["url"]  # type:ignore[index]
+    assert solvers.guess_url(url, DATE, feed_key=FEED_KEY) == body["original"]["url"]  # type:ignore[index]
 
 
 @responses.activate
@@ -223,7 +223,7 @@ def test_wikimedia_not_found() -> None:
     }
 
     responses.add(method="GET", url=url_files, json=body)
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == ""
+    assert solvers.guess_url(url, DATE, feed_key=FEED_KEY) == ""
 
 
 @responses.activate
@@ -238,4 +238,4 @@ def test_zbrushcentral() -> None:
     responses.add(method="GET", url=url, body=body)
 
     expected = "http://www.zbrushcentral.com/uploads/default/optimized/4X/1/a/b/1abfaaf8e1c27403c147abe77407231d79a9172c_2_1024x683.jpeg"  # noqa: W503
-    assert solvers.guess_url(url, None, feed_key=FEED_KEY) == expected
+    assert solvers.guess_url(url, DATE, feed_key=FEED_KEY) == expected

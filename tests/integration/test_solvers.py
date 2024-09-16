@@ -25,11 +25,6 @@ from host import functions, solvers
         ),
         (
             "imgur",
-            "https://i.imgur.com/y06MsKG.jpg",  # Removed
-            "d41d8cd98f00b204e9800998ecf8427e",
-        ),
-        (
-            "imgur",
             "https://i.imgur.com/qypAs0A_d.jpg",
             "bca5dcf37292b684035984ff69f5ecb8",
         ),
@@ -106,10 +101,11 @@ from host import functions, solvers
     ],
 )
 def test_solver(solver: str, url: str, checksum: str, tmp_path: Path) -> None:
-    img = b""
-    if url_img := getattr(solvers, solver)(url, None):
-        img = functions.fetch_image(url_img, verify=True)
+    url_img = getattr(solvers, solver)(url, None)
+    assert url_img
+    img = functions.fetch_image(url_img, verify=True)
 
+    assert img
     file = tmp_path / "file.ext"
     file.write_bytes(img)
     assert functions.checksum(file) == checksum
