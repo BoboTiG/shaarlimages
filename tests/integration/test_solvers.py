@@ -61,12 +61,12 @@ from host import functions, solvers
         (
             "twitter_img",
             "https://pbs.twimg.com/media/DbeGV44WkAAjNAx.jpg:large",
-            "3477f54ac9564123b66503c364a2d18a",
+            "6ea62f00e181fb28beb54a998dd6817f",
         ),
         (
             "twitter_img",
             "https://pbs.twimg.com/media/DbeGV44WkAAjNAx?format=jpg",
-            "3477f54ac9564123b66503c364a2d18a",
+            "6ea62f00e181fb28beb54a998dd6817f",
         ),
         (
             "webb_telescope",

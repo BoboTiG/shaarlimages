@@ -283,7 +283,7 @@ def guess_url(url: str, date: struct_time, *, feed_key: str = "") -> str:
 def alter_url(url: str) -> str:
     """Sometimes it might be better to alter the image URL.
 
-    >>> alter_url("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg", None)
+    >>> alter_url("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg")
     'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:orig'
 
     """

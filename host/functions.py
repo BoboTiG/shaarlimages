@@ -357,7 +357,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict, feed_key: str = ""
         return False
 
     output_file = constants.IMAGES / f"{cache_key}{ext}"
-    if "pbs.twimg.com" in link or not output_file.is_file():
+    if not output_file.is_file():
         if not (image := fetch_image(link, feed_key=feed_key)):
             return False
 
