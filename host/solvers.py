@@ -165,8 +165,10 @@ def twitter_img(url: str, date: struct_time, *, feed_key: str = "") -> str:  # n
     'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
     >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:something", None)
     'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
-    >>> twitter_img("https://pbs.twimg.com/media/DJrIPolXoAAKn6_?format=jpg", None, feed_key="012345")
-    'https://pbs.twimg.com/media/DJrIPolXoAAKn6_.jpg'
+    >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY?format=jpg", None)
+    'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
+    >>> twitter_img("https://pbs.twimg.com/media/CrlG7oSWYAA9APY?format=jpg&name=4096x4096", None)
+    'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg'
 
     """
     parts = urlparse(url)
@@ -276,3 +278,17 @@ def guess_url(url: str, date: struct_time, *, feed_key: str = "") -> str:
         return quora(url, date, feed_key=feed_key)
 
     return url if functions.is_image_link(url) else ""
+
+
+def alter_url(url: str) -> str:
+    """Sometimes it might be better to alter the image URL.
+
+    >>> alter_url("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg", None)
+    'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:orig'
+
+    """
+    match urlparse(url).hostname:
+        case "pbs.twimg.com":
+            # We want the maximum quality
+            return f"{url}:orig"
+    return url

@@ -222,7 +222,7 @@ def fetch_json(url: str, *, verify: bool = False, feed_key: str = "") -> dict[st
 def fetch_image(url: str, *, verify: bool = False, feed_key: str = "") -> bytes | None:
     """Fetch an image."""
     try:
-        req = fetch(url, verify=verify, feed_key=feed_key)
+        req = fetch(solvers.alter_url(url), verify=verify, feed_key=feed_key)
         image = req.content
         if is_image_data(image):
             print(">>> ✅", url, f"{feed_key=}", flush=True)
@@ -357,7 +357,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict, feed_key: str = ""
         return False
 
     output_file = constants.IMAGES / f"{cache_key}{ext}"
-    if not output_file.is_file():
+    if "pbs.twimg.com" in link or not output_file.is_file():
         if not (image := fetch_image(link, feed_key=feed_key)):
             return False
 
