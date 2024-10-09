@@ -1,6 +1,6 @@
 boddle==0.2.9
 bottle==0.13.1
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
 feedgenerator==2.1.0
 feedparser==6.0.11
 freezegun==1.5.1
