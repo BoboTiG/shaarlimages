@@ -33,7 +33,7 @@ def test_checksum(
 
 @pytest.mark.parametrize("file, file_size, size, thumb_size, color, checksum, mimetype", TEST_IMAGES)
 def test_create_thumbnail(
-    file: Path, file_size: int, size: Size, thumb_size: Size, color: str, checksum: str, mimitype: str, tmp_path: Path
+    file: Path, file_size: int, size: Size, thumb_size: Size, color: str, checksum: str, mimetype: str, tmp_path: Path
 ) -> None:
     dest_file = tmp_path / file.name
     assert not dest_file.is_file()
