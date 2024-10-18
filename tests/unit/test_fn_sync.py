@@ -167,6 +167,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
 
     # Valid images
     for file, *_ in TEST_IMAGES[2:]:
+        print(file.name, guess_type(file)[0])
         responses.add(
             method="HEAD",
             url=f"{FEED_URL}/{file.name}",
