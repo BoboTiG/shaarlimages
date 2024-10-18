@@ -57,7 +57,7 @@ def setup_data(tmp_path: Path) -> None:
     # Create the JSON feed
     feed_key = functions.small_hash(functions.feed_key(FEED_URL))
     data = {}
-    for idx, (file, file_size, size, thumb_size, color, checksum) in enumerate(TEST_IMAGES, 1):
+    for idx, (file, file_size, size, thumb_size, color, checksum, mimetype) in enumerate(TEST_IMAGES, 1):
         url = f"{FEED_URL}/{file.name}"
         cache_key = functions.small_hash(url)
         stored_file = f"{cache_key}{file.suffix}"

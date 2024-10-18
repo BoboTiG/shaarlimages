@@ -3,7 +3,6 @@ This is part of Shaarlimages.
 Source: https://github.com/BoboTiG/shaarlimages
 """
 
-from mimetypes import guess_type
 from pathlib import Path
 
 import pytest
@@ -114,7 +113,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
     responses.add(
         method="HEAD",
         url=f"{FEED_URL}/{TEST_IMAGES[0][0].name}",
-        content_type=guess_type(TEST_IMAGES[0][0].name)[0],
+        content_type=TEST_IMAGES[0][6],
     )
     responses.add(
         method="GET",
@@ -126,7 +125,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
     responses.add(
         method="HEAD",
         url=f"{FEED_URL}/{TEST_IMAGES[1][0].name}",
-        content_type=guess_type(TEST_IMAGES[1][0].name)[0],
+        content_type=TEST_IMAGES[1][6],
     )
     responses.add(
         method="GET",
@@ -166,12 +165,11 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
     )
 
     # Valid images
-    for file, *_ in TEST_IMAGES[2:]:
-        print(file.name, guess_type(file)[0])
+    for file, *_, mimetype in TEST_IMAGES[2:]:
         responses.add(
             method="HEAD",
             url=f"{FEED_URL}/{file.name}",
-            content_type=guess_type(file)[0],
+            content_type=mimetype,
         )
         responses.add(
             method="GET",
