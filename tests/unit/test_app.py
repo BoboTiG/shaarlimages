@@ -268,8 +268,9 @@ def test_static_favicon() -> None:
 
 
 def test_static_image(setup_data: FixtureFunction) -> None:
-    image = choice(functions.retrieve_all_uniq_metadata())
-    assert image
+    # We filter out webp images because they are not properly handled on the CI, see #90
+    while (image := choice(functions.retrieve_all_uniq_metadata())).file.endswith(".webp"):
+        pass
     response = app.static_image(image.file)
     response.body.close()
     assert response.status_code == 200
