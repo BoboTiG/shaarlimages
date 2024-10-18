@@ -178,7 +178,7 @@ def static_favicon() -> HTTPResponse:
 
 
 @route("/image/<image>")
-def static_image(image: str) -> str:
+def static_image(image: str) -> HTTPResponse:
     """Get an image."""
     response = static_file(image, root=constants.IMAGES)
     response.set_header("Cache-Control", "public, max-age=31536000")

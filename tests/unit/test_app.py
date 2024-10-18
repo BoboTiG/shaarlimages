@@ -269,6 +269,7 @@ def test_static_favicon() -> None:
 
 def test_static_image(setup_data: FixtureFunction) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
+    assert image
     response = app.static_image(image.file)
     response.body.close()
     assert response.status_code == 200
