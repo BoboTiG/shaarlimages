@@ -26,14 +26,28 @@ def test_any_css_class_question_gray_pride() -> None:
 
 @pytest.mark.parametrize("file, file_size, size, thumb_size, color, checksum, mimetype", TEST_IMAGES)
 def test_checksum(
-    file: Path, file_size: int, size: Size, thumb_size: Size, color: str, checksum: str, mimetype: str, tmp_path: Path
+    file: Path,
+    file_size: int,
+    size: Size,
+    thumb_size: Size,
+    color: str,
+    checksum: str,
+    mimetype: str,
+    tmp_path: Path,
 ) -> None:
     assert functions.checksum(file) == checksum
 
 
 @pytest.mark.parametrize("file, file_size, size, thumb_size, color, checksum, mimetype", TEST_IMAGES)
 def test_create_thumbnail(
-    file: Path, file_size: int, size: Size, thumb_size: Size, color: str, checksum: str, mimetype: str, tmp_path: Path
+    file: Path,
+    file_size: int,
+    size: Size,
+    thumb_size: Size,
+    color: str,
+    checksum: str,
+    mimetype: str,
+    tmp_path: Path,
 ) -> None:
     dest_file = tmp_path / file.name
     assert not dest_file.is_file()
@@ -58,13 +72,25 @@ def test_create_thumbnail_already_exist(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("file, file_size, size, thumb_size, color, checksum, mimetype", TEST_IMAGES)
 def test_docolav(
-    file: Path, file_size: int, size: Size, thumb_size: Size, color: str, checksum: str, mimitype: str
+    file: Path,
+    file_size: int,
+    size: Size,
+    thumb_size: Size,
+    color: str,
+    checksum: str,
+    mimitype: str,
 ) -> None:
     assert functions.docolav(file) == color
 
 
 @pytest.mark.parametrize("file, file_size, size, thumb_size, color, checksum, mimetype", TEST_IMAGES)
 def test_get_size(
-    file: Path, file_size: int, size: Size, thumb_size: Size, color: str, checksum: str, mimitype: str
+    file: Path,
+    file_size: int,
+    size: Size,
+    thumb_size: Size,
+    color: str,
+    checksum: str,
+    mimitype: str,
 ) -> None:
     assert functions.get_size(file) == size
