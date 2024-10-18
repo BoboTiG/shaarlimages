@@ -78,7 +78,7 @@ def test_docolav(
     thumb_size: Size,
     color: str,
     checksum: str,
-    mimitype: str,
+    mimetype: str,
 ) -> None:
     assert functions.docolav(file) == color
 
@@ -91,6 +91,6 @@ def test_get_size(
     thumb_size: Size,
     color: str,
     checksum: str,
-    mimitype: str,
+    mimetype: str,
 ) -> None:
     assert functions.get_size(file) == size
