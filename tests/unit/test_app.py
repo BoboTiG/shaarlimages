@@ -271,6 +271,7 @@ def test_static_image(setup_data: FixtureFunction) -> None:
     image = choice(functions.retrieve_all_uniq_metadata())
     response = app.static_image(image.file)
     response.body.close()
+    print(response)
     assert response.status_code == 200
     assert response.content_type.startswith("image/")
 
