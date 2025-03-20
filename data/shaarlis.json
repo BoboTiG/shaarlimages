@@ -24,6 +24,7 @@
 "http://dsvprn.eu/shaarli?do=rss",
 "http://dukeart.free.fr/shaarli?do=rss",
 "http://dukeart.netlib.re/shaarli?do=rss",
+"https://echo-off.ddns.net/shaarli?do=rss",
 "http://etnadji.web4me.fr/links?do=rss",
 "http://ex0artefact.eu/ahpuch?do=rss",
 "http://fchaix.eu/shaarli?do=rss",
@@ -220,6 +221,7 @@
 "https://dukeart.netlib.re/?do=rss",
 "https://dukeart.netlib.re/links?do=rss",
 "https://dukeart.netlib.re/shaarli?do=rss",
+"https://dukeart.netlib.re/shaarli_pub?do=rss",
 "https://e-jim.be/liens?do=rss",
 "https://e-loquens.fr/?do=rss",
 "https://egp.dk/shaarli?do=rss",
@@ -645,5 +647,5 @@
 "https://yom.li/notes/rss.php?mode=links&do=rss",
 "https://ziirish.info/bm?do=rss"
 ],
-"updated": 1727164224.397679
+"updated": 1742450450.766881
 }
