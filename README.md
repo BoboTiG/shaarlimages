@@ -1,6 +1,9 @@
 # Shaarlimages
 
-[![Patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://www.patreon.com/mschoentgen)
+> [!TIP]
+> Deviens **mon boss**, ou **ma bosse**, pour m'aider à améliorer Shaarlimages, et le monde par ailleurs :
+> 
+> [![Patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://www.patreon.com/mschoentgen)
 
 Shaarlimages, la galerie des shaarlis !
 
