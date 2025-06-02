@@ -4,7 +4,7 @@ charset-normalizer==3.4.2
 feedgenerator==2.1.0
 feedparser==6.0.11
 freezegun==1.5.2
-mypy==1.15.0
+mypy==1.16.0
 opencv-contrib-python-headless==4.11.0.86
 paste==3.10.1
 pytest==8.3.5
