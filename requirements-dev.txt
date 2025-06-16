@@ -9,7 +9,7 @@ opencv-contrib-python-headless==4.11.0.86
 paste==3.10.1
 pytest==8.4.0
 pytest-cov==6.1.1
-requests==2.32.3
+requests==2.32.4
 responses==0.25.7
 ruff==0.11.13
 types-requests==2.32.0.20250602
