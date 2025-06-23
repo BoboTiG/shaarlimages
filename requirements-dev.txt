@@ -7,7 +7,7 @@ freezegun==1.5.2
 mypy==1.16.1
 opencv-contrib-python-headless==4.11.0.86
 paste==3.10.1
-pytest==8.4.0
+pytest==8.4.1
 pytest-cov==6.2.1
 requests==2.32.4
 responses==0.25.7
