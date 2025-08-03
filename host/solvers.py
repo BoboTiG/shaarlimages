@@ -284,11 +284,11 @@ def alter_url(url: str) -> str:
     """Sometimes it might be better to alter the image URL.
 
     >>> alter_url("https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg")
-    'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg:orig'
+    'https://pbs.twimg.com/media/CrlG7oSWYAA9APY.jpg?name=4096x4096'
 
     """
     match urlparse(url).hostname:
         case "pbs.twimg.com":
             # We want the maximum quality
-            return f"{url}:orig"
+            return f"{url}?name=4096x4096"
     return url

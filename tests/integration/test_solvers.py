@@ -60,13 +60,13 @@ from host import functions, solvers
         ),
         (
             "twitter_img",
-            "https://pbs.twimg.com/media/DbeGV44WkAAjNAx.jpg:large",
-            "6ea62f00e181fb28beb54a998dd6817f",
+            "https://pbs.twimg.com/media/GxXxAXxbgAAo_7i.jpg:large",
+            "35adadcfbef231d88b6b72ed24af3459",
         ),
         (
             "twitter_img",
-            "https://pbs.twimg.com/media/DbeGV44WkAAjNAx?format=jpg",
-            "6ea62f00e181fb28beb54a998dd6817f",
+            "https://pbs.twimg.com/media/GxXxAXxbgAAo_7i?format=jpg",
+            "35adadcfbef231d88b6b72ed24af3459",
         ),
         (
             "webb_telescope",
