@@ -9,6 +9,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import cli
+import helpers
+
 
 def create_parser() -> ArgumentParser:
     """Create the arguments parser."""
@@ -43,9 +46,6 @@ def create_parser() -> ArgumentParser:
 
 def main(cli_args: list[str]) -> int:
     """Run the entry point."""
-    import cli
-    import helpers
-
     args = create_parser().parse_args(cli_args)
 
     match args.action:

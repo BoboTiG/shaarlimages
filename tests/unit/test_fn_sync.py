@@ -200,7 +200,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
     assert data.date > 0.0
     assert data.description.startswith("Some description with the 'robe' keyword.")
     assert data.docolav == image[4]
-    assert data.file == f'{functions.small_hash(f"{FEED_URL}/{image[0].name}")}{image[0].suffix}'
+    assert data.file == f"{functions.small_hash(f'{FEED_URL}/{image[0].name}')}{image[0].suffix}"
     assert data.height == image[2].height
     assert data.tags == ["image", "nsfw", "sample", "test"]
     assert data.title == f"Image - {image[0].name}"

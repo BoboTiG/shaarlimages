@@ -103,7 +103,9 @@ def create_thumbnail(file: Path) -> Path | None:
     if thumbnail.is_file():
         return thumbnail
 
-    im = cv2.imread(str(file))
+    if (im := cv2.imread(str(file))) is None:
+        msg = f"Cannot create thumbnail for {file}"
+        raise ValueError(msg)
 
     height, width = im.shape[:2]
     if (height, width) <= (constants.THUMBNAIL_MAX_SIZE.height, constants.THUMBNAIL_MAX_SIZE.width):
@@ -116,11 +118,11 @@ def create_thumbnail(file: Path) -> Path | None:
     if aspect > 1:
         # Horizontal image
         new_w = constants.THUMBNAIL_MAX_SIZE.width
-        new_h = int(round(new_w / aspect))
+        new_h = round(new_w / aspect)
     elif aspect < 1:
         # Vertical image
         new_h = constants.THUMBNAIL_MAX_SIZE.height
-        new_w = int(round(new_h * aspect))
+        new_w = round(new_h * aspect)
     else:
         # Square image
         new_h, new_w = constants.THUMBNAIL_MAX_SIZE.height, constants.THUMBNAIL_MAX_SIZE.width
@@ -333,7 +335,9 @@ def get_random_image() -> custom_types.Metadata:
 
 def get_size(file: Path) -> custom_types.Size:
     """Retrieve the file width & height."""
-    im = cv2.imread(str(file))
+    if (im := cv2.imread(str(file))) is None:
+        msg = f"Cannot get file size for {file}"
+        raise ValueError(msg)
     return custom_types.Size(width=im.shape[1], height=im.shape[0])
 
 
@@ -369,7 +373,7 @@ def handle_item(item: feedparser.FeedParserDict, cache: dict, feed_key: str = ""
         return False
 
     # Prevent timeshift issues (https://stackoverflow.com/a/14467744/1117028)
-    date = struct_time(list(item.published_parsed)[:8] + [-1])
+    date = struct_time([*list(item.published_parsed)[:8], -1])
 
     size = get_size(output_file)
     item.tags = [safe_tag(tag.term) for tag in getattr(item, "tags", [])]
