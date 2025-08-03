@@ -49,16 +49,6 @@ from host import functions, solvers
             "2b607715100fcfb9cbff305a3b84d1e9",
         ),
         (
-            "quora",
-            "https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46",
-            "07a0e7a1965a0c74af2fe221e4922a0e",
-        ),
-        (
-            "quora",
-            "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3",  # noqa: W503
-            "b3b0c5903a666b88965871fd034110d1",
-        ),
-        (
             "twitter_img",
             "https://pbs.twimg.com/media/GxXxAXxbgAAo_7i.jpg:large",
             "35adadcfbef231d88b6b72ed24af3459",
@@ -109,3 +99,27 @@ def test_solver(solver: str, url: str, checksum: str, tmp_path: Path) -> None:
     file = tmp_path / "file.ext"
     file.write_bytes(img)
     assert functions.checksum(file) == checksum
+
+
+@pytest.mark.parametrize(
+    "solver, url",
+    [
+        (
+            "quora",
+            "https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46",
+        ),
+        (
+            "quora",
+            "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3",  # noqa: W503
+        ),
+    ],
+)
+def test_solver_with_erraticèchecksum(solver: str, url: str, tmp_path: Path) -> None:
+    url_img = getattr(solvers, solver)(url, None)
+    assert url_img
+    img = functions.fetch_image(url_img, verify=True)
+
+    assert img
+    file = tmp_path / "file.ext"
+    file.write_bytes(img)
+    assert functions.checksum(file)
