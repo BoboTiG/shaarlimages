@@ -26,6 +26,8 @@ in supporting documentation or portions thereof, including
 modifications, that you make.
 """
 
+application = default_app()
+
 
 def cache(function: Callable) -> Callable:
     """Decorate a HTTP requester function to cache HTTP responses."""
@@ -43,6 +45,14 @@ def cache(function: Callable) -> Callable:
         return response
 
     return wrapper
+
+
+@application.hook("before_request")
+def add_security_headers() -> None:
+    """Redicrect non-www to www."""
+    netloc = request.urlparts.netloc
+    if not netloc.startswith(("www.", "127.0.0.1")):
+        redirect(request.urlparts._replace(netloc=f"www.{netloc}").geturl(), 301)
 
 
 @route("/")
@@ -197,6 +207,3 @@ def static_thumbnail(image: str) -> HTTPResponse:
     response = static_file(image, root=constants.THUMBNAILS)
     response.set_header("Cache-Control", "public, max-age=31536000")
     return response
-
-
-application = default_app()
