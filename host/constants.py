@@ -44,6 +44,9 @@ NSFW = "nsfw"
 NSFW_TAGS = {NSFW, "porn", "sexy"}
 THUMBNAIL_MAX_SIZE = Size(width=400, height=400)
 HASH_LEN = 6  # `small_hash()` value is always 6 characters long
+WAYBACK_URL_QUERY = (
+    "https://web.archive.org/cdx/search/cdx?matchType=exact&limit=1&fl=timestamp,mimetype&output=json&url="
+)
 
 # Local web server
 HTTP_PORT = 8080

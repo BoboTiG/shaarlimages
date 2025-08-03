@@ -687,21 +687,18 @@ def try_wayback_machine(url: str, method: str, *, force: bool = False, feed_key:
         return response
 
     if not waybackdata.snapshot:
-        url_archive = f"https://archive.org/wayback/available?url={url}"
+        url_archive = f"{constants.WAYBACK_URL_QUERY}{url}"
         with fetch(url_archive, from_the_past=False, feed_key=feed_key) as req:
-            if not (snapshot := req.json()["archived_snapshots"].get("closest", {}).get("url")):
+            data = req.json()
+            if len(data) != 2:  # noqa: PLR2004
                 print(">>> 💀", url, flush=True)
                 waybackdata.is_lost = True
                 set_wayback_back_data(url, waybackdata)
                 raise EvanescoError
 
-        # Use direct access to the resource
-        parts = urlparse(snapshot)
-        path = parts.path
-        parts_path = path.split("/")
-        parts_path[2] += "if_"
-
-        waybackdata.snapshot = urlunparse(parts._replace(path="/".join(parts_path), scheme="https"))
+        timestamp, mimetype = data[1]
+        waybackdata.content_type = mimetype
+        waybackdata.snapshot = f"https://web.archive.org/web/{timestamp}if_/{url}"
         set_wayback_back_data(url, waybackdata)
 
     debug(f">>> ⌛ [{method.upper()}]", url)

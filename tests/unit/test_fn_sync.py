@@ -10,7 +10,7 @@ import responses
 from _pytest.capture import CaptureFixture
 
 from host import custom_types, functions, helpers
-from host.constants import DATA, FEEDS, FEEDS_URL, HASH_LEN, IMAGE_EXT, IMAGES
+from host.constants import DATA, FEEDS, FEEDS_URL, HASH_LEN, IMAGE_EXT, IMAGES, WAYBACK_URL_QUERY
 
 from .constants import (
     FEED_URL,
@@ -217,38 +217,32 @@ def test_sync_feed_error() -> None:
 
 @responses.activate
 def test_try_wayback_machine_get() -> None:
-    url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
-    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
-    data = {
-        "archived_snapshots": {
-            "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
-        }
-    }
-    responses.add(method="GET", url=FEED_URL, status=404)
-    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
+    url = "http://www.example.com/f.png"
+    url_final = f"https://web.archive.org/web/20060101064348if_/{url}"
+    data = [["timestamp", "mimetype"], ["20060101064348", "image/jpeg"]]
+
+    responses.add(method="GET", url=url, status=404)
+    responses.add(method="GET", url=f"{WAYBACK_URL_QUERY}{url}", json=data)
     responses.add(method="GET", url=url_final, body=b"ok")
 
-    response = functions.fetch(FEED_URL)
+    response = functions.fetch(url)
     assert response.url == url_final
     assert response.content == b"ok"
 
 
 @responses.activate
 def test_try_wayback_machine_head() -> None:
-    url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
-    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
-    data = {
-        "archived_snapshots": {
-            "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
-        }
-    }
-    responses.add(method="HEAD", url=FEED_URL, status=404)
-    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
+    url = "http://www.example.com/f.png"
+    url_final = f"https://web.archive.org/web/20060101064348if_/{url}"
+    data = [["timestamp", "mimetype"], ["20060101064348", "image/jpeg"]]
+
+    responses.add(method="HEAD", url=url, status=404)
+    responses.add(method="GET", url=f"{WAYBACK_URL_QUERY}{url}", json=data)
     responses.add(method="HEAD", url=url_final, content_type="image/png")
 
-    assert functions.fetch_image_type(FEED_URL) == ".png"
+    assert functions.fetch_image_type(url) == ".png"
 
-    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    waybackdata = functions.load_wayback_back_data(url)
     assert waybackdata.content_type == "image/png"
     assert not waybackdata.is_lost
     assert waybackdata.snapshot
@@ -289,51 +283,48 @@ def test_try_wayback_machine_cache() -> None:
 
 @responses.activate
 def test_try_wayback_machine_head_is_lost() -> None:
-    url_img = "https://web.archive.org/web/20060101064348/http://www.example.com/f.png"
-    url_final = "https://web.archive.org/web/20060101064348if_/http://www.example.com/f.png"
-    data: dict[str, dict] = {
-        "archived_snapshots": {
-            "closest": {"available": True, "url": url_img, "timestamp": "20060101064348", "status": "200"}
-        }
-    }
+    url = "http://www.example.com/f.png"
+    url_final = f"https://web.archive.org/web/20060101064348if_/{url}"
+    data = [["timestamp", "mimetype"], ["20060101064348", "image/jpeg"]]
 
-    responses.add(method="HEAD", url=FEED_URL, status=404)
-    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
+    responses.add(method="HEAD", url=url, status=404)
+    responses.add(method="GET", url=f"{WAYBACK_URL_QUERY}{url}", json=data)
     responses.add(method="HEAD", url=url_final, content_type=None)
 
-    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    waybackdata = functions.load_wayback_back_data(url)
     assert not waybackdata.content_type
     assert not waybackdata.is_lost
     assert not waybackdata.snapshot
 
     with pytest.raises(functions.EvanescoError) as exc:
-        functions.try_wayback_machine(FEED_URL, "head")
+        functions.try_wayback_machine(url, "head")
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."
 
-    waybackdata = functions.load_wayback_back_data(FEED_URL)
-    assert not waybackdata.content_type
+    waybackdata = functions.load_wayback_back_data(url)
+    assert waybackdata.content_type == "image/jpeg"
     assert waybackdata.is_lost
     assert waybackdata.snapshot
 
 
 @responses.activate
 def test_try_wayback_machine_get_is_lost() -> None:
-    data: dict[str, dict] = {"archived_snapshots": {}}
-    responses.add(method="GET", url=FEED_URL, status=404)
-    responses.add(method="GET", url=f"https://archive.org/wayback/available?url={FEED_URL}", json=data)
+    url = "http://www.example.com/f.png"
 
-    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    responses.add(method="GET", url=url, status=404)
+    responses.add(method="GET", url=f"{WAYBACK_URL_QUERY}{url}", json=[])
+
+    waybackdata = functions.load_wayback_back_data(url)
     assert not waybackdata.content_type
     assert not waybackdata.is_lost
     assert not waybackdata.snapshot
 
     with pytest.raises(functions.EvanescoError) as exc:
-        functions.fetch(FEED_URL)
+        functions.fetch(url)
 
     assert str(exc.value) == "Cannot found the resource on internet anymore."
 
-    waybackdata = functions.load_wayback_back_data(FEED_URL)
+    waybackdata = functions.load_wayback_back_data(url)
     assert not waybackdata.content_type
     assert waybackdata.is_lost
     assert not waybackdata.snapshot
