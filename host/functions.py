@@ -88,6 +88,7 @@ def craft_feed(images: custom_types.Metadatas, rss_link: str) -> str:
             categories=image.tags,
             pubdate=datetime.fromtimestamp(image.date, tz=timezone.utc),
             unique_id=f"{config.SITE.url}/zoom/{image.file}",
+            content=None,
         )
 
     return feed.writeString("utf-8")
