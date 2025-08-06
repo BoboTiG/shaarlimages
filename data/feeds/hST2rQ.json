@@ -1849,5 +1849,23 @@
 "title": "File:Stonehenge (sun).jpg - Wikimedia Commons",
 "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Stonehenge_%28sun%29.jpg",
 "width": 1600
+},
+"yrm-9g": {
+"checksum": "ee155a05cd2901e5c2cfddbe3ebfc9f4",
+"date": 1510572536.0,
+"description": "<div class=\"markdown\"><blockquote>\n<p>All of these terms relate to testing, but at different stages in a chip design and manufacturing flow:<br />\n<strong>Verification</strong> is a process in which a design is tested (or verified) against a given specification before manufacturing. This can be done using several methods like software simulations, static formal analysis and FPGA/hardware emulation.<br />\n<strong>Validation</strong> is a process in which the manufactured design is tested for all functional and electrical correctness in a lab set up. This includes having the real chip assembled on a test board or a reference board, running real software/applications and making sure that all features work well.<br />\n<strong>Testing</strong> (or Manufacture testing) mostly involves running certain reliable test patterns on each chip before volume shipment. Once a product is validated and is ready for shipment in large volumes, test patterns are run to identify any defective products during fabrication as well as for \u201cbinning\u201d parts for different skews.</p>\n</blockquote>\n<hr />\n<blockquote>\n<p>Tous ces termes sont li\u00e9s au test, mais \u00e0 diff\u00e9rents niveaux dans le flot de fabrication :<br />\n<strong>V\u00e9rification</strong> : processus par lequel un composant est test\u00e9 (ou v\u00e9rifi\u00e9) par rapport \u00e0 une sp\u00e9cification donn\u00e9e avant une mise en production. Cela peut \u00eatre effectu\u00e9 en utilisant diff\u00e9rentes m\u00e9thodes tels que la simulation logiciel, l'analyse formelle statique ou l'\u00e9mulation.<br />\n<strong>Validation</strong> : processus par lequel un composant produit est test\u00e9 pour la justesse \u00e9lectrique et fonctionnel dans une environnement d\u00e9di\u00e9. Cela inclue avoir un composant assembl\u00e9 sur un banc de test ou un banc de r\u00e9f\u00e9rence, lancer des logiciels/applications et s'assurer que toutes les fonctionnalit\u00e9s fonctionnent correctement.<br />\n<strong>Test</strong> concerne principalement le lancement de certains sc\u00e9narios de test sur chaque composant avant de lancer un certain volume de production. Une fois qu'un produit est valid\u00e9 et pr\u00eat pour la lancement en large volumes, des sc\u00e9narios de tests sont lanc\u00e9s pour identifier tout produit d\u00e9fectueux durant la fabrication ou aussi bien \u00e9carter tout \u00e9l\u00e9ment non-conforme. </p>\n</blockquote></div>\n\n<br />&#8212; <a href=\"https://orangina-rouge.org/shaarli/shaare/dDhV0w\" title=\"Permalien\">Permalien</a>",
+"docolav": "434661",
+"file": "yrm-9g.jpg",
+"guid": "https://orangina-rouge.org/shaarli/shaare/dDhV0w",
+"height": 315,
+"tags": [
+"logiciel",
+"test",
+"traduction",
+"\u00e9lectronique"
+],
+"title": "What is the difference between testing, validation and ASIC verification? - Quora",
+"url": "https://qph.cf2.quoracdn.net/main-custom-t-980-600x315-sqxxospfciejqkjfytssmfbdcvzbbxla.jpeg",
+"width": 600
 }
 }

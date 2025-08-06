@@ -112,6 +112,22 @@
 "url": "https://i.redd.it/8jodpap5zbf91.png",
 "width": 5120
 },
+"yrm-9g": {
+"checksum": "ee155a05cd2901e5c2cfddbe3ebfc9f4",
+"date": 1528216366.0,
+"description": "<div class=\"markdown\"><p>Faudra aussi voir comment les envoyer vers nagios et greylog. Pour demain, entre deux r\u00e9unions.</p></div>\n\n<br />&#8212; <a href=\"https://shaarli.grimbox.be/shaare/H7NaJA\" title=\"Permalink\">Permalink</a>",
+"docolav": "434661",
+"file": "yrm-9g.jpg",
+"guid": "https://shaarli.grimbox.be/shaare/H7NaJA",
+"height": 315,
+"tags": [
+"logging",
+"python"
+],
+"title": "What is Python Logging And Why Is It Useful? - Quora",
+"url": "https://qph.cf2.quoracdn.net/main-custom-t-980-600x315-sqxxospfciejqkjfytssmfbdcvzbbxla.jpeg",
+"width": 600
+},
 "zz0sJg": {
 "checksum": "ff29fbdc7c7d31143f3cd9435579017f",
 "date": 1742234709.0,
