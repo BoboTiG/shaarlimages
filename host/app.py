@@ -48,7 +48,7 @@ def cache(function: Callable) -> Callable:
 
 
 @application.hook("before_request")
-def add_security_headers() -> None:
+def www_redir() -> None:
     """Redicrect non-www to www."""
     netloc = request.urlparts.netloc
     if not netloc.startswith(("www.", "127.0.0.1")):
