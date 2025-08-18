@@ -10,6 +10,6 @@ paste==3.10.1
 pytest==8.4.1
 pytest-cov==6.2.1
 requests==2.32.4
-responses==0.25.7
+responses==0.25.8
 ruff==0.12.9
 types-requests==2.32.4.20250611
