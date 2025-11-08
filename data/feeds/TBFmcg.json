@@ -375,6 +375,22 @@
 "url": "https://apod.nasa.gov/apod/image/2108/FireRainbow_Harbig_4000.jpg",
 "width": 4000
 },
+"2ABdNw": {
+"checksum": "f2c5d3f7b17abc6d5a9fb414b9f1686e",
+"date": 1755969678.0,
+"description": "<div class=\"markdown\"><p><img alt=\"Asperitas Clouds Over New Zealand\" src=\"https://apod.nasa.gov/apod/image/2508/asperatus_priester_1024.jpg\" /></p></div>\n\n<br />&#8212; <a href=\"https://glacan.fr/shaarli/shaare/pk1E_A\" title=\"Permalien\">Permalien</a>",
+"docolav": "78574F",
+"file": "2ABdNw.jpg",
+"guid": "https://glacan.fr/shaarli/shaare/pk1E_A",
+"height": 767,
+"tags": [
+"m\u00e9t\u00e9o",
+"photo"
+],
+"title": "Astronomy Picture of the Day Discover the cosmos!Each day a different i\u2026  - APOD",
+"url": "https://apod.nasa.gov/apod/image/2508/asperatus_priester_1024.jpg",
+"width": 1024
+},
 "2L6VwA": {
 "checksum": "2e84b24c19b3beb961c829acb1ae0ef2",
 "date": 1575643386.0,
@@ -1008,6 +1024,23 @@
 ],
 "title": "Sea and Sky Glows over the Oregon Coast \u00b7 APOD",
 "url": "https://apod.nasa.gov/apod/image/2209/MilkyWayOregon_Montoya_1500.jpg",
+"width": 1500
+},
+"94feOg": {
+"checksum": "b972c0df28a2862f3455341cf4140dd7",
+"date": 1756048311.0,
+"description": "<div class=\"markdown\"><p><img alt=\"Twelve Years of Kappa Cygnids\" src=\"https://apod.nasa.gov/apod/image/2507/KCG2021_08_11_Pano_Elafonisi_met_fin-CCMZ_1024px.png\" /></p></div>\n\n<br />&#8212; <a href=\"https://glacan.fr/shaarli/shaare/FiikqQ\" title=\"Permalien\">Permalien</a>",
+"docolav": "4B504F",
+"file": "94feOg.png",
+"guid": "https://glacan.fr/shaarli/shaare/FiikqQ",
+"height": 1584,
+"tags": [
+"astronomie",
+"nature",
+"photo"
+],
+"title": "Astronomy Picture of the Day Discover the cosmos!Each day a different i\u2026  - APOD",
+"url": "https://apod.nasa.gov/apod/image/2507/KCG2021_08_11_Pano_Elafonisi_met_fin-CCMZ_1500px.png",
 "width": 1500
 },
 "9GlPrw": {
@@ -3012,6 +3045,23 @@
 "url": "https://apod.nasa.gov/apod/image/2407/IridescentClouds_Strand_1500.jpg",
 "width": 1500
 },
+"QGRTxw": {
+"checksum": "2d62281ef409399ce80df1261bdbdd13",
+"date": 1756024282.0,
+"description": "<div class=\"markdown\"><p><img alt=\"P\u00e8che \u00e0 la Lune\" src=\"https://apod.nasa.gov/apod/image/2508/1000212902_bellelli1024.jpg\" /></p></div>\n\n<br />&#8212; <a href=\"https://glacan.fr/shaarli/shaare/njS_bA\" title=\"Permalien\">Permalien</a>",
+"docolav": "273966",
+"file": "QGRTxw.jpg",
+"guid": "https://glacan.fr/shaarli/shaare/njS_bA",
+"height": 2067,
+"tags": [
+"astronomie",
+"nature",
+"photo"
+],
+"title": "Astronomy Picture of the Day Discover the cosmos!Each day a different i\u2026  - APOD",
+"url": "https://apod.nasa.gov/apod/image/2508/1000212902_bellelli.jpg",
+"width": 3100
+},
 "QSB5sw": {
 "checksum": "e301c5a2e6bf44eb5415eb505df9965b",
 "date": 1725209856.0,
@@ -3690,6 +3740,24 @@
 "url": "https://apod.nasa.gov/apod/image/1901/Beijing_pse-s.jpg",
 "width": 2500
 },
+"X4Eufw": {
+"checksum": "a29f5d50ce3ea6a0ebd521638b38f326",
+"date": 1756026951.0,
+"description": "<div class=\"markdown\"><p><img alt=\"Coronal Loops on the Sun\" src=\"https://apod.nasa.gov/apod/image/2507/SunLoops_Vanoni_960.jpg\" /></p></div>\n\n<br />&#8212; <a href=\"https://glacan.fr/shaarli/shaare/2Eq6bQ\" title=\"Permalien\">Permalien</a>",
+"docolav": "763F1D",
+"file": "X4Eufw.jpg",
+"guid": "https://glacan.fr/shaarli/shaare/2Eq6bQ",
+"height": 1663,
+"tags": [
+"astronomie",
+"espace",
+"photo",
+"soleil"
+],
+"title": "Astronomy Picture of the Day Discover the cosmos!Each day a different i\u2026  - APOD",
+"url": "https://apod.nasa.gov/apod/image/2507/SunLoops_Vanoni_1223.jpg",
+"width": 1223
+},
 "X58rZQ": {
 "checksum": "9cc83999124ca0ae56c387d73c8a9e16",
 "date": 1561524632.0,
@@ -4085,6 +4153,22 @@
 "title": "M42: Inside the Orion Nebula \u00b7 APOD",
 "url": "https://apod.nasa.gov/apod/image/1910/M42Detailed_DrudisGoldman_8150.jpg",
 "width": 8150
+},
+"ayktVg": {
+"checksum": "130c19da1469b0c1677a90cb3b8a721a",
+"date": 1757226403.0,
+"description": "<div class=\"markdown\"><p><img alt=\"Toute l&#039;eau sur la Terre\" src=\"https://apod.nasa.gov/apod/image/2509/WaterlessEarth2_woodshole_960.jpg\" /></p></div>\n\n<br />&#8212; <a href=\"https://glacan.fr/shaarli/shaare/7TGvTg\" title=\"Permalien\">Permalien</a>",
+"docolav": "434435",
+"file": "ayktVg.jpg",
+"guid": "https://glacan.fr/shaarli/shaare/7TGvTg",
+"height": 1219,
+"tags": [
+"eau",
+"monde"
+],
+"title": "Toute l'eau sur la Terre... - APOD",
+"url": "https://apod.nasa.gov/apod/image/2509/WaterlessEarth2_woodshole_960.jpg",
+"width": 960
 },
 "b1atZw": {
 "checksum": "ac32535481a7f5692a13f16026858db0",
@@ -4738,6 +4822,24 @@
 "title": "APOD: 2020 May 31 - Aurora over Sweden",
 "url": "https://apod.nasa.gov/apod/image/2005/AuroraSweden_Strand_1500.jpg",
 "width": 1500
+},
+"ghThvA": {
+"checksum": "0120ec539bc23b162f03857808d68679",
+"date": 1756047672.0,
+"description": "<div class=\"markdown\"><p><img alt=\"Lightning over the Volcano of Water\" src=\"https://apod.nasa.gov/apod/image/2507/LightningVolcano_Montufar_960.jpg\" /></p></div>\n\n<br />&#8212; <a href=\"https://glacan.fr/shaarli/shaare/E12cIA\" title=\"Permalien\">Permalien</a>",
+"docolav": "4B5262",
+"file": "ghThvA.jpg",
+"guid": "https://glacan.fr/shaarli/shaare/E12cIA",
+"height": 2348,
+"tags": [
+"m\u00e9t\u00e9o",
+"orage",
+"photo",
+"volcan"
+],
+"title": "Astronomy Picture of the Day Discover the cosmos!Each day a different i\u2026  - APOD",
+"url": "https://apod.nasa.gov/apod/image/2507/LightningVolcano_Montufar_3000.jpg",
+"width": 3000
 },
 "gnG3gg": {
 "checksum": "2faafc193155c9165002d366ff9e0749",
@@ -5778,6 +5880,22 @@
 "title": "SQL joins explained in an image",
 "url": "http://i.imgur.com/1m55Wqo.jpg",
 "width": 966
+},
+"r7hIew": {
+"checksum": "e89d45adc1335013a6fff39d73e6c3b3",
+"date": 1756634076.0,
+"description": "<div class=\"markdown\"><p><img alt=\"A Two Percent Moon\" src=\"https://apod.nasa.gov/apod/image/2508/IMG_4081_1024.jpeg\" /></p></div>\n\n<br />&#8212; <a href=\"https://glacan.fr/shaarli/shaare/Tt8vAA\" title=\"Permalien\">Permalien</a>",
+"docolav": "AE7C73",
+"file": "r7hIew.jpg",
+"guid": "https://glacan.fr/shaarli/shaare/Tt8vAA",
+"height": 4201,
+"tags": [
+"astronomie",
+"photo"
+],
+"title": "Astronomy Picture of the Day Discover the cosmos!Each day a different i\u2026  - APOD",
+"url": "https://apod.nasa.gov/apod/image/2508/IMG_4081.jpeg",
+"width": 3361
 },
 "rPCuog": {
 "checksum": "859f5fd75f176ab534db7cc81850798d",
