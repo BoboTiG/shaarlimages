@@ -12,4 +12,4 @@ pytest-cov==7.1.0
 requests==2.33.1
 responses==0.26.0
 ruff==0.12.12
-types-requests==2.33.0.20260402
+types-requests==2.33.0.20260408
