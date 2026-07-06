@@ -5,7 +5,7 @@ feedgenerator==2.2.1
 feedparser==6.0.12
 freezegun==1.5.5
 mypy==2.1.0
-opencv-contrib-python-headless==4.12.0.88
+opencv-contrib-python-headless==5.0.0.93
 paste==3.10.1
 pytest==9.1.1
 pytest-cov==7.1.0
