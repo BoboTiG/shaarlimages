@@ -115,18 +115,27 @@ def nasa_jpl(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa
     """Resolve the original image URL from NASA's Jet Propulsion Laboratory (JPL).
 
     >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg", None)
-    'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
+    'https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia25/pia25440/PIA25440.jpg'
     >>> nasa_jpl("https://photojournal.jpl.nasa.gov/jpeg/PIA25440.JPG", None)
-    'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.JPG'
-    >>> nasa_jpl("https://photojournal.jpl.nasa.gov/catalog/PIA25440", None, feed_key="012345")
-    'https://photojournal.jpl.nasa.gov/jpeg/PIA25440.jpg'
+    'https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia25/pia25440/PIA25440.jpg'
+    >>> nasa_jpl("https://photojournal.jpl.nasa.gov/catalog/PIA25440", None)
+    'https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia25/pia25440/PIA25440.jpg'
+    >>> nasa_jpl(
+    ...     "https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia25/pia25440/PIA25440.jpg", None
+    ... )
+    'https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia25/pia25440/PIA25440.jpg'
 
     """
-    if functions.is_image_link(url):
+    old_website = "photojournal.jpl.nasa.gov" in url  # Old version of Photojournal
+    if not old_website and functions.is_image_link(url):
         return url
 
+    base_url = "https://assets.science.nasa.gov/content/dam/science/psd/photojournal"
     catalog = urlparse(url).path.split("/")[-1]
-    return f"https://photojournal.jpl.nasa.gov/jpeg/{catalog}.jpg"
+    if old_website:
+        catalog = catalog.rsplit(".", 1)[0]
+    catalog_lower = catalog.lower()
+    return f"{base_url}/{catalog_lower[:3]}/{catalog_lower[:5]}/{catalog_lower}/{catalog}.jpg"
 
 
 def quora(

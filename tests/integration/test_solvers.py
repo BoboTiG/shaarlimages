@@ -40,6 +40,11 @@ from host import functions, solvers
         ),
         (
             "nasa_jpl",
+            "https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia25/pia25440/PIA25440.jpg",
+            "2b607715100fcfb9cbff305a3b84d1e9",
+        ),
+        (
+            "nasa_jpl",
             "https://photojournal.jpl.nasa.gov/catalog/PIA25440",
             "2b607715100fcfb9cbff305a3b84d1e9",
         ),
