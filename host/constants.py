@@ -31,9 +31,15 @@ HTTP_HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/2
 FEEDS_TTL = 60 * 60 * 6  # 6 hours
 FEEDS_URL = "https://raw.githubusercontent.com/BoboTiG/shaarlis/main/shaarlis.json"
 # https://www.iana.org/assignments/media-types/media-types.xhtml#image
-IMAGE_EXT = (".jfif", ".jpeg", ".jpg", ".pjp", ".pjpeg", ".png", ".webp")
-IMAGES_MAGIC_SIG = {".jpg": b"\xff\xd8\xff", ".png": b"\x89PNG", ".webp": b"RIFF"}
-IMAGES_CONTENT_TYPE = {"image/jpeg": ".jpg", "image/jpg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
+IMAGE_EXT = (".avif", ".jfif", ".jpeg", ".jpg", ".pjp", ".pjpeg", ".png", ".webp")
+IMAGES_MAGIC_SIG = {".avif": b"\x00\x00\x00\x1cftypavif", ".jpg": b"\xff\xd8\xff", ".png": b"\x89PNG", ".webp": b"RIFF"}
+IMAGES_CONTENT_TYPE = {
+    "image/avif": ".avif",
+    "image/jpeg": ".jpg",
+    "image/jpg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+}
 # Unsupported image types
 # image/apng: animation would make the gallery weird, issues with thumbnails & dominant color
 # image/gif: animation would make the gallery weird, issues with thumbnails & dominant color

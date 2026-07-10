@@ -14,6 +14,7 @@ from bottle import HTTPResponse
 
 from host import app, functions
 from host.constants import HASH_LEN
+from .constants import TEST_IMAGES
 
 
 def test_cache_invalidation(setup_data: FixtureFunction) -> None:
@@ -111,8 +112,8 @@ def test_rss(setup_data: FixtureFunction) -> None:
     # Check it loads properly, extended tests can be found in a specific test file
     parsed1 = feedparser.parse(feed1)
     parsed2 = feedparser.parse(feed2)
-    assert len(parsed1.entries) == 4
-    assert len(parsed2.entries) == 4
+    assert len(parsed1.entries) == len(TEST_IMAGES)
+    assert len(parsed2.entries) == len(TEST_IMAGES)
 
     # Ensure the cache is working too
     assert "Cached:" not in feed1
@@ -123,7 +124,7 @@ def test_rss_all(setup_data: FixtureFunction) -> None:
     feed = app.rss_all()
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 4
+    assert len(parsed.entries) == len(TEST_IMAGES)
 
 
 def test_rss_with_custom_items_count(setup_data: FixtureFunction) -> None:
@@ -137,14 +138,14 @@ def test_rss_search_by_term(setup_data: FixtureFunction) -> None:
     feed = app.rss_search_by_term("robe")
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 3
+    assert len(parsed.entries) == len(TEST_IMAGES) - 1
 
 
 def test_rss_search_by_term_all(setup_data: FixtureFunction) -> None:
     feed = app.rss_search_by_term_all("robe")
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 3
+    assert len(parsed.entries) == len(TEST_IMAGES) - 1
 
 
 def test_rss_search_by_term_with_custom_items_count(setup_data: FixtureFunction) -> None:
@@ -158,14 +159,20 @@ def test_rss_search_by_tag(setup_data: FixtureFunction) -> None:
     feed = app.rss_search_by_tag("nsfw")
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 2
+    expected_count = len(TEST_IMAGES) // 2
+    if len(TEST_IMAGES) % 2 == 1:
+        expected_count += 1
+    assert len(parsed.entries) == expected_count
 
 
 def test_rss_search_by_tag_all(setup_data: FixtureFunction) -> None:
     feed = app.rss_search_by_tag_all("nsfw")
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 2
+    expected_count = len(TEST_IMAGES) // 2
+    if len(TEST_IMAGES) % 2 == 1:
+        expected_count += 1
+    assert len(parsed.entries) == expected_count
 
 
 def test_rss_search_by_tag_with_custom_items_count(setup_data: FixtureFunction) -> None:

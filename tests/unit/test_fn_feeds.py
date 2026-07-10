@@ -11,6 +11,7 @@ from _pytest.fixtures import FixtureFunction
 
 from host import config, custom_types, functions
 from host.constants import DATA, FEEDS, HASH_LEN
+from .constants import TEST_IMAGES
 
 
 def check_item(item: custom_types.Metadata) -> None:
@@ -41,13 +42,17 @@ def test_craft_feed(setup_data: FixtureFunction) -> None:
     assert feed.title == config.SITE.title
 
     items = parsed.entries
-    assert len(items) == 4
+    assert len(items) == len(TEST_IMAGES)
 
     item = items[0]
     assert config.SITE.url in item.description
     assert "Simple description with the 'robe' keyword." in item.description
     assert item.link.startswith(f"{config.SITE.url}/zoom/")
-    assert sorted(tag.term for tag in item.tags) == ["clothes", "image", "sample", "test"]
+    assert (
+        sorted(tag.term for tag in item.tags) == ["clothes", "image", "sample", "test"]
+        if len(TEST_IMAGES) % 2 == 0
+        else ["image", "nsfw", "sample", "test"]
+    )
     assert item.title == "Awesome image!"
 
 

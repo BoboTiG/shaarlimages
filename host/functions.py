@@ -411,6 +411,8 @@ def invalidate_caches() -> None:
 def is_image_data(raw: bytes) -> bool:
     r"""Check whenever the provided `raw` data seems like a supported image format.
 
+    >>> is_image_data(b"\x00\x00\x00\x1cftypavif")  # AVIF
+    True
     >>> is_image_data(b"\xff\xd8\xff\xe0\x00\x10JFIF\x00")  # JPG with exif data
     True
     >>> is_image_data(b"\xff\xd8\xff\xe14\xbbExif\x00")  # JPG

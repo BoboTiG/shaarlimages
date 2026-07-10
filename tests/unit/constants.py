@@ -14,6 +14,7 @@ IMAGE_JPG = DATA / "1.jpg"
 IMAGE_PNG = DATA / "2.png"
 IMAGE_SQUARE = DATA / "3.jpg"
 IMAGE_WEBP = DATA / "4.webp"
+IMAGE_AVIF = DATA / "5.avif"
 
 TEST_IMAGES = [
     # (local file, file size, original size, thumbnail size, docolav, checksum, mimetype)
@@ -52,6 +53,15 @@ TEST_IMAGES = [
         "6A7777",
         "95603fa0936de10e5068b1d200680273",
         "image/webp",
+    ),
+    (
+        IMAGE_AVIF,
+        9701,
+        Size(width=1000, height=1058),
+        Size(width=378, height=400),
+        "6A6563",
+        "111eedd68809d0a7be12f7fe2a693ea2",
+        "image/avif",
     ),
 ]
 FEED_URL = "https://shaarli.example.org"

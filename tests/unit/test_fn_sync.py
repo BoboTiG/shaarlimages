@@ -177,7 +177,7 @@ def test_sync_feed(with_timestamps: bool, tmp_path: Path) -> None:
             body=file.read_bytes(),
         )
 
-    assert helpers.sync_feed(FEED_URL) == 3
+    assert helpers.sync_feed(FEED_URL) == len(TEST_IMAGES) - 1
     assert helpers.sync_feed(FEED_URL) == 0
 
     # Force the sync
