@@ -128,10 +128,11 @@ def test_rss_all(setup_data: FixtureFunction) -> None:
 
 
 def test_rss_with_custom_items_count(setup_data: FixtureFunction) -> None:
-    feed = app.rss_with_custom_items_count(2)
+    count = 2
+    feed = app.rss_with_custom_items_count(count)
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 2
+    assert len(parsed.entries) == count
 
 
 def test_rss_search_by_term(setup_data: FixtureFunction) -> None:
@@ -149,10 +150,11 @@ def test_rss_search_by_term_all(setup_data: FixtureFunction) -> None:
 
 
 def test_rss_search_by_term_with_custom_items_count(setup_data: FixtureFunction) -> None:
-    feed = app.rss_search_by_term_with_custom_items_count("robe", 3)
+    count = 3
+    feed = app.rss_search_by_term_with_custom_items_count("robe", count)
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 3
+    assert len(parsed.entries) == count
 
 
 def test_rss_search_by_tag(setup_data: FixtureFunction) -> None:
@@ -176,10 +178,11 @@ def test_rss_search_by_tag_all(setup_data: FixtureFunction) -> None:
 
 
 def test_rss_search_by_tag_with_custom_items_count(setup_data: FixtureFunction) -> None:
-    feed = app.rss_search_by_tag_with_custom_items_count("nsfw", 1)
+    count = 1
+    feed = app.rss_search_by_tag_with_custom_items_count("nsfw", count)
 
     parsed = feedparser.parse(feed)
-    assert len(parsed.entries) == 1
+    assert len(parsed.entries) == count
 
 
 def test_search_first_page_is_redirection() -> None:

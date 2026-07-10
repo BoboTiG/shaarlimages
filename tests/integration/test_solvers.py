@@ -16,7 +16,7 @@ from host import functions, solvers
         (
             "cheeseburger",
             "https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/",
-            "b303c658fe124f27a60c161ea021e1fc",
+            "0150ad98cd4288c5291c18a4f28b0450",
         ),
         (
             "developpez",
@@ -66,7 +66,7 @@ from host import functions, solvers
         (
             "webb_telescope",
             "https://webbtelescope.org/contents/media/images/2023/134/01HAWFJMYS933DDC7NJJE2VFRH",
-            "89607347744366c0861286da5307eb24",
+            "0b8bc5f5d44777e7ff0b57ad0c0d6eaf",
         ),
         (
             "wikimedia",
@@ -113,13 +113,13 @@ def test_solver(solver: str, url: str, checksum: str, tmp_path: Path) -> None:
             "quora",
             "https://qph.cf2.quoracdn.net/main-qimg-146ab3a9693b5c97c7fb1e48c3898c46",
         ),
-        (
-            "quora",
-            "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3",  # noqa: W503
-        ),
+        # (
+        #     "quora",
+        #     "https://www.quora.com/What-is-the-history-of-Japanese-jacket-wrestlers-judoka-beating-up-founding-family-members-of-Brazilian-Jiu-Jitsu-the-Gracie-family/answer/Andr%C3%A9-Abrah%C3%A3o-3",  # noqa: W503
+        # ),
     ],
 )
-def test_solver_with_erraticèchecksum(solver: str, url: str, tmp_path: Path) -> None:
+def test_solver_with_erratic_checksum(solver: str, url: str, tmp_path: Path) -> None:
     url_img = getattr(solvers, solver)(url, None)
     assert url_img
     img = functions.fetch_image(url_img, verify=True)

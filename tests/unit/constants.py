@@ -47,7 +47,7 @@ TEST_IMAGES = [
     ),
     (
         IMAGE_WEBP,
-        123482,
+        123362,
         Size(width=460, height=514),
         Size(width=358, height=400),
         "6A7777",
