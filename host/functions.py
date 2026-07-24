@@ -195,16 +195,21 @@ def feed_key(url: str) -> str:
     return f"{parts.hostname}{path.removesuffix('/')}"
 
 
-def fetch(
+def fetch(  # noqa: PLR0913
     url: str,
     *,
     method: str = "get",
     verify: bool = False,
     from_the_past: bool = True,
     feed_key: str = "",
+    additional_headers: dict[str, str] | None = None,
 ) -> requests.Response:
     """Make a HTTP call."""
-    with SESSION.request(method=method, url=url, headers=constants.HTTP_HEADERS, timeout=120.0, verify=verify) as req:
+    headers = constants.HTTP_HEADERS
+    if additional_headers:
+        headers |= additional_headers
+
+    with SESSION.request(method=method, url=url, headers=headers, timeout=120.0, verify=verify) as req:
         try:
             req.raise_for_status()
         except requests.exceptions.HTTPError:

@@ -14,6 +14,16 @@ from host import functions, solvers
     "solver, url, checksum",
     [
         (
+            "artstation",
+            "https://www.artstation.com/artwork/Xn9yw0",
+            "e4061b561bbfb6039228eae391573de8",
+        ),
+        (
+            "artstation",
+            "https://www.artstation.com/tohad",
+            "e3647ef74cf93983f0f6efc9172b42f9",
+        ),
+        (
             "cheeseburger",
             "https://i.chzbgr.com/maxW500/7579559168/hFBFD2016/",
             "0150ad98cd4288c5291c18a4f28b0450",

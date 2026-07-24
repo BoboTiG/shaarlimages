@@ -14,6 +14,43 @@ import functions
 IMGUR_SUFFIX = tuple(f"_d{ext}" for ext in constants.IMAGE_EXT)
 
 
+def artstation(
+    url: str,
+    date: struct_time,  # noqa: ARG001
+    *,
+    pattern: re.Pattern = re.compile(rb'<meta content="([^"]+)" property="og:image"'),
+    feed_key: str = "",
+) -> str:
+    """Resolve the original image URL from Quora.
+
+    >>> artstation(
+    ...     "https://cdnb.artstation.com/p/assets/images/images/034/624/357/large/sylvain-sarrailh-mariokira2021.jpg",
+    ...     None,
+    ... )
+    'https://cdnb.artstation.com/p/assets/images/images/034/624/357/large/sylvain-sarrailh-mariokira2021.jpg'
+    >>> artstation(
+    ...     "https://cdnb.artstation.com/p/assets/images/images/034/624/357/large/sylvain-sarrailh-mariokira2021.jpg?1612797458",
+    ...     None,
+    ... )
+    'https://cdnb.artstation.com/p/assets/images/images/034/624/357/large/sylvain-sarrailh-mariokira2021.jpg'
+
+    """
+    if ".jpg?" in url:
+        url = url.rsplit("?", 1)[0]
+
+    if functions.is_image_link(url):
+        return url
+
+    headers = {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "fr-FR,fr;q=0.8,en-US;q=0.5,en;q=0.3",
+        "Referrer": "www.artstation.com",
+    }
+    response = functions.fetch(url, verify=True, feed_key=feed_key, from_the_past=False, additional_headers=headers)
+    return image[1].decode().rsplit("?", 1)[0] if (image := pattern.search(response.content)) else ""
+
+
 def cheeseburger(url: str, date: struct_time, *, feed_key: str = "") -> str:  # noqa: ARG001
     """Resolve the original image URL from Cheeseburger.
 
@@ -256,6 +293,7 @@ SOLVERS: dict[str, Callable] = {
     "pbs.twimg.com": twitter_img,
     "photojournal.jpl.nasa.gov": nasa_jpl,
     "webbtelescope.org": webb_telescope,
+    "www.artstation.com": artstation,
     "www.developpez.net": developpez,
     "www.zbrushcentral.com": zbrush_central,
 }
