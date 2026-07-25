@@ -47,7 +47,7 @@ def artstation(
         "Accept-Language": "fr-FR,fr;q=0.8,en-US;q=0.5,en;q=0.3",
         "Referrer": "www.artstation.com",
     }
-    response = functions.fetch(url, verify=True, feed_key=feed_key, from_the_past=False, additional_headers=headers)
+    response = functions.fetch(url, verify=True, feed_key=feed_key, additional_headers=headers)
     return image[1].decode().rsplit("?", 1)[0] if (image := pattern.search(response.content)) else ""
 
 
