@@ -44,5 +44,20 @@
 "title": "Pr\u00e9parer Windows Server 2012 avant l\u2019installation d\u2019un R\u00f4le | Tech2Tech : La communaut\u00e9 des techniciens informatique",
 "url": "http://www.tech2tech.fr/wp-content/uploads/2014/11/WS2012-preparation.jpg",
 "width": 660
+},
+"pfzuvA": {
+"checksum": "b5ceef7bb74c7289795838f11e484915",
+"date": 1417155364.0,
+"description": "<div class=\"markdown\"><p>The latest stable version is 1.0 released in March 2013 (changelog). The full version contains all plugins. The light version only contains the Java upload plugin.</p>\n<p><a href=\"http://www.net2ftp.com/homepage/download.html\">http://www.net2ftp.com/homepage/download.html</a></p></div>\n\n<br />&#8212; <a href=\"https://shaarli.sebw.info/shaare/laTTNQ\" title=\"Permalien\">Permalien</a>",
+"docolav": "C3C3C1",
+"file": "pfzuvA.png",
+"guid": "https://shaarli.sebw.info/shaare/laTTNQ",
+"height": 654,
+"tags": [
+"ftp"
+],
+"title": "net2ftp - a web based FTP client",
+"url": "http://www.net2ftp.com/homepage/screenshots/login_basic_large.png",
+"width": 800
 }
 }
